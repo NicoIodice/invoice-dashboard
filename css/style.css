@@ -1,0 +1,220 @@
+body {
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+main {
+  display: flex;
+  gap: 2rem;
+}
+
+.left {
+  flex: 3;
+}
+
+.right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+#year-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  background: #f9fbff;
+  border: 1.5px solid #2d6cdf;
+  border-radius: 8px;
+  padding: 0.4em 1em;
+  box-shadow: 0 2px 8px rgba(45, 108, 223, 0.07);
+}
+
+#year-toggle label {
+  color: #2d6cdf;
+  font-weight: 500;
+  margin-right: 0.2em;
+}
+
+#yearSelect {
+  border: 1.5px solid #2d6cdf;
+  border-radius: 6px;
+  padding: 0.2em 0.8em;
+  font-size: 1em;
+  background: #fff;
+  color: #2d6cdf;
+  font-weight: 500;
+  outline: none;
+  transition: border 0.2s;
+}
+
+#yearSelect:focus {
+  border-color: #1abc9c;
+}
+
+#refreshBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2em;
+  height: 2.2em;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2d6cdf 60%, #1abc9c 100%);
+  color: #fff;
+  font-size: 1.4em;
+  cursor: pointer;
+  border: none;
+  transition: box-shadow 0.2s, background 0.2s;
+  box-shadow: 0 2px 8px rgba(45, 108, 223, 0.10);
+  outline: none;
+}
+#refreshBtn:focus, #refreshBtn:hover {
+  box-shadow: 0 4px 16px rgba(45, 108, 223, 0.18);
+  background: linear-gradient(135deg, #1abc9c 60%, #2d6cdf 100%);
+}
+
+#refreshBtn::before {
+  content: "🔄";
+  font-size: 1.3em;
+  display: block;
+  line-height: 1;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1.5px solid #2d6cdf;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(45, 108, 223, 0.07);
+}
+
+th, td {
+  padding: 10px;
+  border-bottom: 1px solid #e3eaf7;
+  text-align: center; /* Center align all table cells */
+}
+
+th {
+  background: #e3eaf7;
+  color: #2d6cdf;
+  font-weight: 600;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+.panel {
+  border: 1.5px solid #2d6cdf;
+  border-radius: 10px;
+  background-color: #f9fbff;
+  box-shadow: 0 2px 8px rgba(45, 108, 223, 0.08);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: box-shadow 0.2s;
+}
+
+.panel:hover {
+  box-shadow: 0 4px 16px rgba(45, 108, 223, 0.15);
+}
+
+#quarterSummary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.quarter-item {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  border-bottom: 1px solid #eee;
+  padding: 0.25rem 0;
+}
+
+.quarter-label {
+  flex: 1;
+  color: #2d6cdf;
+  font-weight: 500;
+}
+
+.quarter-value {
+  flex-shrink: 0;
+  color: #222;
+}
+
+.total-value {
+  color: #fff;
+  background: #2d6cdf;
+  padding: 0.2em 0.7em;
+  border-radius: 6px;
+  font-size: 1.15em;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  margin-left: 0.5em;
+}
+
+#fiscalStatus {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* Aligns content to the right */
+  gap: 0.5rem;
+}
+
+.fiscal-item {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  border-bottom: 1px solid #eee;
+  padding: 0.25rem 0;
+}
+
+.fiscal-label {
+  flex: 1;
+}
+
+.fiscal-icon {
+  flex-shrink: 0;
+}
+
+#nifStats {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.nif-item {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  border-bottom: 1px solid #eee;
+  padding: 0.25rem 0;
+  font-size: 1em;
+}
+
+.nif-label {
+  flex: 1;
+  color: #2d6cdf;
+  font-weight: 500;
+}
+
+.nif-count {
+  flex-shrink: 0;
+  color: #222;
+}

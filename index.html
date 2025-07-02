@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard de Faturas</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <header>
+    <h1>📊 Faturas-Recibo Emitidas</h1>
+    <div id="year-toggle">
+        <label for="yearSelect">Ano:</label>
+        <select id="yearSelect"></select>
+        <span id="refreshBtn" title="Atualizar Dados" tabindex="0" role="button"></span>
+    </div>
+  </header>
+
+  <main>
+    <section class="left">
+      <table id="invoiceTable">
+        <thead>
+          <tr>
+            <th>NIF</th>
+            <th>VALOR</th>
+            <th>DATA EMISSÃO</th>
+            <th>DATA SERVIÇO</th>
+            <th>Trimestre</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section class="right">
+      <div class="panel" id="quarterPanel">
+        <h3>Resumo Trimestral</h3>
+        <div id="quarterSummary"></div>
+        <p><strong>Total Anual:</strong> <span id="totalYearValue" class="total-value">0.00 €</span></p>
+      </div>
+
+      <div class="panel" id="taxPanel">
+        <h3>Estado Fiscal</h3>
+        <div class="fiscal-item">
+        <span class="fiscal-label">Pagamento IVA</span>
+        <span class="fiscal-icon green">❌</span>
+        </div>
+        <div class="fiscal-item">
+        <span class="fiscal-label">Retenção na Fonte</span>
+        <span class="fiscal-icon red">❌</span>
+        </div>
+        <div class="fiscal-item">
+        <span class="fiscal-label">Pagamento IRS</span>
+        <span class="fiscal-icon green">❌</span>
+        </div>
+      </div>
+
+      <div class="panel" id="nifStatsPanel">
+        <h3>Faturas por NIF</h3>
+        <ul id="nifStats"></ul>
+        <p><strong>Total de Faturas:</strong> <span id="totalInvoices" class="total-value">0</span></p>
+      </div>
+    </section>
+  </main>
+
+  <script src="./js/script.js"></script>
+</body>
+</html>
