@@ -194,24 +194,65 @@ async function setupYearSelector() {
 
   yearSelect.addEventListener("change", () => {
     currentYear = yearSelect.value;
+    loadDataFromDropbox();
     loadCSV(currentYear);
   });
 }
 
 refreshBtn.addEventListener("click", () => {
-  // 🔄 Future Dropbox fetch goes here
-  // e.g., fetch from Dropbox → save in local `/data` folder
-
+  loadDataFromDropbox();
   loadCSV(currentYear);
 });
+
+async function loadDataFromDropbox() {
+    const DROPBOX_FOLDER_PATH = `${config.dropboxFolder}`;
+  try {
+    const files = await listDropboxFiles(DROPBOX_FOLDER_PATH);
+    console.log("Fetch files:" + files);
+  } catch (e) {
+    alert("❌ Erro ao acessar Dropbox.");
+    return;
+  }
+}
+
+async function loadDropboxToken() {
+  const res = await fetch('config/dropbox.env');
+  const text = await res.text();
+  const match = text.match(/^DROPBOX_ACCESS_TOKEN\s*=\s*(.+)$/m);
+  if (!match) throw new Error("❌ DROPBOX_ACCESS_TOKEN não encontrado em config/.env");
+  return match[1].trim();
+}
 
 async function loadConfig() {
   const res = await fetch('config/config.json');
   config = await res.json();
 }
 
+async function listDropboxFiles(folderPath) {
+  const DROPBOX_ACCESS_TOKEN = await loadDropboxToken();
+
+  const res = await fetch('https://api.dropboxapi.com/2/files/list_folder', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${DROPBOX_ACCESS_TOKEN}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      path: folderPath,
+      recursive: false
+    })
+  });
+  if (!res.ok) throw new Error('❌ Erro ao acessar Dropbox');
+  const data = await res.json();
+  // Returns an array of file names
+  return data.entries
+    .filter(entry => entry['.tag'] === 'file')
+    .map(entry => entry.name);
+}
+
 (async function init() {
   await loadConfig();
+  loadDataFromDropbox();
   setupYearSelector();
   loadCSV(currentYear);
 })();
