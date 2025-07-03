@@ -178,6 +178,56 @@ tr:last-child td {
   margin-left: 0.5em;
 }
 
+.quarter-tooltip {
+  position: relative;
+  cursor: pointer;
+}
+
+.quarter-tooltip-panel {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 120%;
+  z-index: 10;
+  min-width: 180px;
+  background: #fff;
+  color: #222;
+  border: 1px solid #2d6cdf;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(45, 108, 223, 0.13);
+  padding: 0.7em 1em;
+  font-size: 0.98em;
+  white-space: nowrap;
+}
+
+.quarter-tooltip:hover .quarter-tooltip-panel,
+.quarter-tooltip:focus .quarter-tooltip-panel {
+  display: block;
+}
+
+.quarter-tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.1em 0;
+  min-width: 180px;
+}
+
+.quarter-tooltip-label {
+  color: #2d6cdf;
+  font-weight: 500;
+  flex: 1;
+  text-align: left;
+}
+
+.quarter-tooltip-value {
+  color: #222;
+  font-weight: 500;
+  flex-shrink: 0;
+  text-align: right;
+  margin-left: 1.5em;
+}
+
 #fiscalStatus {
   display: flex;
   flex-direction: column;

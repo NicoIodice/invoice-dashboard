@@ -48,17 +48,15 @@ function updateUI(rows) {
   tableBody.innerHTML = "";
   quarterTotals.fill(0);
   Object.keys(nifCounts).forEach(k => delete nifCounts[k]);
-
   totalValue = 0;
 
   // Update invoice data table
   updateInvoicesTable(rows);
 
   // Update panels
-  updateQuarterSummaryPanel(quarterTotals);
+  updateQuarterSummaryPanel(quarterTotals, rows); // Pass rows here!
   updateFiscalStatusPanel(config);
   updateInvoicesByNifPanel(rows, nifCounts);
-
 }
 
 function updateInvoicesTable(rows) {
@@ -89,14 +87,56 @@ function updateInvoicesTable(rows) {
   }
 }
 
-function updateQuarterSummaryPanel(quarterTotals) {
+function updateQuarterSummaryPanel(quarterTotals, rows = []) {
+  // Calculate totals per month for each quarter
+  const monthsByQuarter = [
+    [0, 1, 2],   // Q1: Jan, Feb, Mar
+    [3, 4, 5],   // Q2: Apr, May, Jun
+    [6, 7, 8],   // Q3: Jul, Aug, Sep
+    [9, 10, 11], // Q4: Oct, Nov, Dec
+  ];
+  const monthNames = [
+    "Janeiro", "Fevereiro", "Março",
+    "Abril", "Maio", "Junho",
+    "Julho", "Agosto", "Setembro",
+    "Outubro", "Novembro", "Dezembro"
+  ];
+
+  // Prepare month totals for each quarter
+  const monthTotalsByQuarter = monthsByQuarter.map(months => {
+    const totals = {};
+    months.forEach(m => totals[m] = 0);
+    rows.forEach(row => {
+      const date = new Date(row['DATA SERVICO']);
+      const month = date.getMonth();
+      if (months.includes(month)) {
+        totals[month] += parseFloat(row.VALOR);
+      }
+    });
+    return totals;
+  });
+
   document.getElementById("quarterSummary").innerHTML = quarterTotals
-    .map((val, i) => `
-      <div class="quarter-item">
-        <span class="quarter-label">Trimestre ${i + 1}</span>
-        <span class="quarter-value">${formatCurrency(val)}</span>
-      </div>
-    `)
+    .map((val, i) => {
+      // Tooltip content for this quarter
+      const monthTotals = monthTotalsByQuarter[i];
+      const tooltip = Object.entries(monthTotals)
+        .map(([m, total]) =>
+          `<div class="quarter-tooltip-row">
+            <span class="quarter-tooltip-label">${monthNames[m]}</span>
+            <span class="quarter-tooltip-value">${formatCurrency(total)}</span>
+          </div>`
+        ).join("");
+      return `
+        <div class="quarter-item">
+          <span class="quarter-label quarter-tooltip">
+            Trimestre ${i + 1}
+            <span class="quarter-tooltip-panel">${tooltip}</span>
+          </span>
+          <span class="quarter-value">${formatCurrency(val)}</span>
+        </div>
+      `;
+    })
     .join("");
 
   document.getElementById("totalYearValue").textContent = formatCurrency(totalValue);
@@ -132,7 +172,10 @@ function updateFiscalStatusPanel(config) {
 }
 
 function updateInvoicesByNifPanel(rows, nifCounts) {
-  const nifList = Object.entries(nifCounts)
+  const sortedNifs = Object.entries(nifCounts)
+    .sort((a, b) => b[1] - a[1]); // Sort by count descending
+
+  const nifList = sortedNifs
     .map(([nif, count]) => `
       <li class="nif-item">
         <span class="nif-label">${nif}</span>
