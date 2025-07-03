@@ -8,6 +8,8 @@ let totalValue = 0;
 const quarterTotals = [0, 0, 0, 0];
 const nifCounts = {};
 
+const DROPBOX_CONFIG = 'config/dropbox.env';
+
 async function loadConfig() {
   const res = await fetch('config/config.json');
   Object.assign(config, await res.json());
@@ -24,8 +26,19 @@ function formatCurrency(value) {
   return `${parseFloat(value).toFixed(2)} €`;
 }
 
+function resetDashboard() {
+  tableBody.innerHTML = "";
+  quarterTotals.fill(0);
+  Object.keys(nifCounts).forEach(k => delete nifCounts[k]);
+  totalValue = 0;
+  updateQuarterSummaryPanel(quarterTotals);
+  updateFiscalStatusPanel(config);
+  updateInvoicesByNifPanel([], nifCounts);
+}
+
 function validateRow(row) {
-  const nifValid = /^\d+$/.test(row.NIF);
+  //const nifValid = /^\d+$/.test(row.NIF);
+  const nifValid = row.NIF && row.NIF.trim().length > 0;
   const valueValid = /^\d+(\.\d{1,2})?$/.test(row.VALOR);
   const dateValid = /^\d{4}-\d{2}-\d{2}$/.test(row['DATA SERVICO']);
   return nifValid && valueValid && dateValid;
@@ -50,7 +63,10 @@ function updateUI(rows) {
 
 function updateInvoicesTable(rows) {
   for (const row of rows) {
-    if (!validateRow(row)) continue;
+    if (!validateRow(row)) {
+      console.warn("Linha inválida ignorada:", row);
+      continue;
+    }
 
     const date = new Date(row['DATA SERVICO']);
     const month = date.getMonth();
@@ -131,44 +147,80 @@ function updateInvoicesByNifPanel(rows, nifCounts) {
 
 async function loadCSV(year) {
   try {
-    const filePath = `${config.dataFolder}/${year}.csv`.replace('./', ''); // Normalize path
-    const res = await fetch(filePath);
-    const text = await res.text();
+    let text;
+    if (config.loadFromDropbox) {
+      // Fetch CSV from Dropbox
+      const DROPBOX_ACCESS_TOKEN = await loadDropboxToken();
+      const filePath = `${config.dropboxFolder}/${year}.csv`;
+      const res = await fetch('https://content.dropboxapi.com/2/files/download', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${DROPBOX_ACCESS_TOKEN}`,
+          'Dropbox-API-Arg': JSON.stringify({ path: filePath })
+        }
+      });
+      if (!res.ok) throw new Error(`❌ Erro ao baixar ${year}.csv do Dropbox`);
+      text = await res.text();
+    } else {
+      // Fetch CSV from local
+      const filePath = `${config.dataFolder}/${year}.csv`.replace('./', '');
+      const res = await fetch(filePath);
+      if (!res.ok) throw new Error(`❌ Erro ao carregar CSV local para o ano ${year}.csv`);
+      text = await res.text();
+    }
+
     const lines = text.trim().split("\n").slice(1); // Skip headers
     const rows = lines
-    .map(line => {
+      .map(line => {
         const [NIF, VALOR, EMISSAO, SERVICO] = line.split(",");
         if (
-        typeof NIF === "undefined" ||
-        typeof VALOR === "undefined" ||
-        typeof EMISSAO === "undefined" ||
-        typeof SERVICO === "undefined"
+          typeof NIF === "undefined" ||
+          typeof VALOR === "undefined" ||
+          typeof EMISSAO === "undefined" ||
+          typeof SERVICO === "undefined"
         ) {
-        return null; // skip invalid lines
+          return null; // skip invalid lines
         }
         return {
-        NIF: NIF.trim(),
-        VALOR: VALOR.trim(),
-        'DATA EMISSAO': EMISSAO.trim(),
-        'DATA SERVICO': SERVICO.trim()
+          NIF: NIF.trim(),
+          VALOR: VALOR.trim(),
+          'DATA EMISSAO': EMISSAO.trim(),
+          'DATA SERVICO': SERVICO.trim()
         };
-    })
-    .filter(Boolean); // remove nulls
+      })
+      .filter(Boolean); // remove nulls
     updateUI(rows);
   } catch (err) {
     alert("❌ Erro ao carregar CSV para o ano selecionado.");
+    resetDashboard();
     console.error(err);
   }
 }
 
 async function setupYearSelector() {
-  // Fetch the file list from the data folder
   let files = [];
   try {
-    const res = await fetch('data/index.json');
-    files = await res.json();
+    if (config.loadFromDropbox) {
+      // Fetch index.json from Dropbox
+      const DROPBOX_ACCESS_TOKEN = await loadDropboxToken();
+      const indexPath = `${config.dropboxFolder}/index.json`;
+      const res = await fetch('https://content.dropboxapi.com/2/files/download', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${DROPBOX_ACCESS_TOKEN}`,
+          'Dropbox-API-Arg': JSON.stringify({ path: indexPath })
+        }
+      });
+      if (!res.ok) throw new Error("❌ Erro ao baixar index.json do Dropbox");
+      files = await res.json();
+    } else {
+      // Fetch index.json from local
+      const res = await fetch('data/index.json');
+      files = await res.json();
+    }
   } catch (e) {
     alert("❌ Não foi possível carregar a lista de anos.");
+    resetDashboard();
     return;
   }
 
@@ -194,65 +246,29 @@ async function setupYearSelector() {
 
   yearSelect.addEventListener("change", () => {
     currentYear = yearSelect.value;
-    loadDataFromDropbox();
     loadCSV(currentYear);
   });
 }
 
-refreshBtn.addEventListener("click", () => {
-  loadDataFromDropbox();
-  loadCSV(currentYear);
+refreshBtn.addEventListener("click", async () => {
+  refreshBtn.classList.add("refreshing");
+  try {
+    await loadCSV(currentYear);
+  } finally {
+    setTimeout(() => refreshBtn.classList.remove("refreshing"), 700); // match animation duration
+  }
 });
 
-async function loadDataFromDropbox() {
-    const DROPBOX_FOLDER_PATH = `${config.dropboxFolder}`;
-  try {
-    const files = await listDropboxFiles(DROPBOX_FOLDER_PATH);
-    console.log("Fetch files:" + files);
-  } catch (e) {
-    alert("❌ Erro ao acessar Dropbox.");
-    return;
-  }
-}
-
 async function loadDropboxToken() {
-  const res = await fetch('config/dropbox.env');
+  const res = await fetch(DROPBOX_CONFIG);
   const text = await res.text();
   const match = text.match(/^DROPBOX_ACCESS_TOKEN\s*=\s*(.+)$/m);
-  if (!match) throw new Error("❌ DROPBOX_ACCESS_TOKEN não encontrado em config/.env");
+  if (!match) throw new Error(`❌ DROPBOX_ACCESS_TOKEN não encontrado em ${DROPBOX_CONFIG}`);
   return match[1].trim();
-}
-
-async function loadConfig() {
-  const res = await fetch('config/config.json');
-  config = await res.json();
-}
-
-async function listDropboxFiles(folderPath) {
-  const DROPBOX_ACCESS_TOKEN = await loadDropboxToken();
-
-  const res = await fetch('https://api.dropboxapi.com/2/files/list_folder', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${DROPBOX_ACCESS_TOKEN}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      path: folderPath,
-      recursive: false
-    })
-  });
-  if (!res.ok) throw new Error('❌ Erro ao acessar Dropbox');
-  const data = await res.json();
-  // Returns an array of file names
-  return data.entries
-    .filter(entry => entry['.tag'] === 'file')
-    .map(entry => entry.name);
 }
 
 (async function init() {
   await loadConfig();
-  loadDataFromDropbox();
   setupYearSelector();
   loadCSV(currentYear);
 })();

@@ -3,6 +3,7 @@ body {
   display: flex;
   flex-direction: column;
   padding: 1rem;
+  background: #f5f7fa; /* Soft finance-style background */
 }
 
 header {
@@ -77,6 +78,7 @@ main {
   box-shadow: 0 2px 8px rgba(45, 108, 223, 0.10);
   outline: none;
 }
+
 #refreshBtn:focus, #refreshBtn:hover {
   box-shadow: 0 4px 16px rgba(45, 108, 223, 0.18);
   background: linear-gradient(135deg, #1abc9c 60%, #2d6cdf 100%);
@@ -87,6 +89,15 @@ main {
   font-size: 1.3em;
   display: block;
   line-height: 1;
+}
+
+@keyframes rotate-refresh {
+  0% { transform: rotate(0deg);}
+  100% { transform: rotate(-360deg);}
+}
+
+#refreshBtn.refreshing {
+  animation: rotate-refresh 0.7s linear;
 }
 
 table {
