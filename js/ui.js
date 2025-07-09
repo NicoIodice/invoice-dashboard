@@ -46,6 +46,7 @@ export function updateInvoicesTable(rows, tableBody, quarterTotals, nifCounts) {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${row.NIF}</td>
+      <td>${row.ENTIDADE || '-'}</td>
       <td>${formatCurrency(value)}</td>
       <td>${row['DATA EMISSAO']}</td>
       <td>${row['DATA SERVICO']}</td>

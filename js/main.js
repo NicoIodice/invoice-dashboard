@@ -1,5 +1,5 @@
 import { loadConfig, config } from './config.js';
-import { loadCSV, getYearList } from './data.js';
+import { loadNifsMap, loadCSV, getYearList } from './data.js';
 import { resetDashboard, updateUI } from './ui.js';
 
 const tableBody = document.querySelector("#invoiceTable tbody");
@@ -9,6 +9,8 @@ const refreshBtn = document.getElementById("refreshBtn");
 let currentYear = new Date().getFullYear();
 const quarterTotals = [0, 0, 0, 0];
 const nifCounts = {};
+
+let nifsMap = {};
 
 async function setupYearSelector() {
   let years;
@@ -35,7 +37,10 @@ async function setupYearSelector() {
 
 async function loadAndUpdate() {
   try {
-    const rows = await loadCSV(currentYear);
+    if (!Object.keys(nifsMap).length) {
+      nifsMap = await loadNifsMap();
+    }
+    const rows = await loadCSV(currentYear, nifsMap);
     updateUI(rows, tableBody, quarterTotals, nifCounts, config);
   } catch (err) {
     alert("❌ Erro ao carregar CSV para o ano selecionado.");

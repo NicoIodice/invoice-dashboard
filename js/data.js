@@ -1,7 +1,7 @@
 import { config } from './config.js';
 import { dropboxDownload, dropboxDownloadJSON } from './dropbox.js';
 
-export async function loadCSV(year) {
+export async function loadCSV(year, nifsMap) {
   let text;
   if (config.loadFromDropbox) {
     const filePath = `${config.dropboxFolder}/${year}.csv`;
@@ -12,10 +12,10 @@ export async function loadCSV(year) {
     if (!res.ok) throw new Error(`❌ Erro ao carregar CSV local para o ano ${year}.csv`);
     text = await res.text();
   }
-  return parseCSV(text);
+  return parseCSV(text, nifsMap);
 }
 
-export function parseCSV(text) {
+export function parseCSV(text, nifsMap = {}) {
   const lines = text.trim().split("\n").slice(1); // Skip headers
   return lines
     .map(line => {
@@ -28,8 +28,12 @@ export function parseCSV(text) {
       ) {
         return null; // skip invalid lines
       }
+      // Find entity entity name for this NIF
+      const entidade = nifsMap[NIF.trim()] || "-";
+      console.log("NIF:" + NIF.trim() + " | Entidade: " + entidade);
       return {
         NIF: NIF.trim(),
+        ENTIDADE: entidade,
         VALOR: VALOR.trim(),
         'DATA EMISSAO': EMISSAO.trim(),
         'DATA SERVICO': SERVICO.trim()
@@ -55,4 +59,21 @@ export async function getYearList() {
     })
     .filter(Boolean)
     .sort((a, b) => b - a);
+}
+
+export async function loadNifsMap() {
+  let nifsArr = [];
+  if (config.loadFromDropbox) {
+    const nifsPath = `${config.dropboxFolder}/nifs.json`;
+    nifsArr = await dropboxDownloadJSON(nifsPath);
+  } else {
+    const res = await fetch('data/nifs.json');
+    nifsArr = await res.json();
+  }
+  // Convert array to map: { [id]: entity }
+  const nifsMap = {};
+  nifsArr.forEach(item => {
+    nifsMap[item.id] = item.entity;
+  });
+  return nifsMap;
 }
