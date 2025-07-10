@@ -3,6 +3,12 @@ import { config } from './config.js';
 const DROPBOX_CONFIG = 'config/dropbox.env';
 
 async function getDropboxEnvVar(name) {
+  // If running on GitHub Pages (window.DROPBOX_CONFIG exists), use it
+  if (typeof window !== 'undefined' && window.DROPBOX_CONFIG && window.DROPBOX_CONFIG[name]) {
+    return window.DROPBOX_CONFIG[name];
+  }
+  
+  // Otherwise, try to read from dropbox.env (local dev)
   const res = await fetch(DROPBOX_CONFIG); // this only works locally
   const text = await res.text();
   const match = text.match(new RegExp(`^${name}\\s*=\\s*(.+)$`, 'm'));
