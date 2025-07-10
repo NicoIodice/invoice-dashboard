@@ -41,7 +41,7 @@ jobs:
       - name: List contents of config folder
         run: ls -l config
       - name: Show contents of config/dropbox.env
-        run: cat config/secrets.js
+        run: cat config/secretss.js
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
