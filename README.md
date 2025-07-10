@@ -96,7 +96,7 @@ pip install dropbox
     - files.metadata.write
     - files.metadata.read
 5. Under OAuth 2, get the app key and secret and replace it in the "config/.env" file
-- ⚠️ Never commit this token to Git!
+    - ⚠️ Never commit this token to Git!
 6. Run the helper script to get a refresh token:
 
 ```bash
@@ -127,16 +127,16 @@ You'll be prompted to authorize via browser. After success, it prints:
 ### Setting up Dropbox secrets
 1. Go to your repository **Settings > Secrets and variables > Actions**
 2. Add the following secrets:
-- DROPBOX_REFRESH_TOKEN
-- DROPBOX_APP_KEY
-- DROPBOX_APP_SECRET
+    - DROPBOX_REFRESH_TOKEN
+    - DROPBOX_APP_KEY
+    - DROPBOX_APP_SECRET
 
 The static.yml workflow
 - **Purpose:** Automates deployment to GitHub Pages and injects Dropbox credentials at build time.
 - **Key steps:**
- - Checks out your code.
- - Generates config/secrets.js with your Dropbox secrets.
- - Uploads the site to GitHub Pages.
+    - Checks out your code.
+    - Generates config/secrets.js with your Dropbox secrets.
+    - Uploads the site to GitHub Pages.
 
 **Excerpt from .github/workflows/static.yml:**
 ```yaml
