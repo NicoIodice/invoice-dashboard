@@ -37,7 +37,7 @@ jobs:
           echo "  DROPBOX_REFRESH_TOKEN: '${{ secrets.DROPBOX_REFRESH_TOKEN }}'," >> config/secrets.js
           echo "  DROPBOX_APP_KEY: '${{ secrets.DROPBOX_APP_KEY }}'," >> config/secrets.js
           echo "  DROPBOX_APP_SECRET: '${{ secrets.DROPBOX_APP_SECRET }}'" >> config/secrets.js
-          echo "};" >> config/secretss.js
+          echo "};" >> config/secrets.js
       - name: List contents of config folder
         run: ls -l config
       - name: Show contents of config/secrets.js
