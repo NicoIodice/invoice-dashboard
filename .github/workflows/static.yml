@@ -31,12 +31,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Generate config/dropbox.env from repository secrets
+      - name: Generate config/secrets.js from repository secrets
         run: |
-          echo "  DROPBOX_REFRESH_TOKEN: '${{ secrets.DROPBOX_REFRESH_TOKEN }}'," >> config/dropbox.env
-          echo "  DROPBOX_APP_KEY: '${{ secrets.DROPBOX_APP_KEY }}'," >> config/dropbox.env
-          echo "  DROPBOX_APP_SECRET: '${{ secrets.DROPBOX_APP_SECRET }}'" >> config/dropbox.env
-          echo "};" >> config/dropbox.env
+          echo "window.DROPBOX_CONFIG = {" > config/secrets.js
+          echo "  DROPBOX_REFRESH_TOKEN: '${{ secrets.DROPBOX_REFRESH_TOKEN }}'," >> config/secrets.js
+          echo "  DROPBOX_APP_KEY: '${{ secrets.DROPBOX_APP_KEY }}'," >> config/secrets.js
+          echo "  DROPBOX_APP_SECRET: '${{ secrets.DROPBOX_APP_SECRET }}'" >> config/secrets.js
+          echo "};" >> config/secrets.js
       - name: List contents of config folder
         run: ls -l config
       - name: Show contents of config/dropbox.env
