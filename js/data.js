@@ -30,7 +30,6 @@ export function parseCSV(text, nifsMap = {}) {
       }
       // Find entity entity name for this NIF
       const entidade = nifsMap[NIF.trim()] || "-";
-      console.log("NIF:" + NIF.trim() + " | Entidade: " + entidade);
       return {
         NIF: NIF.trim(),
         ENTIDADE: entidade,
