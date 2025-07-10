@@ -174,7 +174,7 @@ export function getQuarter(month) {
 
 // Helper: validate a row (should be imported or duplicated if needed)
 export function validateRow(row) {
-  const nifValid = row.NIF && row.NIF.trim().length > 0;
+  const nifValid = row.NIF && /^\d+$/.test(row.NIF.trim());
   const valueValid = /^\d+(\.\d{1,2})?$/.test(row.VALOR);
   const dateValid = /^\d{4}-\d{2}-\d{2}$/.test(row['DATA SERVICO']);
   return nifValid && valueValid && dateValid;

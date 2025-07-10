@@ -71,9 +71,10 @@ async function setupYearSelector() {
   let years;
   try {
     years = await getYearList();
-  } catch (e) {
-    alert("❌ Não foi possível carregar a lista de anos.");
+  } catch (err) {
+    //alert("❌ Não foi possível carregar a lista de anos.");
     resetDashboard(tableBody, quarterTotals, nifCounts, config);
+    console.error("❌ Não foi possível carregar a lista de anos.", err);
     return;
   }
   yearSelect.innerHTML = "";
@@ -99,9 +100,9 @@ async function loadAndUpdate() {
     const rows = await loadCSV(currentYear, nifsMap);
     updateUI(rows, tableBody, quarterTotals, nifCounts, config);
   } catch (err) {
-    alert("❌ Erro ao carregar CSV para o ano selecionado.");
+    //alert("❌ Erro ao carregar CSV para o ano selecionado.");
     resetDashboard(tableBody, quarterTotals, nifCounts, config);
-    console.error(err);
+    console.error("❌ Erro ao carregar CSV para o ano selecionado:", err);
   } finally {
     hideLoading();
   }
