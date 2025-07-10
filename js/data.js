@@ -3,6 +3,7 @@ import { dropboxListFolder, dropboxDownload, dropboxDownloadJSON } from './dropb
 
 export async function loadCSV(year, nifsMap) {
   let text;
+  alert(`❌ Load From Dropbox: ${config.dropboxFolder} - Data Folderx: ${config.dataFolder}`);
   if (config.loadFromDropbox) {
     const filePath = `${config.dropboxFolder}/${year}.csv`;
     text = await dropboxDownload(filePath);
