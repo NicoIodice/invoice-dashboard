@@ -24,7 +24,9 @@
 
   <!-- Main invoice dashboard -->
   <header>
-    <h1 id="pageTitle">📊 Faturas-Recibo Emitidas</h1>
+    <h1 id="pageTitle">📊 Faturas-Recibo Emitidas
+      <span id="infoIcon" title="Informação" style="cursor:pointer; margin-left:0.5em; font-size:0.8em;">ℹ️</span>
+    </h1>
     <div id="year-toggle">
         <label for="yearSelect">Ano:</label>
         <select id="yearSelect"></select>
@@ -91,6 +93,23 @@
       </thead>
       <tbody></tbody>
     </table>
+  </div>
+
+  <div id="infoDialog" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.35); z-index:99999; align-items:center; justify-content:center;">
+    <div style="background:#fff; padding:2em; border-radius:10px; max-width:90vw; max-height:80vh; overflow:auto; box-shadow:0 4px 24px rgba(0,0,0,0.18); position:relative;">
+      <button id="closeInfoDialog" style="position:absolute; top:0.5em; right:0.5em; background:none; border:none; font-size:1.3em; cursor:pointer;">✖️</button>
+      <h2>Sobre o Dashboard</h2>
+      <p>
+        IVA (https://www.vendus.pt/blog/isencao-iva-artigo-9-53/)	<br>
+        NIF começados por 5 são empresas > Isento IVA Art.º53	<br>
+        NIFS começados por 1, 2 OU 3 são singulares > Isento IVA Art.º 9 <br>
+        IVA - Regime de Isenção <br>
+        <br><br>	
+        IRS (Retençao na fonte)	<br>
+        NIF começados por 5 são empresas > Dispensa de retenção - art. 101.º-B,n.º1,al. a) e b), do CIRS <br>	
+        NIFS começados por 1, 2 OU 3 são singulares > Sem retenção - Art.101º, n.º1 do CIRS	
+      </p>
+    </div>
   </div>
 
   <!-- Loading Mask -->
