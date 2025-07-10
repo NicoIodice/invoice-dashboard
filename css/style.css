@@ -394,6 +394,28 @@ tr:last-child td {
   color: #222;
 }
 
+#classesPanel {
+  margin-left: 60px;
+  margin-top: 2em;
+  padding: 2em;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(45,108,223,0.07);
+  max-width: 600px;
+}
+
+#classesTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1em;
+}
+
+#classesTable th, #classesTable td {
+  border: 1px solid #e0e6ed;
+  padding: 0.5em 1em;
+  text-align: left;
+}
+
 #loadingOverlay {
   position: fixed;
   z-index: 9999;

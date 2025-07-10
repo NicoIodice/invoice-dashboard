@@ -1,5 +1,5 @@
 import { loadConfig, config } from './config.js';
-import { loadNifsMap, loadCSV, getYearList } from './data.js';
+import { loadNifsMap, loadCSV, getYearList, loadClassValues } from './data.js';
 import { showLoading, hideLoading, resetDashboard, updateUI } from './ui.js';
 
 const pageTitle = document.getElementById('pageTitle');
@@ -19,6 +19,13 @@ const quarterTotals = [0, 0, 0, 0];
 const nifCounts = {};
 
 let nifsMap = {};
+
+const menuClasses = document.getElementById('menuClasses');
+const classesPanel = document.getElementById('classesPanel');
+
+let classValues = [];
+let classSortKey = 'nif';
+let classSortAsc = true;
 
 let entitiesSortKey = 'ENTIDADE';
 let entitiesSortAsc = true;
@@ -90,6 +97,72 @@ async function setupYearSelector() {
     loadAndUpdate();
   });
 }
+
+menuClasses.addEventListener('click', async () => {
+  mainContent.style.display = 'none';
+  entitiesPanel.style.display = 'none';
+  classesPanel.style.display = '';
+  if (yearToggle) yearToggle.style.display = 'none';
+  menuClasses.classList.add('active');
+  menuDashboard.classList.remove('active');
+  menuEntities.classList.remove('active');
+  if (pageTitle) pageTitle.innerHTML = '🏷️ Valores por Aula';
+
+  classValues = await loadClassValues();
+  renderClassesTable();
+});
+
+function renderClassesTable() {
+  const tbody = document.querySelector('#classesTable tbody');
+  tbody.innerHTML = '';
+  const arr = [...classValues];
+  arr.sort((a, b) => {
+    let cmp;
+    if (classSortKey === 'nif') {
+      cmp = a.nif.localeCompare(b.nif, 'pt');
+    } else if (classSortKey === 'entidade') {
+      const entA = nifsMap[a.nif] || '';
+      const entB = nifsMap[b.nif] || '';
+      cmp = entA.localeCompare(entB, 'pt');
+    } else if (classSortKey === 'classesPerWeek') {
+      cmp = a.classesPerWeek - b.classesPerWeek;
+    } else {
+      cmp = parseFloat(a.valuePerClass) - parseFloat(b.valuePerClass);
+    }
+    return classSortAsc ? cmp : -cmp;
+  });
+  arr.forEach(({ nif, classesPerWeek, valuePerClass }) => {
+    const entidade = nifsMap[nif] || '-';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${nif}</td><td>${entidade}</td><td>${classesPerWeek}</td><td>${parseFloat(valuePerClass).toFixed(2)} €</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// Sorting event listeners
+document.getElementById('sortClassNif').addEventListener('click', () => {
+  classSortKey = 'nif';
+  classSortAsc = !classSortAsc;
+  renderClassesTable();
+});
+
+document.getElementById('sortClassEntidade').addEventListener('click', () => {
+  classSortKey = 'entidade';
+  classSortAsc = !classSortAsc;
+  renderClassesTable();
+});
+
+document.getElementById('sortClassCount').addEventListener('click', () => {
+  classSortKey = 'classesPerWeek';
+  classSortAsc = !classSortAsc;
+  renderClassesTable();
+});
+
+document.getElementById('sortClassValue').addEventListener('click', () => {
+  classSortKey = 'valuePerClass';
+  classSortAsc = !classSortAsc;
+  renderClassesTable();
+});
 
 async function loadAndUpdate() {
   showLoading();

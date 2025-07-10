@@ -62,13 +62,27 @@ export async function getYearList() {
     .sort((a, b) => b - a);
 }
 
+export async function loadClassValues() {
+  let arr = [];
+  if (config.loadFromDropbox) {
+    const path = `${config.dropboxFolder}/class-values.json`;
+    arr = await dropboxDownloadJSON(path);
+  } else {
+    const filePath = `${config.dataFolder}/class-values.json`.replace('./', '');
+    const res = await fetch(filePath);
+    arr = await res.json();
+  }
+  return arr;
+}
+
 export async function loadNifsMap() {
   let nifsArr = [];
   if (config.loadFromDropbox) {
     const nifsPath = `${config.dropboxFolder}/nifs.json`;
     nifsArr = await dropboxDownloadJSON(nifsPath);
   } else {
-    const res = await fetch('data/nifs.json');
+    const filePath = `${config.dataFolder}/nifs.json`.replace('./', '');
+    const res = await fetch(filePath);
     nifsArr = await res.json();
   }
   // Convert array to map: { [id]: entity }
