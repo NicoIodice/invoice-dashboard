@@ -51,6 +51,7 @@ export function updateInvoicesTable(rows, tableBody, quarterTotals, nifCounts) {
     nifCounts[row.NIF] = (nifCounts[row.NIF] || 0) + 1;
 
     const tr = document.createElement("tr");
+    tr.classList.add(`quarter-${quarter}`); // Add this line
     tr.innerHTML = `
       <td>${row.NIF}</td>
       <td>${row.ENTIDADE || '-'}</td>
