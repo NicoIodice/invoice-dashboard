@@ -17,13 +17,13 @@
     </div>
     <div class="sidebar-menu" id="menuEntities">
       <span class="sidebar-icon">🏢</span>
-      <span class="sidebar-label">List of Entities</span>
+      <span class="sidebar-label">Lista de Entidades</span>
     </div>
   </div>
 
   <!-- Main invoice dashboard -->
   <header>
-    <h1>📊 Faturas-Recibo Emitidas</h1>
+    <h1 id="pageTitle">📊 Faturas-Recibo Emitidas</h1>
     <div id="year-toggle">
         <label for="yearSelect">Ano:</label>
         <select id="yearSelect"></select>
@@ -81,12 +81,11 @@
 
   <!-- Entities Table Panel (hidden by default) -->
   <div id="entitiesPanel" style="display:none;">
-    <h2>List of Entities</h2>
     <table id="entitiesTable">
       <thead>
         <tr>
-          <th>NIF</th>
-          <th>ENTIDADE</th>
+          <th id="sortNif" style="cursor:pointer;">NIF ▲▼</th>
+          <th id="sortEntidade" style="cursor:pointer;">ENTIDADE ▲▼</th>
         </tr>
       </thead>
       <tbody></tbody>

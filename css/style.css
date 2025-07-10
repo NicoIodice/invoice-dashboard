@@ -21,11 +21,13 @@ body {
   align-items: flex-start;
   padding-top: 60px;
   box-shadow: 2px 0 12px rgba(79,140,255,0.10);
+  padding-left: 0;
+  padding-right: 0;
   border-right: 1.5px solid #e3eaf7;
 }
 
 #sidebar:hover {
-  width: 180px;
+  width: 200px;
   background: linear-gradient(135deg, #4f8cff 80%, #e3eaf7 100%);
 }
 
@@ -33,10 +35,11 @@ body {
   width: 100%;
   display: flex;
   align-items: center;
-  padding: 12px 10px;
+  padding: 12px 12px 12px 14px; /* More left padding for icon+label */
   cursor: pointer;
   border-radius: 0 20px 20px 0;
   margin-bottom: 6px;
+  overflow-x: hidden;
   transition: background 0.15s, color 0.2s;
 }
 
@@ -58,10 +61,15 @@ body {
   white-space: nowrap;
   font-weight: 500;
   letter-spacing: 0.5px;
+  max-width: 110px;      /* Limit label width */
+  overflow: hidden;      /* Hide overflow */
+  text-overflow: ellipsis; /* Add ... if too long */
+  display: inline-block;
 }
 
 #sidebar:hover .sidebar-label {
   opacity: 1;
+  margin-left: 0.2em;
 }
 
 #entitiesPanel {
@@ -95,6 +103,15 @@ header {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+  margin-left: 60px; /* enough for sidebar */
+  margin-top: 1.5rem;
+  transition: margin-left 0.2s;
+}
+
+@media (max-width: 600px) {
+  header {
+    margin-left: 0;
+  }
 }
 
 main {

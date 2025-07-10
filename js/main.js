@@ -2,6 +2,8 @@ import { loadConfig, config } from './config.js';
 import { loadNifsMap, loadCSV, getYearList } from './data.js';
 import { showLoading, hideLoading, resetDashboard, updateUI } from './ui.js';
 
+const pageTitle = document.getElementById('pageTitle');
+
 const yearToggle = document.getElementById('year-toggle');
 const menuDashboard = document.getElementById('menuDashboard');
 const menuEntities = document.getElementById('menuEntities');
@@ -18,12 +20,29 @@ const nifCounts = {};
 
 let nifsMap = {};
 
+let entitiesSortKey = 'ENTIDADE';
+let entitiesSortAsc = true;
+
 menuDashboard.addEventListener('click', () => {
   entitiesPanel.style.display = 'none';
   mainContent.style.display = '';
   if (yearToggle) yearToggle.style.display = '';
   menuDashboard.classList.add('active');
   menuEntities.classList.remove('active');
+  // Update header title/icon
+  if (pageTitle) pageTitle.innerHTML = '📊 Faturas-Recibo Emitidas';
+});
+
+menuEntities.addEventListener('click', async () => {
+  mainContent.style.display = 'none';
+  entitiesPanel.style.display = '';
+  if (yearToggle) yearToggle.style.display = 'none';
+  menuEntities.classList.add('active');
+  menuDashboard.classList.remove('active');
+
+  // Load and display entities
+  nifsMap = await loadNifsMap();
+  renderEntitiesTable();
 });
 
 menuEntities.addEventListener('click', async () => {
@@ -33,6 +52,9 @@ menuEntities.addEventListener('click', async () => {
   if (yearToggle) yearToggle.style.display = 'none';
   menuEntities.classList.add('active');
   menuDashboard.classList.remove('active');
+
+  // Update header title/icon
+  if (pageTitle) pageTitle.innerHTML = '🏢 Lista de Entidades';
 
   // Load and display entities
   const nifsMap = await loadNifsMap();
@@ -93,6 +115,40 @@ refreshBtn.addEventListener("click", async () => {
     setTimeout(() => refreshBtn.classList.remove("refreshing"), 700);
   }
 });
+
+// Add event listeners for list of entities sorting
+document.getElementById('sortNif').addEventListener('click', () => {
+  entitiesSortKey = 'NIF';
+  entitiesSortAsc = !entitiesSortAsc;
+  renderEntitiesTable();
+});
+
+document.getElementById('sortEntidade').addEventListener('click', () => {
+  entitiesSortKey = 'ENTIDADE';
+  entitiesSortAsc = !entitiesSortAsc;
+  renderEntitiesTable();
+});
+
+function renderEntitiesTable() {
+  const tbody = document.querySelector('#entitiesTable tbody');
+  tbody.innerHTML = '';
+  // Convert map to array for sorting
+  const entitiesArr = Object.entries(nifsMap).map(([id, entity]) => ({ id, entity }));
+  entitiesArr.sort((a, b) => {
+    let cmp;
+    if (entitiesSortKey === 'NIF') {
+      cmp = a.id.localeCompare(b.id, 'pt');
+    } else {
+      cmp = a.entity.localeCompare(b.entity, 'pt');
+    }
+    return entitiesSortAsc ? cmp : -cmp;
+  });
+  entitiesArr.forEach(({ id, entity }) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${id}</td><td>${entity}</td>`;
+    tbody.appendChild(tr);
+  });
+}
 
 (async function init() {
   await loadConfig();
