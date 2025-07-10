@@ -1,5 +1,5 @@
 import { config } from './config.js';
-import { dropboxDownload, dropboxDownloadJSON } from './dropbox.js';
+import { dropboxListFolder, dropboxDownload, dropboxDownloadJSON } from './dropbox.js';
 
 export async function loadCSV(year, nifsMap) {
   let text;
@@ -44,11 +44,12 @@ export function parseCSV(text, nifsMap = {}) {
 export async function getYearList() {
   let files;
   if (config.loadFromDropbox) {
-    const indexPath = `${config.dropboxFolder}/index.json`;
-    files = await dropboxDownloadJSON(indexPath);
+    const indexPath = `${config.dropboxFolder}`;
+    files = await dropboxListFolder(indexPath);
   } else {
-    const res = await fetch('data/index.json');
-    files = await res.json();
+    // TODO: Fix this later
+    const filePath = `${config.dataFolder}`.replace('./', '');
+    const res = await fetch(filePath);
   }
   const yearPattern = /^(\d{4})\.csv$/;
   return files

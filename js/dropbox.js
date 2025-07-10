@@ -26,7 +26,9 @@ export async function getDropboxAccessToken() {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: params
   });
+
   if (!res.ok) throw new Error('❌ Erro ao obter access token do Dropbox');
+  
   const data = await res.json();
   return data.access_token;
 }
@@ -51,4 +53,30 @@ export async function dropboxDownloadJSON(path) {
   } catch {
     throw new Error(`❌ Erro ao processar JSON de ${path}`);
   }
+}
+
+export async function dropboxListFolder(path) {
+  const token = await getDropboxAccessToken();
+  const res = await fetch('https://api.dropboxapi.com/2/files/list_folder', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      path: path,
+      recursive: false
+    })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(`❌ Erro ao listar ficheiros da Dropbox: ${data.error_summary || response.statusText}`);
+  }
+
+  // Extract just the file names
+  return data.entries
+    .filter(entry => entry['.tag'] === 'file')
+    .map(file => file.name);
 }
