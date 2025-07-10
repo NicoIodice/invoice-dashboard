@@ -42,9 +42,9 @@ Prepare your folder structure:
   "dropboxFolder": "/invoice-dashboard-data"
 }
 ```
-- Modify paths as needed (relative or absolute).
-- Set "loadFromDropbox": true to load data from Dropbox (recommended for GitHub Pages).
-- Set "loadFromDropbox": false to load data from local files (for local development only).
+    - Modify paths as needed (relative or absolute).
+    - Set "loadFromDropbox": true to load data from Dropbox (recommended for GitHub Pages).
+    - Set "loadFromDropbox": false to load data from local files (for local development only).
 
 2. Create a `.env` in the config folder, using the .env.example as example, as:
 
