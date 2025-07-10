@@ -31,16 +31,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Generate config/secrets.js from repository secrets
+      - name: Generate config/secretss.js from repository secrets
         run: |
-          echo "window.DROPBOX_CONFIG = {" > config/secrets.js
-          echo "  DROPBOX_REFRESH_TOKEN: '${{ secrets.DROPBOX_REFRESH_TOKEN }}'," >> config/secrets.js
-          echo "  DROPBOX_APP_KEY: '${{ secrets.DROPBOX_APP_KEY }}'," >> config/secrets.js
-          echo "  DROPBOX_APP_SECRET: '${{ secrets.DROPBOX_APP_SECRET }}'" >> config/secrets.js
-          echo "};" >> config/secrets.js
+          echo "window.DROPBOX_CONFIG = {" > config/secretss.js
+          echo "  DROPBOX_REFRESH_TOKEN: '${{ secrets.DROPBOX_REFRESH_TOKEN }}'," >> config/secretss.js
+          echo "  DROPBOX_APP_KEY: '${{ secrets.DROPBOX_APP_KEY }}'," >> config/secretss.js
+          echo "  DROPBOX_APP_SECRET: '${{ secrets.DROPBOX_APP_SECRET }}'" >> config/secretss.js
+          echo "};" >> config/secretss.js
       - name: List contents of config folder
         run: ls -l config
-      - name: Show contents of config/dropbox.env
+      - name: Show contents of config/secrets.js
         run: cat config/secretss.js
       - name: Setup Pages
         uses: actions/configure-pages@v5
