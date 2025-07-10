@@ -425,3 +425,68 @@ tr:last-child td {
   color: #2d6cdf;
   font-weight: 500;
 }
+
+/* iPhone devices responsive styles */
+@media (max-width: 900px) {
+  main {
+    flex-direction: column;
+    gap: 0;
+  }
+  .left, .right {
+    width: 100%;
+    min-width: 0;
+  }
+  #entitiesPanel {
+    margin-left: 0;
+    margin-top: 1em;
+    padding: 1em;
+    max-width: 100vw;
+  }
+  header {
+    margin-left: 0;
+    margin-top: 1em;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5em;
+  }
+}
+
+@media (max-width: 600px) {
+  #sidebar {
+    width: 40px;
+    padding-top: 40px;
+  }
+  #sidebar:hover {
+    width: 120px;
+  }
+  .sidebar-label {
+    max-width: 60px;
+    font-size: 0.95em;
+  }
+  main, #entitiesPanel {
+    margin-left: 0;
+    margin-top: 1em;
+    padding: 0.5em;
+  }
+  table, th, td {
+    font-size: 0.95em;
+    padding: 0.4em;
+  }
+  #year-toggle {
+    flex-direction: column;
+    gap: 0.3em;
+    padding: 0.3em 0.5em;
+  }
+}
+
+@media (max-width: 600px) {
+  table {
+    display: block;
+    overflow-x: auto;
+    width: 100%;
+  }
+  th, td {
+    min-width: 90px;
+    white-space: nowrap;
+  }
+}
