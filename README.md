@@ -54,17 +54,37 @@ DROPBOX_APP_KEY=you_app_key
 DROPBOX_APP_SECRET=your_app_secret
 ```
 
-Never commit this file! Use dropbox.env.example as a template.
+⚠️ Never commit this file! Use dropbox.env.example as a template.
 
-### 🔧 Dropbox API Setup Instructions
+### 📄 Invoice Data File Format
+- **File type:** CSV (Comma-Separated Values)
+- **File name pattern:** The file name must be the year (e.g., 2024.csv, 2023.csv, etc.)
+- **Required columns (header row):**
+```
+NIF,VALOR,DATA EMISSAO,DATA SERVICO
+```
+- **Example content:**
+```
+123456789,100.00,2025-03-01,2025-01-01
+123456789,100.00,2025-03-01,2025-12-01
+```
+- **Where to store:**
+    - If using Dropbox, upload these files to your configured Dropbox folder.
+    - If using local files, place them in your data folder.
 
-#### 📦 Install the Dropbox SDK
+This format is required for the dashboard to correctly parse and display your invoice data.
+
+---
+
+## 🔧 Dropbox API Setup Instructions
+
+### 📦 Install the Dropbox SDK
 Please make sure to install the following dependencies:
 ```bash
 pip install dropbox
 ```
 
-##### 🔐 Generate a Refresh Token
+#### 🔐 Generate a Refresh Token
 1. Go to the [Dropbox App Console](https://www.dropbox.com/developers/apps)
 2. Create a new app
     - Choose “Scoped access”
@@ -89,20 +109,22 @@ You'll be prompted to authorize via browser. After success, it prints:
 - Refresh Token ← Save this value in your .env (DROPBOX_REFRESH_TOKEN)
 - Expires At
 
-### 🌐 Deploying to GitHub Pages
+---
 
-#### Why use Dropbox and GitHub Actions?
+## 🌐 Deploying to GitHub Pages
+
+### Why use Dropbox and GitHub Actions?
 - **No backend required:** All data is loaded directly from Dropbox using short-lived access tokens.
 - **Secrets are safe:** Dropbox credentials are injected at build time using GitHub Actions and never committed to the repository.
 - **Always up-to-date:** The dashboard always loads the latest data from your Dropbox folder.
 
-#### How it works
+### How it works
 - On every push to main, the .github/workflows/static.yml workflow runs.
 - This workflow generates a config/secrets.js file using your repository secrets(DROPBOX_REFRESH_TOKEN, DROPBOX_APP_KEY, DROPBOX_APP_SECRET).
 - The website loads these secrets at runtime (only in the browser, never committed).
 - If loadFromDropbox is true in config.json, all data is loaded from Dropbox.
 
-#### Setting up Dropbox secrets
+### Setting up Dropbox secrets
 1. Go to your repository **Settings > Secrets and variables > Actions**
 2. Add the following secrets:
 - DROPBOX_REFRESH_TOKEN
@@ -129,7 +151,7 @@ The static.yml workflow
 ```
 ---
 
-### 🖥️ Local Development
+## 🖥️ Local Development
 
 1. Copy config/dropbox.env.example to config/dropbox.env and fill in your Dropbox credentials.
 2. Run a local server (e.g., npx serve . or use VS Code Live Server).
@@ -137,14 +159,14 @@ The static.yml workflow
 
 ---
 
-### 📱 Mobile & iOS Compatibility
+## 📱 Mobile & iOS Compatibility
 
 - The dashboard is fully responsive and works on iOS Safari and Android Chrome.
 - All data is loaded from Dropbox when loadFromDropbox is enabled, so no local files are required on mobile.
 
 ---
 
-### 🛡️ Security Notes
+## 🛡️ Security Notes
 
 - **Never commit your Dropbox credentials.**
 - All secrets are injected at build time and are not visible in your repository.
@@ -152,6 +174,6 @@ The static.yml workflow
 
 ---
 
-###  📦 Requirements
+##  📦 Requirements
 - Modern browser (Chrome, Firefox, Safari, Edge)
 - For local development: Node.js (for static server) or any static file server
