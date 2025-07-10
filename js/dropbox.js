@@ -3,11 +3,22 @@ import { config } from './config.js';
 const DROPBOX_CONFIG = 'config/dropbox.env';
 
 async function getDropboxEnvVar(name) {
-  const res = await fetch(DROPBOX_CONFIG);
-  const text = await res.text();
-  const match = text.match(new RegExp(`^${name}\\s*=\\s*(.+)$`, 'm'));
-  if (!match) throw new Error(`❌ ${name} não encontrado em ${DROPBOX_CONFIG}`);
-  return match[1].trim();
+  try {
+    // Attempt to load from local dropbox.env
+    const res = await fetch(DROPBOX_CONFIG); // this only works locally
+    const text = await res.text();
+    const match = text.match(new RegExp(`^${name}\\s*=\\s*(.+)$`, 'm'));
+    if (!match) throw new Error(`❌ ${name} não encontrado em ${DROPBOX_CONFIG}`);
+    return match[1].trim();
+  } catch (err) {
+    console.warn(`⚠️ Local env load failed: ${err.message}`);
+
+    // Fallback: use injected config (set manually in code or via build)
+    const fallback = window?.DROPBOX_ENV?.[name];
+    if (fallback) return fallback;
+
+    throw new Error(`❌ ${name} não encontrado nos secrets`);
+  }
 }
 
 export async function getDropboxAccessToken() {
