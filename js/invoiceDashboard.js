@@ -1,6 +1,6 @@
 import { config } from './config.js';
 import { showLoading, hideLoading, formatCurrency } from './utils.js';
-import { loadNifsMap, loadCSV, getYearList } from './data.js';
+import { loadCSV, getYearList } from './data.js';
 
 let currentYear = new Date().getFullYear();
 
@@ -10,8 +10,6 @@ const refreshBtn = document.getElementById("refreshBtn");
 
 const quarterTotals = [0, 0, 0, 0];
 const nifCounts = {};
-
-let nifsMap = {};
 
 export async function setupYearSelector() {
   let years;
@@ -46,12 +44,9 @@ refreshBtn.addEventListener("click", async () => {
   }
 });
 
-export async function loadAndUpdateDashboard() {
+export async function loadAndUpdateDashboard(nifsMap) {
   showLoading();
   try {
-    if (!Object.keys(nifsMap).length) {
-      nifsMap = await loadNifsMap();
-    }
     const rows = await loadCSV(currentYear, nifsMap);
     updateUI(rows, tableBody, quarterTotals, nifCounts, config);
   } catch (err) {

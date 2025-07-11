@@ -1,12 +1,7 @@
-import { loadNifsMap } from './data.js';
-
 let classSortKey = 'entidade';
 let classSortAsc = true;
 
-let nifsMap = {};
-
-export async function renderClassesTable(classValues) {
-  nifsMap = await loadNifsMap();
+export async function renderClassesTable(nifsMap, classValues) {
   const tbody = document.querySelector('#classesTable tbody');
   tbody.innerHTML = '';
   const arr = [...classValues];

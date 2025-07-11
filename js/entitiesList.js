@@ -1,12 +1,8 @@
-import { loadNifsMap } from './data.js';
 
 let entitiesSortKey = 'ENTIDADE';
 let entitiesSortAsc = true;
 
-let nifsMap = {};
-
-export async function renderEntitiesTable() {
-  nifsMap = await loadNifsMap();
+export async function renderEntitiesTable(nifsMap) {
   const tbody = document.querySelector('#entitiesTable tbody');
   tbody.innerHTML = '';
   // Convert map to array for sorting
@@ -27,15 +23,17 @@ export async function renderEntitiesTable() {
   });
 }
 
-// Add event listeners for list of entities sorting
-document.getElementById('sortNif').addEventListener('click', () => {
-  entitiesSortKey = 'NIF';
-  entitiesSortAsc = !entitiesSortAsc;
-  renderEntitiesTable();
-});
+export function entitiesListListeners(nifsMap) {
+  // Add event listeners for list of entities sorting
+  document.getElementById('sortNif').addEventListener('click', () => {
+    entitiesSortKey = 'NIF';
+    entitiesSortAsc = !entitiesSortAsc;
+    renderEntitiesTable(nifsMap);
+  });
 
-document.getElementById('sortEntidade').addEventListener('click', () => {
-  entitiesSortKey = 'ENTIDADE';
-  entitiesSortAsc = !entitiesSortAsc;
-  renderEntitiesTable();
-});
+  document.getElementById('sortEntidade').addEventListener('click', () => {
+    entitiesSortKey = 'ENTIDADE';
+    entitiesSortAsc = !entitiesSortAsc;
+    renderEntitiesTable(nifsMap);
+  });
+}
