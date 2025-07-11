@@ -1,9 +1,10 @@
 import { loadConfig } from './config.js';
+import { showLoading, hideLoading } from './utils.js';
 import { loadClassValues } from './data.js';
+import { infoDialogListeners } from './infoDialog.js';
 import { setupYearSelector, loadAndUpdateDashboard } from './invoiceDashboard.js';
 import { renderClassesTable } from './classesInfo.js';
 import { renderEntitiesTable } from './entitiesList.js';
-import { showLoading, hideLoading } from './utils.js';
 
 const PT_MONTHS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -301,24 +302,10 @@ function adjustCalendarTooltips() {
   });
 }
 
-document.getElementById('infoIcon').addEventListener('click', () => {
-  document.getElementById('infoDialog').style.display = 'flex';
-});
-
-document.getElementById('closeInfoDialog').addEventListener('click', () => {
-  document.getElementById('infoDialog').style.display = 'none';
-});
-
-// Optional: close dialog when clicking outside the box
-document.getElementById('infoDialog').addEventListener('click', (e) => {
-  if (e.target === e.currentTarget) {
-    e.currentTarget.style.display = 'none';
-  }
-});
-
 (async function init() {
   await loadConfig();
   await setupYearSelector();
   await loadAndUpdateDashboard();
   menuDashboard.classList.add('active');
+  infoDialogListeners();
 })();
