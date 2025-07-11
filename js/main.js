@@ -2,6 +2,21 @@ import { loadConfig, config } from './config.js';
 import { loadNifsMap, loadCSV, getYearList, loadClassValues } from './data.js';
 import { showLoading, hideLoading, resetDashboard, updateUI } from './ui.js';
 
+const PT_MONTHS = [
+  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+];
+const PT_WEEKDAYS = [
+  "Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"
+];
+
+const PT_HOLIDAYS_2025 = [
+  "2025-01-01", "2025-04-18", "2025-04-25", "2025-05-01", "2025-06-10",
+  "2025-06-19", "2025-06-24", "2025-08-15", "2025-10-05", "2025-11-01", 
+  "2025-12-01", "2025-12-08", "2025-12-25"
+  // Add more if needed
+];
+
 const pageTitle = document.getElementById('pageTitle');
 
 const yearToggle = document.getElementById('year-toggle');
@@ -27,6 +42,9 @@ let classValues = [];
 let classSortKey = 'entidade';
 let classSortAsc = true;
 
+const menuSalarySim = document.getElementById('menuSalarySim');
+const salarySimPanel = document.getElementById('salarySimPanel');
+
 let entitiesSortKey = 'ENTIDADE';
 let entitiesSortAsc = true;
 
@@ -46,23 +64,6 @@ menuDashboard.addEventListener('click', async () => {
   }
 });
 
-menuEntities.addEventListener('click', async () => {
-  showLoading();
-  try {
-    mainContent.style.display = 'none';
-    entitiesPanel.style.display = '';
-    if (yearToggle) yearToggle.style.display = 'none';
-    menuEntities.classList.add('active');
-    menuDashboard.classList.remove('active');
-    // Update header title/icon
-    if (pageTitle) pageTitle.innerHTML = '🏢 Lista de Entidades';
-    nifsMap = await loadNifsMap();
-    renderEntitiesTable();
-  } finally {
-    hideLoading();
-  }
-});
-
 menuClasses.addEventListener('click', async () => {
   showLoading();
   try {
@@ -76,6 +77,45 @@ menuClasses.addEventListener('click', async () => {
     if (pageTitle) pageTitle.innerHTML = '🏷️ Valores por Aula';
     classValues = await loadClassValues();
     renderClassesTable();
+  } finally {
+    hideLoading();
+  }
+});
+
+menuSalarySim.addEventListener('click', async () => {
+  showLoading();
+  try {
+    mainContent.style.display = 'none';
+    entitiesPanel.style.display = 'none';
+    classesPanel.style.display = 'none';
+    salarySimPanel.style.display = '';
+    if (yearToggle) yearToggle.style.display = 'none';
+    menuSalarySim.classList.add('active');
+    menuDashboard.classList.remove('active');
+    menuEntities.classList.remove('active');
+    menuClasses.classList.remove('active');
+    if (pageTitle) pageTitle.innerHTML = '🗓️ Simulação Vencimento';
+
+    // Load class values if not loaded
+    if (!classValues.length) classValues = await loadClassValues();
+    renderSalaryCalendar();
+  } finally {
+    hideLoading();
+  }
+});
+
+menuEntities.addEventListener('click', async () => {
+  showLoading();
+  try {
+    mainContent.style.display = 'none';
+    entitiesPanel.style.display = '';
+    if (yearToggle) yearToggle.style.display = 'none';
+    menuEntities.classList.add('active');
+    menuDashboard.classList.remove('active');
+    // Update header title/icon
+    if (pageTitle) pageTitle.innerHTML = '🏢 Lista de Entidades';
+    nifsMap = await loadNifsMap();
+    renderEntitiesTable();
   } finally {
     hideLoading();
   }
@@ -253,6 +293,90 @@ function renderEntitiesTable() {
     tr.innerHTML = `<td>${id}</td><td>${entity}</td>`;
     tbody.appendChild(tr);
   });
+}
+
+function renderSalaryCalendar() {
+  const container = document.getElementById('salaryCalendar');
+  container.innerHTML = '';
+
+  const year = new Date().getFullYear();
+
+  // Build table: columns = months, rows = days (1-31)
+  const table = document.createElement('table');
+  table.className = 'salary-calendar-table';
+
+  // Header row: months
+  const thead = document.createElement('thead');
+  const headRow = document.createElement('tr');
+  headRow.innerHTML = `<th>Dia</th>` + PT_MONTHS.map(m => `<th>${m}</th>`).join('');
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
+  // Body: rows for each day (1-31)
+  const tbody = document.createElement('tbody');
+  for (let day = 1; day <= 31; day++) {
+    const row = document.createElement('tr');
+    row.innerHTML = `<th>${day}</th>`;
+    for (let monthIdx = 0; monthIdx < 12; monthIdx++) {
+      const daysInMonth = new Date(year, monthIdx + 1, 0).getDate();
+      const cell = document.createElement('td');
+      if (day > daysInMonth) {
+        cell.style.background = '#222'; // Invalid day for this month
+      } else {
+        const date = new Date(year, monthIdx, day);
+        const yyyy_mm_dd = `${year}-${String(monthIdx+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        // Weekend
+        if (date.getDay() === 0 || date.getDay() === 6) {
+          cell.style.background = '#fffbe6';
+        }
+        // Holiday
+        if (PT_HOLIDAYS_2025.includes(yyyy_mm_dd)) {
+          cell.style.background = '#eee';
+        }
+        // Weekday label (transparent, optional)
+        cell.innerHTML = `<span style="opacity:0.3;font-size:0.8em">${PT_WEEKDAYS[date.getDay()]}</span><br>`;
+        // Only show value if not holiday
+        if (!PT_HOLIDAYS_2025.includes(yyyy_mm_dd)) {
+          const total = getExpectedValueForDay(classValues, date);
+          if (total > 0) {
+            cell.innerHTML += `<span style="font-weight:bold">${total.toFixed(2)} €</span>`;
+          }
+        }
+      }
+      row.appendChild(cell);
+    }
+    tbody.appendChild(row);
+  }
+  table.appendChild(tbody);
+  container.appendChild(table);
+}
+
+// Helper to get expected value for a given date
+function getExpectedValueForDay(classValues, date) {
+  let total = 0;
+  const weekday = PT_WEEKDAYS[date.getDay()];
+  const yyyy_mm_dd = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+  classValues.forEach(entry => {
+    entry.classes.forEach(cls => {
+      // Only count if weekday matches and date is within valuePeriod
+      if (cls.day && cls.day.toLowerCase().startsWith(weekday.slice(0,3).toLowerCase())) {
+        // Check period
+        let valid = true;
+        if (cls.valuePeriod && cls.valuePeriod.startDate) {
+          const [d,m,y] = cls.valuePeriod.startDate.split('-');
+          const start = new Date(`${y}-${m}-${d}`);
+          if (date < start) valid = false;
+        }
+        if (cls.valuePeriod && cls.valuePeriod.endDate) {
+          const [d,m,y] = cls.valuePeriod.endDate.split('-');
+          const end = new Date(`${y}-${m}-${d}`);
+          if (date > end) valid = false;
+        }
+        if (valid) total += Number(cls.value);
+      }
+    });
+  });
+  return total;
 }
 
 document.getElementById('infoIcon').addEventListener('click', () => {

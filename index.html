@@ -16,10 +16,14 @@
       <span class="sidebar-icon">📊</span>
       <span class="sidebar-label">Dashboard</span>
     </div>
-  <div class="sidebar-menu" id="menuClasses">
-    <span class="sidebar-icon">🏷️</span>
-    <span class="sidebar-label">Valores por Aula</span>
-  </div>
+    <div class="sidebar-menu" id="menuClasses">
+      <span class="sidebar-icon">🏷️</span>
+      <span class="sidebar-label">Valores por Aula</span>
+    </div>
+    <div class="sidebar-menu" id="menuSalarySim">
+      <span class="sidebar-icon">🗓️</span>
+      <span class="sidebar-label">Simulação Vencimento</span>
+    </div>
     <div class="sidebar-menu" id="menuEntities">
       <span class="sidebar-icon">🏢</span>
       <span class="sidebar-label">Lista de Entidades</span>
@@ -86,17 +90,9 @@
     </section>
   </main>
 
-  <!-- Entities Table Panel (hidden by default) -->
-  <div id="entitiesPanel" style="display:none;">
-    <table id="entitiesTable">
-      <thead>
-        <tr>
-          <th id="sortNif" style="cursor:pointer;">NIF ▲▼</th>
-          <th id="sortEntidade" style="cursor:pointer;">ENTIDADE ▲▼</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+  <!-- Salary Simulation Calendar Panel (hidden by default) -->
+  <div id="salarySimPanel" style="display:none;">
+    <div id="salaryCalendar"></div>
   </div>
 
   <!-- Classes Table Panel (hidden by default) -->
@@ -108,6 +104,19 @@
           <th id="sortClassEntidade" style="cursor:pointer;">ENTIDADE ▲▼</th>
           <th id="sortClassCount" style="cursor:pointer;">Nº Aulas/Semana ▲▼</th>
           <th id="sortClassValue" style="cursor:pointer;">Valor/Aula ▲▼</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Entities Table Panel (hidden by default) -->
+  <div id="entitiesPanel" style="display:none;">
+    <table id="entitiesTable">
+      <thead>
+        <tr>
+          <th id="sortNif" style="cursor:pointer;">NIF ▲▼</th>
+          <th id="sortEntidade" style="cursor:pointer;">ENTIDADE ▲▼</th>
         </tr>
       </thead>
       <tbody></tbody>

@@ -416,6 +416,28 @@ tr:last-child td {
   text-align: left;
 }
 
+.salary-calendar-table {
+  margin: 2em auto;
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 1200px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(45, 108, 223, 0.07);
+}
+
+.salary-calendar-table th, .salary-calendar-table td {
+  border: 1px solid #e0e6ed;
+  padding: 0.3em 0.5em;
+  text-align: center;
+  min-width: 70px;
+  min-height: 40px;
+}
+
+.salary-calendar-table th {
+  background: #e3eaf7;
+  color: #2d6cdf;
+}
+
 #loadingOverlay {
   position: fixed;
   z-index: 9999;
