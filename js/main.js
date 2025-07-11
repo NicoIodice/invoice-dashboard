@@ -1,28 +1,15 @@
-import { loadConfig, config } from './config.js';
-import { loadNifsMap, loadCSV, getYearList, loadClassValues } from './data.js';
-import { showLoading, hideLoading, resetDashboard, updateUI } from './ui.js';
+import { loadConfig } from './config.js';
+import { loadNifsMap, loadClassValues } from './data.js';
+import { setupYearSelector, loadAndUpdateDashboard } from './dashboard.js';
+import { showLoading, hideLoading } from './utils.js';
 
 const PT_MONTHS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
 ];
+
 const PT_WEEKDAYS = [
   "Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"
-];
-const EN_TO_PT_WEEKDAYS = {
-  "sunday": "Domingo",
-  "monday": "Segunda",
-  "tuesday": "Terça",
-  "wednesday": "Quarta",
-  "thursday": "Quinta",
-  "friday": "Sexta",
-  "saturday": "Sábado"
-};
-const PT_HOLIDAYS_2025 = [
-  "2025-01-01", "2025-04-18", "2025-04-25", "2025-05-01", "2025-06-10",
-  "2025-06-19", "2025-06-24", "2025-08-15", "2025-10-05", "2025-11-01", 
-  "2025-12-01", "2025-12-08", "2025-12-25"
-  // Add more if needed
 ];
 
 const pageTitle = document.getElementById('pageTitle');
@@ -33,13 +20,7 @@ const menuEntities = document.getElementById('menuEntities');
 const entitiesPanel = document.getElementById('entitiesPanel');
 const mainContent = document.querySelector('main');
 
-const tableBody = document.querySelector("#invoiceTable tbody");
-const yearSelect = document.getElementById("yearSelect");
 const refreshBtn = document.getElementById("refreshBtn");
-
-let currentYear = new Date().getFullYear();
-const quarterTotals = [0, 0, 0, 0];
-const nifCounts = {};
 
 let nifsMap = {};
 
@@ -50,6 +31,7 @@ let classValues = [];
 let classSortKey = 'entidade';
 let classSortAsc = true;
 
+let currentYearHolidays = [];
 const menuSalarySimulation = document.getElementById('menuSalarySimulation');
 const salarySimPanel = document.getElementById('salarySimPanel');
 
@@ -67,7 +49,7 @@ menuDashboard.addEventListener('click', async () => {
     menuClasses.classList.remove('active');
     menuSalarySimulation.classList.remove('active');
     if (pageTitle) pageTitle.innerHTML = '📊 Faturas-Recibo Emitidas';
-    await loadAndUpdate();
+    await loadAndUpdateDashboard();
   } finally {
     hideLoading();
   }
@@ -103,9 +85,10 @@ menuSalarySimulation.addEventListener('click', async () => {
     menuEntities.classList.remove('active');
     menuClasses.classList.remove('active');
     if (pageTitle) pageTitle.innerHTML = '🗓️ Simulação Vencimento';
-
     // Load class values if not loaded
     if (!classValues.length) classValues = await loadClassValues();
+    const currentCalendarYear = new Date().getFullYear();
+    currentYearHolidays = await loadYearHolidays(currentCalendarYear);
     renderSalaryCalendar();
     adjustCalendarTooltips();
   } finally {
@@ -148,30 +131,6 @@ function hideAllPanels() {
   entitiesPanel.style.display = 'none';
   classesPanel.style.display = 'none';
   salarySimPanel.style.display = 'none';
-}
-
-async function setupYearSelector() {
-  let years;
-  try {
-    years = await getYearList();
-  } catch (err) {
-    //alert("❌ Não foi possível carregar a lista de anos.");
-    resetDashboard(tableBody, quarterTotals, nifCounts, config);
-    console.error("❌ Não foi possível carregar a lista de anos.", err);
-    return;
-  }
-  yearSelect.innerHTML = "";
-  years.forEach(year => {
-    const opt = document.createElement("option");
-    opt.value = year;
-    opt.textContent = year;
-    if (year == currentYear) opt.selected = true;
-    yearSelect.appendChild(opt);
-  });
-  yearSelect.addEventListener("change", () => {
-    currentYear = yearSelect.value;
-    loadAndUpdate();
-  });
 }
 
 function renderClassesTable() {
@@ -264,27 +223,11 @@ document.getElementById('sortClassValue').addEventListener('click', () => {
   renderClassesTable();
 });
 
-async function loadAndUpdate() {
-  showLoading();
-  try {
-    if (!Object.keys(nifsMap).length) {
-      nifsMap = await loadNifsMap();
-    }
-    const rows = await loadCSV(currentYear, nifsMap);
-    updateUI(rows, tableBody, quarterTotals, nifCounts, config);
-  } catch (err) {
-    //alert("❌ Erro ao carregar CSV para o ano selecionado.");
-    resetDashboard(tableBody, quarterTotals, nifCounts, config);
-    console.error("❌ Erro ao carregar CSV para o ano selecionado:", err);
-  } finally {
-    hideLoading();
-  }
-}
 
 refreshBtn.addEventListener("click", async () => {
   refreshBtn.classList.add("refreshing");
   try {
-    await loadAndUpdate();
+    await loadAndUpdateDashboard();
   } finally {
     setTimeout(() => refreshBtn.classList.remove("refreshing"), 700);
   }
@@ -370,13 +313,13 @@ function renderSalaryCalendar() {
           cell.style.background = cell.style.background || '#fffbe6';
         }
         // Holiday
-        if (PT_HOLIDAYS_2025.includes(yyyy_mm_dd)) {
+        if (currentYearHolidays.includes(yyyy_mm_dd)) {
           cell.style.background = '#eee';
         }
         // Weekday label (transparent, optional)
         cell.innerHTML = `<span style="opacity:0.3;font-size:0.8em">${PT_WEEKDAYS[date.getDay()]}</span><br>`;
         // Only show value if not holiday
-        if (!PT_HOLIDAYS_2025.includes(yyyy_mm_dd)) {
+        if (!currentYearHolidays.includes(yyyy_mm_dd)) {
           const { total, details } = getExpectedValueAndDetailsForDay(classValues, date);
           if (total > 0) {
             // Sort details by time ascending
@@ -469,6 +412,17 @@ function getExpectedValueAndDetailsForDay(classValues, date) {
   return { total, details };
 }
 
+// Add this function after your imports
+async function loadYearHolidays(year) {
+  try {
+    const holidays = await loadHolidays();
+    return holidays[year] || [];
+  } catch (err) {
+    console.error(`❌ Erro ao carregar feriados para ${year}:`, err);
+    return [];
+  }
+}
+
 function adjustCalendarTooltips() {
   // For each tooltip cell, adjust the tooltip position if near the edges
   document.querySelectorAll('.salary-calendar-table tr').forEach(row => {
@@ -507,6 +461,6 @@ document.getElementById('infoDialog').addEventListener('click', (e) => {
 (async function init() {
   await loadConfig();
   await setupYearSelector();
-  await loadAndUpdate();
+  await loadAndUpdateDashboard();
   menuDashboard.classList.add('active');
 })();

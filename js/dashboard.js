@@ -1,17 +1,59 @@
-// Utility for formatting currency
-export function formatCurrency(value) {
-  return `${parseFloat(value).toFixed(2)} €`;
+import { config } from './config.js';
+import { showLoading, hideLoading, formatCurrency } from './utils.js';
+import { loadNifsMap, loadCSV, getYearList } from './data.js';
+
+let currentYear = new Date().getFullYear();
+
+const tableBody = document.querySelector("#invoiceTable tbody");
+const yearSelect = document.getElementById("yearSelect");
+
+const quarterTotals = [0, 0, 0, 0];
+const nifCounts = {};
+
+let nifsMap = {};
+
+export async function setupYearSelector() {
+  let years;
+  try {
+    years = await getYearList();
+  } catch (err) {
+    //alert("❌ Não foi possível carregar a lista de anos.");
+    resetDashboard(tableBody, quarterTotals, nifCounts, config);
+    console.error("❌ Não foi possível carregar a lista de anos.", err);
+    return;
+  }
+  yearSelect.innerHTML = "";
+  years.forEach(year => {
+    const opt = document.createElement("option");
+    opt.value = year;
+    opt.textContent = year;
+    if (year == currentYear) opt.selected = true;
+    yearSelect.appendChild(opt);
+  });
+  yearSelect.addEventListener("change", () => {
+    currentYear = yearSelect.value;
+    loadAndUpdateDashboard();
+  });
 }
 
-export function showLoading() {
-  document.getElementById('loadingOverlay').style.display = 'flex';
+export async function loadAndUpdateDashboard() {
+  showLoading();
+  try {
+    if (!Object.keys(nifsMap).length) {
+      nifsMap = await loadNifsMap();
+    }
+    const rows = await loadCSV(currentYear, nifsMap);
+    updateUI(rows, tableBody, quarterTotals, nifCounts, config);
+  } catch (err) {
+    //alert("❌ Erro ao carregar CSV para o ano selecionado.");
+    resetDashboard(tableBody, quarterTotals, nifCounts, config);
+    console.error("❌ Erro ao carregar CSV para o ano selecionado:", err);
+  } finally {
+    hideLoading();
+  }
 }
-export function hideLoading() {
-  document.getElementById('loadingOverlay').style.display = 'none';
-}
-
 // Resets all dashboard panels and table
-export function resetDashboard(tableBody, quarterTotals, nifCounts, config) {
+function resetDashboard(tableBody, quarterTotals, nifCounts, config) {
   tableBody.innerHTML = "";
   quarterTotals.fill(0);
   Object.keys(nifCounts).forEach(k => delete nifCounts[k]);
@@ -21,7 +63,7 @@ export function resetDashboard(tableBody, quarterTotals, nifCounts, config) {
 }
 
 // Updates the main UI with new rows
-export function updateUI(rows, tableBody, quarterTotals, nifCounts, config) {
+function updateUI(rows, tableBody, quarterTotals, nifCounts, config) {
   tableBody.innerHTML = "";
   quarterTotals.fill(0);
   Object.keys(nifCounts).forEach(k => delete nifCounts[k]);
@@ -34,7 +76,7 @@ export function updateUI(rows, tableBody, quarterTotals, nifCounts, config) {
 }
 
 // Updates the invoice table
-export function updateInvoicesTable(rows, tableBody, quarterTotals, nifCounts) {
+function updateInvoicesTable(rows, tableBody, quarterTotals, nifCounts) {
   for (const row of rows) {
     if (!validateRow(row)) {
       console.warn("Linha inválida ignorada:", row);
@@ -65,7 +107,7 @@ export function updateInvoicesTable(rows, tableBody, quarterTotals, nifCounts) {
 }
 
 // Updates the quarter summary panel with tooltips
-export function updateQuarterSummaryPanel(quarterTotals, rows = []) {
+function updateQuarterSummaryPanel(quarterTotals, rows = []) {
   const monthsByQuarter = [
     [0, 1, 2],   // Q1: Jan, Feb, Mar
     [3, 4, 5],   // Q2: Apr, May, Jun
@@ -118,7 +160,7 @@ export function updateQuarterSummaryPanel(quarterTotals, rows = []) {
 }
 
 // Updates the fiscal status panel
-export function updateFiscalStatusPanel(config) {
+function updateFiscalStatusPanel(config) {
   const taxPanel = document.getElementById("taxPanel");
   taxPanel.querySelectorAll(".fiscal-item").forEach(el => el.remove());
 
@@ -147,7 +189,7 @@ export function updateFiscalStatusPanel(config) {
 }
 
 // Updates the NIF stats panel
-export function updateInvoicesByNifPanel(rows, nifCounts) {
+function updateInvoicesByNifPanel(rows, nifCounts) {
   const sortedNifs = Object.entries(nifCounts)
     .sort((a, b) => b[1] - a[1]);
 
@@ -165,7 +207,7 @@ export function updateInvoicesByNifPanel(rows, nifCounts) {
 }
 
 // Helper: get quarter from month (0-based)
-export function getQuarter(month) {
+function getQuarter(month) {
   if (month <= 2) return 1;
   if (month <= 5) return 2;
   if (month <= 8) return 3;
@@ -173,7 +215,7 @@ export function getQuarter(month) {
 }
 
 // Helper: validate a row (should be imported or duplicated if needed)
-export function validateRow(row) {
+function validateRow(row) {
   const nifValid = row.NIF && /^\d+$/.test(row.NIF.trim());
   const valueValid = /^\d+(\.\d{1,2})?$/.test(row.VALOR);
   const dateValid = /^\d{4}-\d{2}-\d{2}$/.test(row['DATA SERVICO']);

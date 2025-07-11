@@ -63,12 +63,13 @@ export async function getYearList() {
 }
 
 export async function loadClassValues() {
+  const fileName = 'class-values.json';
   let arr = [];
   if (config.loadFromDropbox) {
-    const path = `${config.dropboxFolder}/class-values.json`;
+    const path = `${config.dropboxFolder}/${fileName}`;
     arr = await dropboxDownloadJSON(path);
   } else {
-    const filePath = `${config.dataFolder}/class-values.json`.replace('./', '');
+    const filePath = `${config.dataFolder}/${fileName}`.replace('./', '');
     const res = await fetch(filePath);
     arr = await res.json();
   }
@@ -76,12 +77,13 @@ export async function loadClassValues() {
 }
 
 export async function loadNifsMap() {
+  const fileName = 'nifs.json';
   let nifsArr = [];
   if (config.loadFromDropbox) {
-    const nifsPath = `${config.dropboxFolder}/nifs.json`;
+    const nifsPath = `${config.dropboxFolder}/${fileName}`;
     nifsArr = await dropboxDownloadJSON(nifsPath);
   } else {
-    const filePath = `${config.dataFolder}/nifs.json`.replace('./', '');
+    const filePath = `${config.dataFolder}/${fileName}`.replace('./', '');
     const res = await fetch(filePath);
     nifsArr = await res.json();
   }
@@ -91,4 +93,18 @@ export async function loadNifsMap() {
     nifsMap[item.id] = item.entity;
   });
   return nifsMap;
+}
+
+export async function loadHolidays() {
+  const fileName = 'holidays.json';
+  let holidays = {};
+  if (config.loadFromDropbox) {
+    const path = `${config.dropboxFolder}/${fileName}`;
+    holidays = await dropboxDownloadJSON(path);
+  } else {
+    const filePath = `${config.dataFolder}/${fileName}`.replace('./', '');
+    const res = await fetch(filePath);
+    holidays = await res.json();
+  }
+  return holidays;
 }
