@@ -327,6 +327,9 @@ function renderSalaryCalendar() {
 
   // Body: rows for each day (1-31)
   const tbody = document.createElement('tbody');
+  // We'll collect monthly sums here
+  const monthlySums = Array(12).fill(0);
+
   for (let day = 1; day <= 31; day++) {
     const row = document.createElement('tr');
     row.innerHTML = `<th>${day}</th>`;
@@ -370,6 +373,8 @@ function renderSalaryCalendar() {
               <span style="font-weight:bold">${total.toFixed(2)} €</span>
               <div class="calendar-tooltip-panel">${tooltipHtml}</div>
             `;
+            // Add to monthly sum
+            monthlySums[monthIdx] += total;
           }
         }
       }
@@ -378,6 +383,25 @@ function renderSalaryCalendar() {
     tbody.appendChild(row);
   }
   table.appendChild(tbody);
+
+  // --- Add summary row ---
+  const tfoot = document.createElement('tfoot');
+  const sumRow = document.createElement('tr');
+  sumRow.style.background = '#e3eaf7';
+  sumRow.innerHTML = `<th style="font-weight:bold;">Total</th>`;
+  let yearTotal = 0;
+  for (let m = 0; m < 12; m++) {
+    sumRow.innerHTML += `<th style="font-weight:bold;">${monthlySums[m].toFixed(2)} €</th>`;
+    yearTotal += monthlySums[m];
+  }
+  // Add total for the year at the far right
+  sumRow.innerHTML += `<th style="font-weight:bold;background:#2d6cdf;color:#fff;">${yearTotal.toFixed(2)} €</th>`;
+  tfoot.appendChild(sumRow);
+  table.appendChild(tfoot);
+
+  // Add an extra empty header cell to align the year total
+  table.querySelector('thead tr').innerHTML += `<th>Total Ano</th>`;
+
   container.appendChild(table);
 }
 
