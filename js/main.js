@@ -24,54 +24,61 @@ const menuClasses = document.getElementById('menuClasses');
 const classesPanel = document.getElementById('classesPanel');
 
 let classValues = [];
-let classSortKey = 'nif';
+let classSortKey = 'entidade';
 let classSortAsc = true;
 
 let entitiesSortKey = 'ENTIDADE';
 let entitiesSortAsc = true;
 
-menuDashboard.addEventListener('click', () => {
-  entitiesPanel.style.display = 'none';
-  mainContent.style.display = '';
-  if (yearToggle) yearToggle.style.display = '';
-  menuDashboard.classList.add('active');
-  menuEntities.classList.remove('active');
-  // Update header title/icon
-  if (pageTitle) pageTitle.innerHTML = '📊 Faturas-Recibo Emitidas';
+menuDashboard.addEventListener('click', async () => {
+  showLoading();
+  try {
+    entitiesPanel.style.display = 'none';
+    mainContent.style.display = '';
+    if (yearToggle) yearToggle.style.display = '';
+    menuDashboard.classList.add('active');
+    menuEntities.classList.remove('active');
+    // Update header title/icon
+    if (pageTitle) pageTitle.innerHTML = '📊 Faturas-Recibo Emitidas';
+    await loadAndUpdate();
+  } finally {
+    hideLoading();
+  }
 });
 
 menuEntities.addEventListener('click', async () => {
-  mainContent.style.display = 'none';
-  entitiesPanel.style.display = '';
-  if (yearToggle) yearToggle.style.display = 'none';
-  menuEntities.classList.add('active');
-  menuDashboard.classList.remove('active');
-
-  // Load and display entities
-  nifsMap = await loadNifsMap();
-  renderEntitiesTable();
+  showLoading();
+  try {
+    mainContent.style.display = 'none';
+    entitiesPanel.style.display = '';
+    if (yearToggle) yearToggle.style.display = 'none';
+    menuEntities.classList.add('active');
+    menuDashboard.classList.remove('active');
+    // Update header title/icon
+    if (pageTitle) pageTitle.innerHTML = '🏢 Lista de Entidades';
+    nifsMap = await loadNifsMap();
+    renderEntitiesTable();
+  } finally {
+    hideLoading();
+  }
 });
 
-menuEntities.addEventListener('click', async () => {
-  // Hide dashboard, show entities panel
-  mainContent.style.display = 'none';
-  entitiesPanel.style.display = '';
-  if (yearToggle) yearToggle.style.display = 'none';
-  menuEntities.classList.add('active');
-  menuDashboard.classList.remove('active');
-
-  // Update header title/icon
-  if (pageTitle) pageTitle.innerHTML = '🏢 Lista de Entidades';
-
-  // Load and display entities
-  const nifsMap = await loadNifsMap();
-  const tbody = document.querySelector('#entitiesTable tbody');
-  tbody.innerHTML = '';
-  Object.entries(nifsMap).forEach(([id, entity]) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${id}</td><td>${entity}</td>`;
-    tbody.appendChild(tr);
-  });
+menuClasses.addEventListener('click', async () => {
+  showLoading();
+  try {
+    mainContent.style.display = 'none';
+    entitiesPanel.style.display = 'none';
+    classesPanel.style.display = '';
+    if (yearToggle) yearToggle.style.display = 'none';
+    menuClasses.classList.add('active');
+    menuDashboard.classList.remove('active');
+    menuEntities.classList.remove('active');
+    if (pageTitle) pageTitle.innerHTML = '🏷️ Valores por Aula';
+    classValues = await loadClassValues();
+    renderClassesTable();
+  } finally {
+    hideLoading();
+  }
 });
 
 async function setupYearSelector() {
@@ -98,43 +105,67 @@ async function setupYearSelector() {
   });
 }
 
-menuClasses.addEventListener('click', async () => {
-  mainContent.style.display = 'none';
-  entitiesPanel.style.display = 'none';
-  classesPanel.style.display = '';
-  if (yearToggle) yearToggle.style.display = 'none';
-  menuClasses.classList.add('active');
-  menuDashboard.classList.remove('active');
-  menuEntities.classList.remove('active');
-  if (pageTitle) pageTitle.innerHTML = '🏷️ Valores por Aula';
-
-  classValues = await loadClassValues();
-  renderClassesTable();
-});
-
 function renderClassesTable() {
   const tbody = document.querySelector('#classesTable tbody');
   tbody.innerHTML = '';
   const arr = [...classValues];
-  arr.sort((a, b) => {
+
+  // Prepare a flat array for sorting and rendering
+  const rows = arr.map(entry => {
+    const { nif, classes } = entry;
+    const entidade = nifsMap[nif] || '-';
+    const numClasses = classes.length;
+    // Get all unique values per class
+    const uniqueValues = [...new Set(classes.map(c => c.value))];
+    // Get all endDates (if any)
+    const endDates = classes.map(c => c.valuePeriod?.endDate).filter(Boolean);
+    // Find the latest endDate (if any)
+    let latestEndDate = null;
+    if (endDates.length) {
+      latestEndDate = endDates
+        .map(dateStr => new Date(dateStr.split('-').reverse().join('-')))
+        .sort((a, b) => b - a)[0];
+    }
+    // Check if all classes have an endDate and if current date is after the latest
+    const allHaveEndDate = classes.every(c => c.valuePeriod && c.valuePeriod.endDate);
+    const now = new Date();
+    const expired = allHaveEndDate && latestEndDate && now > latestEndDate;
+    return {
+      nif,
+      entidade,
+      numClasses,
+      uniqueValues,
+      expired
+    };
+  });
+
+  // Sorting
+  rows.sort((a, b) => {
     let cmp;
     if (classSortKey === 'nif') {
       cmp = a.nif.localeCompare(b.nif, 'pt');
     } else if (classSortKey === 'entidade') {
-      const entA = nifsMap[a.nif] || '';
-      const entB = nifsMap[b.nif] || '';
-      cmp = entA.localeCompare(entB, 'pt');
-    } else if (classSortKey === 'classesPerWeek') {
-      cmp = a.classesPerWeek - b.classesPerWeek;
+      cmp = a.entidade.localeCompare(b.entidade, 'pt');
+    } else if (classSortKey === 'numClasses') {
+      cmp = a.numClasses - b.numClasses;
     } else {
-      cmp = parseFloat(a.valuePerClass) - parseFloat(b.valuePerClass);
+      // Sort by first value per class
+      cmp = (a.uniqueValues[0] || 0) - (b.uniqueValues[0] || 0);
     }
     return classSortAsc ? cmp : -cmp;
   });
-  arr.forEach(({ nif, classesPerWeek, valuePerClass }) => {
-    const entidade = nifsMap[nif] || '-';
+
+  // Render rows
+  rows.forEach(({ nif, entidade, numClasses, uniqueValues, expired }) => {
+    const valueCell = uniqueValues.map(v => `${parseFloat(v).toFixed(2)} €`).join(', ');
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${nif}</td><td>${entidade}</td><td>${classesPerWeek}</td><td>${parseFloat(valuePerClass).toFixed(2)} €</td>`;
+    if (expired) tr.style.background = '#eee';
+    tr.innerHTML = `
+      <td>${nif}</td>
+      <td>${entidade}</td>
+      <td>${numClasses}</td>
+      <td>${valueCell}</td>
+    `;
     tbody.appendChild(tr);
   });
 }
@@ -153,13 +184,13 @@ document.getElementById('sortClassEntidade').addEventListener('click', () => {
 });
 
 document.getElementById('sortClassCount').addEventListener('click', () => {
-  classSortKey = 'classesPerWeek';
+  classSortKey = 'numClasses';
   classSortAsc = !classSortAsc;
   renderClassesTable();
 });
 
 document.getElementById('sortClassValue').addEventListener('click', () => {
-  classSortKey = 'valuePerClass';
+  classSortKey = 'value';
   classSortAsc = !classSortAsc;
   renderClassesTable();
 });
