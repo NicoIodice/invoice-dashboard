@@ -300,6 +300,10 @@ function renderSalaryCalendar() {
   container.innerHTML = '';
 
   const year = new Date().getFullYear();
+  const today = new Date();
+  const todayDay = today.getDate();
+  const todayMonth = today.getMonth();
+  const todayYear = today.getFullYear();
 
   // Build table: columns = months, rows = days (1-31)
   const table = document.createElement('table');
@@ -325,9 +329,13 @@ function renderSalaryCalendar() {
       } else {
         const date = new Date(year, monthIdx, day);
         const yyyy_mm_dd = `${year}-${String(monthIdx+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        // Highlight current day
+        if (day === todayDay && monthIdx === todayMonth && year === todayYear) {
+          cell.style.background = '#b3e6ff'; // Light blue highlight
+        }
         // Weekend
         if (date.getDay() === 0 || date.getDay() === 6) {
-          cell.style.background = '#fffbe6';
+          cell.style.background = cell.style.background || '#fffbe6';
         }
         // Holiday
         if (PT_HOLIDAYS_2025.includes(yyyy_mm_dd)) {
