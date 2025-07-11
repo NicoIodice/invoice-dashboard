@@ -72,6 +72,24 @@ body {
   margin-left: 0.2em;
 }
 
+body.sidebar-collapsed #sidebar {
+  width: 48px !important;
+}
+
+body.sidebar-collapsed #sidebar:hover {
+  width: 48px !important;
+  background: linear-gradient(135deg, #4f8cff 60%, #b3cfff 100%);
+}
+
+body.sidebar-collapsed .sidebar-label {
+  opacity: 0 !important;
+}
+
+body.sidebar-collapsed header,
+body.sidebar-collapsed main {
+  margin-left: 48px !important;
+}
+
 #entitiesPanel {
   margin-left: 60px;
   margin-top: 2em;

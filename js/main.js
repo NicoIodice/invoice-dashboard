@@ -130,6 +130,18 @@ menuEntities.addEventListener('click', async () => {
   }
 });
 
+const sidebarToggle = document.getElementById('sidebarToggle');
+const sidebarToggleIcon = document.getElementById('sidebarToggleIcon');
+sidebarToggle.addEventListener('click', () => {
+  document.body.classList.toggle('sidebar-collapsed');
+  // Change icon direction
+  if (document.body.classList.contains('sidebar-collapsed')) {
+    sidebarToggleIcon.textContent = '➡️';
+  } else {
+    sidebarToggleIcon.textContent = '⬅️';
+  }
+});
+
 async function setupYearSelector() {
   let years;
   try {
