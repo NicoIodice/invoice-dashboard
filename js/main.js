@@ -1,6 +1,6 @@
 import { loadConfig } from './config.js';
 import { loadNifsMap, loadClassValues } from './data.js';
-import { setupYearSelector, loadAndUpdateDashboard } from './dashboard.js';
+import { setupYearSelector, loadAndUpdateDashboard } from './invoiceDashboard.js';
 import { showLoading, hideLoading } from './utils.js';
 
 const PT_MONTHS = [
