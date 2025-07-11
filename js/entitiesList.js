@@ -3,8 +3,10 @@ import { loadNifsMap } from './data.js';
 let entitiesSortKey = 'ENTIDADE';
 let entitiesSortAsc = true;
 
+let nifsMap = {};
+
 export async function renderEntitiesTable() {
-  let nifsMap = await loadNifsMap();
+  nifsMap = await loadNifsMap();
   const tbody = document.querySelector('#entitiesTable tbody');
   tbody.innerHTML = '';
   // Convert map to array for sorting
