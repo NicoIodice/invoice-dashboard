@@ -50,7 +50,7 @@ let classValues = [];
 let classSortKey = 'entidade';
 let classSortAsc = true;
 
-const menuSalarySim = document.getElementById('menuSalarySim');
+const menuSalarySimulation = document.getElementById('menuSalarySimulation');
 const salarySimPanel = document.getElementById('salarySimPanel');
 
 let entitiesSortKey = 'ENTIDADE';
@@ -59,12 +59,13 @@ let entitiesSortAsc = true;
 menuDashboard.addEventListener('click', async () => {
   showLoading();
   try {
-    entitiesPanel.style.display = 'none';
+    hideAllPanels();
     mainContent.style.display = '';
     if (yearToggle) yearToggle.style.display = '';
     menuDashboard.classList.add('active');
     menuEntities.classList.remove('active');
-    // Update header title/icon
+    menuClasses.classList.remove('active');
+    menuSalarySimulation.classList.remove('active');
     if (pageTitle) pageTitle.innerHTML = '📊 Faturas-Recibo Emitidas';
     await loadAndUpdate();
   } finally {
@@ -72,16 +73,17 @@ menuDashboard.addEventListener('click', async () => {
   }
 });
 
+// Repeat for other menu handlers:
 menuClasses.addEventListener('click', async () => {
   showLoading();
   try {
-    mainContent.style.display = 'none';
-    entitiesPanel.style.display = 'none';
+    hideAllPanels();
     classesPanel.style.display = '';
     if (yearToggle) yearToggle.style.display = 'none';
     menuClasses.classList.add('active');
     menuDashboard.classList.remove('active');
     menuEntities.classList.remove('active');
+    menuSalarySimulation.classList.remove('active');
     if (pageTitle) pageTitle.innerHTML = '🏷️ Valores por Aula';
     classValues = await loadClassValues();
     renderClassesTable();
@@ -90,15 +92,13 @@ menuClasses.addEventListener('click', async () => {
   }
 });
 
-menuSalarySim.addEventListener('click', async () => {
+menuSalarySimulation.addEventListener('click', async () => {
   showLoading();
   try {
-    mainContent.style.display = 'none';
-    entitiesPanel.style.display = 'none';
-    classesPanel.style.display = 'none';
+    hideAllPanels();
     salarySimPanel.style.display = '';
     if (yearToggle) yearToggle.style.display = 'none';
-    menuSalarySim.classList.add('active');
+    menuSalarySimulation.classList.add('active');
     menuDashboard.classList.remove('active');
     menuEntities.classList.remove('active');
     menuClasses.classList.remove('active');
@@ -116,12 +116,13 @@ menuSalarySim.addEventListener('click', async () => {
 menuEntities.addEventListener('click', async () => {
   showLoading();
   try {
-    mainContent.style.display = 'none';
+    hideAllPanels();
     entitiesPanel.style.display = '';
     if (yearToggle) yearToggle.style.display = 'none';
     menuEntities.classList.add('active');
     menuDashboard.classList.remove('active');
-    // Update header title/icon
+    menuClasses.classList.remove('active');
+    menuSalarySimulation.classList.remove('active');
     if (pageTitle) pageTitle.innerHTML = '🏢 Lista de Entidades';
     nifsMap = await loadNifsMap();
     renderEntitiesTable();
@@ -141,6 +142,13 @@ sidebarToggle.addEventListener('click', () => {
     sidebarToggleIcon.textContent = '⬅️';
   }
 });
+
+function hideAllPanels() {
+  mainContent.style.display = 'none';
+  entitiesPanel.style.display = 'none';
+  classesPanel.style.display = 'none';
+  salarySimPanel.style.display = 'none';
+}
 
 async function setupYearSelector() {
   let years;

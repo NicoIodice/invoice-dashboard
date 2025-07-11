@@ -1,16 +1,14 @@
 body {
   font-family: sans-serif;
-  /*display: flex;*/
-  /*flex-direction: column;*/
   padding: 1rem;
-  background: #f5f7fa; /* Soft finance-style background */
+  background: #f5f7fa;
 }
 
 #sidebar {
   position: fixed;
   top: 0;
   left: 0;
-  height: 100vh; /* Use 100vh, not 200vh */
+  height: 100vh;
   width: 4em;
   background: linear-gradient(135deg, #4f8cff 60%, #b3cfff 100%);
   color: #fff;
@@ -18,11 +16,11 @@ body {
   transition: width 0.2s, background 0.3s;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Ensures bottom button stays at the bottom */
+  justify-content: space-between;
   align-items: flex-start;
   padding-left: 0;
   padding-right: 0;
-  border-right: 1.5px solid #e3eaf7;
+  border-right: 0.09em solid #e3eaf7;
 }
 
 #sidebar > div {
@@ -30,7 +28,7 @@ body {
 }
 
 #sidebar:hover {
-  width: 200px;
+  width: 12em;
   background: linear-gradient(135deg, #4f8cff 80%, #e3eaf7 100%);
 }
 
@@ -38,10 +36,10 @@ body {
   width: 100%;
   display: flex;
   align-items: center;
-  padding: 12px 12px 12px 14px; /* More left padding for icon+label */
+  padding: 0.75em 0.75em 0.75em 0.9em;
   cursor: pointer;
-  border-radius: 0 20px 20px 0;
-  margin-bottom: 6px;
+  border-radius: 0 1.25em 1.25em 0;
+  margin-bottom: 0.4em;
   overflow-x: hidden;
   transition: background 0.15s, color 0.2s;
 }
@@ -54,7 +52,7 @@ body {
 .sidebar-icon {
   font-size: 1.4em;
   margin-right: 0.7em;
-  min-width: 24px;
+  min-width: 1.5em;
   text-align: center;
 }
 
@@ -63,10 +61,10 @@ body {
   transition: opacity 0.2s;
   white-space: nowrap;
   font-weight: 500;
-  letter-spacing: 0.5px;
-  max-width: 110px;      /* Limit label width */
-  overflow: hidden;      /* Hide overflow */
-  text-overflow: ellipsis; /* Add ... if too long */
+  letter-spacing: 0.03em;
+  max-width: 7em;
+  overflow: hidden;
+  text-overflow: ellipsis;
   display: inline-block;
 }
 
@@ -76,11 +74,11 @@ body {
 }
 
 body.sidebar-collapsed #sidebar {
-  width: 48px !important;
+  width: 3em !important;
 }
 
 body.sidebar-collapsed #sidebar:hover {
-  width: 48px !important;
+  width: 3em !important;
   background: linear-gradient(135deg, #4f8cff 60%, #b3cfff 100%);
 }
 
@@ -90,23 +88,23 @@ body.sidebar-collapsed .sidebar-label {
 
 body.sidebar-collapsed header,
 body.sidebar-collapsed main {
-  margin-left: 48px !important;
+  margin-left: 3em !important;
 }
 
 #sidebarToggle {
-  margin-bottom: 18px;
-  margin-left: 8px;
+  margin-bottom: 1.1em;
+  margin-left: 0.5em;
   align-self: flex-start;
 }
 
 #entitiesPanel {
-  margin-left: 60px;
-  margin-top: 2em;
-  padding: 2em;
+  margin-left: 3.75em;
+  margin-top: 1.25em;
+  padding: 1.25em;
   background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 12px rgba(45,108,223,0.07);
-  max-width: 600px;
+  border-radius: 0.6em;
+  box-shadow: 0 0.13em 0.75em rgba(45,108,223,0.07);
+  max-width: 37.5em;
 }
 
 #entitiesPanel h2 {
@@ -116,12 +114,12 @@ body.sidebar-collapsed main {
 #entitiesTable {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 1em;
+  margin-top: 0.6em;
 }
 
 #entitiesTable th, #entitiesTable td {
-  border: 1px solid #e0e6ed;
-  padding: 0.5em 1em;
+  border: 0.09em solid #e0e6ed;
+  padding: 0.3em 0.6em;
   text-align: left;
 }
 
@@ -130,12 +128,12 @@ header {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
-  margin-left: 60px; /* enough for sidebar */
+  margin-left: 3.75em;
   margin-top: 1.5rem;
   transition: margin-left 0.2s;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 37.5em) {
   header {
     margin-left: 0;
   }
@@ -162,22 +160,22 @@ main {
   align-items: center;
   gap: 0.7em;
   background: #f9fbff;
-  border: 1.5px solid #2d6cdf;
-  border-radius: 8px;
-  padding: 0.4em 1em;
-  box-shadow: 0 2px 8px rgba(45, 108, 223, 0.07);
+  border: 0.09em solid #2d6cdf;
+  border-radius: 0.5em;
+  padding: 0.25em 0.6em;
+  box-shadow: 0 0.13em 0.75em rgba(45, 108, 223, 0.07);
 }
 
 #year-toggle label {
   color: #2d6cdf;
   font-weight: 500;
-  margin-right: 0.2em;
+  margin-right: 0.13em;
 }
 
 #yearSelect {
-  border: 1.5px solid #2d6cdf;
-  border-radius: 6px;
-  padding: 0.2em 0.8em;
+  border: 0.09em solid #2d6cdf;
+  border-radius: 0.4em;
+  padding: 0.13em 0.5em;
   font-size: 1em;
   background: #fff;
   color: #2d6cdf;
@@ -194,27 +192,27 @@ main {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.2em;
-  height: 2.2em;
+  width: 1.4em;
+  height: 1.4em;
   border-radius: 50%;
   background: linear-gradient(135deg, #2d6cdf 60%, #1abc9c 100%);
   color: #fff;
-  font-size: 1.4em;
+  font-size: 1.1em;
   cursor: pointer;
   border: none;
   transition: box-shadow 0.2s, background 0.2s;
-  box-shadow: 0 2px 8px rgba(45, 108, 223, 0.10);
+  box-shadow: 0 0.13em 0.75em rgba(45, 108, 223, 0.10);
   outline: none;
 }
 
 #refreshBtn:focus, #refreshBtn:hover {
-  box-shadow: 0 4px 16px rgba(45, 108, 223, 0.18);
+  box-shadow: 0 0.25em 1em rgba(45, 108, 223, 0.18);
   background: linear-gradient(135deg, #1abc9c 60%, #2d6cdf 100%);
 }
 
 #refreshBtn::before {
   content: "🔄";
-  font-size: 1.3em;
+  font-size: 1.1em;
   display: block;
   line-height: 1;
 }
@@ -232,17 +230,17 @@ table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  border: 1.5px solid #2d6cdf;
-  border-radius: 10px;
+  border: 0.09em solid #2d6cdf;
+  border-radius: 0.6em;
   overflow: hidden;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(45, 108, 223, 0.07);
+  box-shadow: 0 0.13em 0.75em rgba(45, 108, 223, 0.07);
 }
 
 th, td {
-  padding: 10px;
-  border-bottom: 1px solid #e3eaf7;
-  text-align: center; /* Center align all table cells */
+  padding: 0.6em;
+  border-bottom: 0.09em solid #e3eaf7;
+  text-align: center;
 }
 
 th {
@@ -255,31 +253,18 @@ tr:last-child td {
   border-bottom: none;
 }
 
-.quarter-1 {
-  background-color: rgba(45, 108, 223, 0.08);   /* Soft blue */
-}
-.quarter-2 {
-  background-color: rgba(26, 188, 156, 0.08);   /* Soft green */
-}
-.quarter-3 {
-  background-color: rgba(241, 196, 15, 0.10);   /* Soft yellow */
-}
-.quarter-4 {
-  background-color: rgba(231, 76, 60, 0.09);    /* Soft red */
-}
-
 .panel {
-  border: 1.5px solid #2d6cdf;
-  border-radius: 10px;
+  border: 0.09em solid #2d6cdf;
+  border-radius: 0.6em;
   background-color: #f9fbff;
-  box-shadow: 0 2px 8px rgba(45, 108, 223, 0.08);
+  box-shadow: 0 0.13em 0.75em rgba(45, 108, 223, 0.08);
   padding: 1rem;
   margin-bottom: 1rem;
   transition: box-shadow 0.2s;
 }
 
 .panel:hover {
-  box-shadow: 0 4px 16px rgba(45, 108, 223, 0.15);
+  box-shadow: 0 0.25em 1em rgba(45, 108, 223, 0.15);
 }
 
 #quarterSummary {
@@ -293,7 +278,7 @@ tr:last-child td {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  border-bottom: 1px solid #eee;
+  border-bottom: 0.07em solid #eee;
   padding: 0.25rem 0;
 }
 
@@ -312,10 +297,10 @@ tr:last-child td {
   color: #fff;
   background: #2d6cdf;
   padding: 0.2em 0.7em;
-  border-radius: 6px;
+  border-radius: 0.6em;
   font-size: 1.15em;
   font-weight: bold;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.03em;
   margin-left: 0.5em;
 }
 
@@ -330,12 +315,12 @@ tr:last-child td {
   left: 0;
   top: 120%;
   z-index: 10;
-  min-width: 180px;
+  min-width: 11em;
   background: #fff;
   color: #222;
-  border: 1px solid #2d6cdf;
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(45, 108, 223, 0.13);
+  border: 0.09em solid #2d6cdf;
+  border-radius: 0.5em;
+  box-shadow: 0 0.25em 1em rgba(45, 108, 223, 0.13);
   padding: 0.7em 1em;
   font-size: 0.98em;
   white-space: nowrap;
@@ -351,7 +336,7 @@ tr:last-child td {
   justify-content: space-between;
   align-items: center;
   padding: 0.1em 0;
-  min-width: 180px;
+  min-width: 11em;
 }
 
 .quarter-tooltip-label {
@@ -372,7 +357,7 @@ tr:last-child td {
 #fiscalStatus {
   display: flex;
   flex-direction: column;
-  align-items: flex-end; /* Aligns content to the right */
+  align-items: flex-end;
   gap: 0.5rem;
 }
 
@@ -380,7 +365,7 @@ tr:last-child td {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  border-bottom: 1px solid #eee;
+  border-bottom: 0.07em solid #eee;
   padding: 0.25rem 0;
 }
 
@@ -405,7 +390,7 @@ tr:last-child td {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  border-bottom: 1px solid #eee;
+  border-bottom: 0.07em solid #eee;
   padding: 0.25rem 0;
   font-size: 1em;
 }
@@ -422,13 +407,13 @@ tr:last-child td {
 }
 
 #classesPanel {
-  margin-left: 60px;
+  margin-left: 4em;
   margin-top: 2em;
   padding: 2em;
   background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 12px rgba(45,108,223,0.07);
-  max-width: 600px;
+  border-radius: 1em;
+  box-shadow: 0 0.13em 0.75em rgba(45,108,223,0.07);
+  max-width: 37.5em;
 }
 
 #classesTable {
@@ -438,7 +423,7 @@ tr:last-child td {
 }
 
 #classesTable th, #classesTable td {
-  border: 1px solid #e0e6ed;
+  border: 0.09em solid #e0e6ed;
   padding: 0.5em 1em;
   text-align: left;
 }
@@ -447,17 +432,17 @@ tr:last-child td {
   margin: 2em auto;
   border-collapse: collapse;
   width: 100%;
-  max-width: 1200px;
+  max-width: 75em;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(45, 108, 223, 0.07);
+  box-shadow: 0 0.13em 0.75em rgba(45, 108, 223, 0.07);
 }
 
 .salary-calendar-table th, .salary-calendar-table td {
-  border: 1px solid #e0e6ed;
+  border: 0.09em solid #e0e6ed;
   padding: 0.3em 0.5em;
   text-align: center;
-  min-width: 70px;
-  min-height: 40px;
+  min-width: 4.5em;
+  min-height: 2.5em;
 }
 
 .salary-calendar-table th {
@@ -477,12 +462,12 @@ tr:last-child td {
   left: 50%;
   top: 110%;
   transform: translateX(-50%);
-  min-width: 180px;
+  min-width: 11em;
   background: #fff;
   color: #222;
-  border: 1px solid #2d6cdf;
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(45, 108, 223, 0.13);
+  border: 0.09em solid #2d6cdf;
+  border-radius: 0.5em;
+  box-shadow: 0 0.25em 1em rgba(45, 108, 223, 0.13);
   padding: 0.7em 1em;
   font-size: 0.98em;
   z-index: 100;
@@ -522,11 +507,11 @@ tr:last-child td {
 }
 
 .loading-spinner {
-  border: 6px solid #e0e6ed;
-  border-top: 6px solid #2d6cdf;
+  border: 0.4em solid #e0e6ed;
+  border-top: 0.4em solid #2d6cdf;
   border-radius: 50%;
-  width: 48px;
-  height: 48px;
+  width: 3em;
+  height: 3em;
   animation: spin 1s linear infinite;
   margin-bottom: 1em;
 }
@@ -544,7 +529,7 @@ tr:last-child td {
 
 /* iPhone devices responsive styles */
 /*
-@media (max-width: 900px) {
+@media (max-width: 56em) {
   main {
     flex-direction: column;
     gap: 0;
@@ -568,16 +553,16 @@ tr:last-child td {
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 37.5em) {
   #sidebar {
-    width: 40px;
-    padding-top: 40px;
+    width: 2.5em;
+    padding-top: 2.5em;
   }
   #sidebar:hover {
-    width: 120px;
+    width: 7.5em;
   }
   .sidebar-label {
-    max-width: 60px;
+    max-width: 3.75em;
     font-size: 0.95em;
   }
   main, #entitiesPanel {
@@ -596,14 +581,14 @@ tr:last-child td {
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 37.5em) {
   table {
     display: block;
     overflow-x: auto;
     width: 100%;
   }
   th, td {
-    min-width: 90px;
+    min-width: 5.6em;
     white-space: nowrap;
   }
 }
