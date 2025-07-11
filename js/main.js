@@ -379,15 +379,23 @@ function renderSalaryCalendar() {
         if (!PT_HOLIDAYS_2025.includes(yyyy_mm_dd)) {
           const { total, details } = getExpectedValueAndDetailsForDay(classValues, date);
           if (total > 0) {
-            // Tooltip HTML
-            const tooltipHtml = details.map(d =>
+            // Sort details by time ascending
+            const sortedDetails = details.slice().sort((a, b) => {
+              // Extract start time as number for sorting (e.g. "14h00-15h00" => 1400)
+              const getStart = t => t && t.split('-')[0] ? Number(t.split('-')[0].replace('h','')) : 0;
+              return getStart(a.time) - getStart(b.time);
+            });
+
+            // Prepare calendar tooltip HTML
+            const tooltipHtml = sortedDetails.map(d =>
               `<div>
-                <span style="color:#2d6cdf;font-weight:500;">${d.classType || ''}</span>
-                <span style="margin-left:0.5em;">${d.value.toFixed(2)} €</span>
-                <span style="margin-left:0.5em;color:#888;">${nifsMap[d.nif] || d.nif || ''}</span>
-                <span style="margin-left:0.5em;color:#555;">${d.time ? '(' + d.time + ')' : ''}</span>
+                ${d.time ? `<span style="color:#2d6cdf;">${d.time}</span> - ` : ''}
+                <span style="color:#888;">${nifsMap[d.nif] || d.nif || ''}</span>
+                <span style="color:#2d6cdf; font-weight:500;"> ${d.classType || ''}</span>
+                <span style="color:#222;"> [${d.value.toFixed(2)} €]</span>
               </div>`
             ).join('');
+
             cell.classList.add('calendar-tooltip');
             cell.innerHTML += `
               <span style="font-weight:bold">${total.toFixed(2)} €</span>

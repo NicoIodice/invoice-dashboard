@@ -464,7 +464,8 @@ tr:last-child td {
   left: 50%;
   top: 110%;
   transform: translateX(-50%);
-  min-width: 11em;
+  width: auto;
+  min-width: 0;
   background: #fff;
   color: #222;
   border: 0.09em solid #2d6cdf;
@@ -473,7 +474,7 @@ tr:last-child td {
   padding: 0.7em 1em;
   font-size: 0.98em;
   z-index: 100;
-  white-space: nowrap;
+  white-space: normal;
   pointer-events: none;
 }
 
@@ -495,6 +496,12 @@ tr:last-child td {
   left: auto;
   right: 0;
   transform: none;
+}
+
+.calendar-tooltip-panel div {
+  text-align: left;
+  font-family: monospace;
+  white-space: nowrap;
 }
 
 #loadingOverlay {
