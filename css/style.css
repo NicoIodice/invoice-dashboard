@@ -142,6 +142,8 @@ header {
 main {
   display: flex;
   gap: 2rem;
+  margin-left: 4em; /* Same as #sidebar width */
+  transition: margin-left 0.2s;
 }
 
 .left {
