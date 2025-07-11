@@ -1,7 +1,7 @@
 body {
   font-family: sans-serif;
-  display: flex;
-  flex-direction: column;
+  /*display: flex;*/
+  /*flex-direction: column;*/
   padding: 1rem;
   background: #f5f7fa; /* Soft finance-style background */
 }
@@ -10,20 +10,23 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  height: 100vh;
-  width: 48px;
+  height: 100vh; /* Use 100vh, not 200vh */
+  width: 4em;
   background: linear-gradient(135deg, #4f8cff 60%, #b3cfff 100%);
   color: #fff;
   z-index: 1000;
   transition: width 0.2s, background 0.3s;
   display: flex;
   flex-direction: column;
+  justify-content: space-between; /* Ensures bottom button stays at the bottom */
   align-items: flex-start;
-  padding-top: 60px;
-  box-shadow: 2px 0 12px rgba(79,140,255,0.10);
   padding-left: 0;
   padding-right: 0;
   border-right: 1.5px solid #e3eaf7;
+}
+
+#sidebar > div {
+  width: 100%;
 }
 
 #sidebar:hover {
@@ -88,6 +91,12 @@ body.sidebar-collapsed .sidebar-label {
 body.sidebar-collapsed header,
 body.sidebar-collapsed main {
   margin-left: 48px !important;
+}
+
+#sidebarToggle {
+  margin-bottom: 18px;
+  margin-left: 8px;
+  align-self: flex-start;
 }
 
 #entitiesPanel {
