@@ -6,6 +6,7 @@ let currentYear = new Date().getFullYear();
 
 const tableBody = document.querySelector("#invoiceTable tbody");
 const yearSelect = document.getElementById("yearSelect");
+const refreshBtn = document.getElementById("refreshBtn");
 
 const quarterTotals = [0, 0, 0, 0];
 const nifCounts = {};
@@ -35,6 +36,15 @@ export async function setupYearSelector() {
     loadAndUpdateDashboard();
   });
 }
+
+refreshBtn.addEventListener("click", async () => {
+  refreshBtn.classList.add("refreshing");
+  try {
+    await loadAndUpdateDashboard();
+  } finally {
+    setTimeout(() => refreshBtn.classList.remove("refreshing"), 700);
+  }
+});
 
 export async function loadAndUpdateDashboard() {
   showLoading();

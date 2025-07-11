@@ -1,6 +1,7 @@
 import { loadConfig } from './config.js';
-import { loadNifsMap, loadClassValues } from './data.js';
+import { loadClassValues } from './data.js';
 import { setupYearSelector, loadAndUpdateDashboard } from './invoiceDashboard.js';
+import { renderEntitiesTable } from './entitiesList.js';
 import { showLoading, hideLoading } from './utils.js';
 
 const PT_MONTHS = [
@@ -20,10 +21,6 @@ const menuEntities = document.getElementById('menuEntities');
 const entitiesPanel = document.getElementById('entitiesPanel');
 const mainContent = document.querySelector('main');
 
-const refreshBtn = document.getElementById("refreshBtn");
-
-let nifsMap = {};
-
 const menuClasses = document.getElementById('menuClasses');
 const classesPanel = document.getElementById('classesPanel');
 
@@ -34,9 +31,6 @@ let classSortAsc = true;
 let currentYearHolidays = [];
 const menuSalarySimulation = document.getElementById('menuSalarySimulation');
 const salarySimPanel = document.getElementById('salarySimPanel');
-
-let entitiesSortKey = 'ENTIDADE';
-let entitiesSortAsc = true;
 
 menuDashboard.addEventListener('click', async () => {
   showLoading();
@@ -107,7 +101,6 @@ menuEntities.addEventListener('click', async () => {
     menuClasses.classList.remove('active');
     menuSalarySimulation.classList.remove('active');
     if (pageTitle) pageTitle.innerHTML = '🏢 Lista de Entidades';
-    nifsMap = await loadNifsMap();
     renderEntitiesTable();
   } finally {
     hideLoading();
@@ -222,50 +215,6 @@ document.getElementById('sortClassValue').addEventListener('click', () => {
   classSortAsc = !classSortAsc;
   renderClassesTable();
 });
-
-
-refreshBtn.addEventListener("click", async () => {
-  refreshBtn.classList.add("refreshing");
-  try {
-    await loadAndUpdateDashboard();
-  } finally {
-    setTimeout(() => refreshBtn.classList.remove("refreshing"), 700);
-  }
-});
-
-// Add event listeners for list of entities sorting
-document.getElementById('sortNif').addEventListener('click', () => {
-  entitiesSortKey = 'NIF';
-  entitiesSortAsc = !entitiesSortAsc;
-  renderEntitiesTable();
-});
-
-document.getElementById('sortEntidade').addEventListener('click', () => {
-  entitiesSortKey = 'ENTIDADE';
-  entitiesSortAsc = !entitiesSortAsc;
-  renderEntitiesTable();
-});
-
-function renderEntitiesTable() {
-  const tbody = document.querySelector('#entitiesTable tbody');
-  tbody.innerHTML = '';
-  // Convert map to array for sorting
-  const entitiesArr = Object.entries(nifsMap).map(([id, entity]) => ({ id, entity }));
-  entitiesArr.sort((a, b) => {
-    let cmp;
-    if (entitiesSortKey === 'NIF') {
-      cmp = a.id.localeCompare(b.id, 'pt');
-    } else {
-      cmp = a.entity.localeCompare(b.entity, 'pt');
-    }
-    return entitiesSortAsc ? cmp : -cmp;
-  });
-  entitiesArr.forEach(({ id, entity }) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${id}</td><td>${entity}</td>`;
-    tbody.appendChild(tr);
-  });
-}
 
 function renderSalaryCalendar() {
   const container = document.getElementById('salaryCalendar');
