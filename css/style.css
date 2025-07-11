@@ -438,6 +438,51 @@ tr:last-child td {
   color: #2d6cdf;
 }
 
+/* Tooltip for calendar cells */
+.calendar-tooltip {
+  position: relative;
+  cursor: pointer;
+}
+
+.calendar-tooltip-panel {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 110%;
+  transform: translateX(-50%);
+  min-width: 180px;
+  background: #fff;
+  color: #222;
+  border: 1px solid #2d6cdf;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(45, 108, 223, 0.13);
+  padding: 0.7em 1em;
+  font-size: 0.98em;
+  z-index: 100;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.calendar-tooltip:hover .calendar-tooltip-panel,
+.calendar-tooltip:focus .calendar-tooltip-panel {
+  display: block;
+  pointer-events: auto;
+}
+
+.calendar-tooltip-panel.top {
+  top: auto;
+  bottom: 110%;
+}
+.calendar-tooltip-panel.left {
+  left: 0;
+  transform: none;
+}
+.calendar-tooltip-panel.right {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
 #loadingOverlay {
   position: fixed;
   z-index: 9999;

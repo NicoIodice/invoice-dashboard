@@ -9,7 +9,15 @@ const PT_MONTHS = [
 const PT_WEEKDAYS = [
   "Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"
 ];
-
+const EN_TO_PT_WEEKDAYS = {
+  "sunday": "Domingo",
+  "monday": "Segunda",
+  "tuesday": "Terça",
+  "wednesday": "Quarta",
+  "thursday": "Quinta",
+  "friday": "Sexta",
+  "saturday": "Sábado"
+};
 const PT_HOLIDAYS_2025 = [
   "2025-01-01", "2025-04-18", "2025-04-25", "2025-05-01", "2025-06-10",
   "2025-06-19", "2025-06-24", "2025-08-15", "2025-10-05", "2025-11-01", 
@@ -99,6 +107,7 @@ menuSalarySim.addEventListener('click', async () => {
     // Load class values if not loaded
     if (!classValues.length) classValues = await loadClassValues();
     renderSalaryCalendar();
+    adjustCalendarTooltips();
   } finally {
     hideLoading();
   }
@@ -345,9 +354,22 @@ function renderSalaryCalendar() {
         cell.innerHTML = `<span style="opacity:0.3;font-size:0.8em">${PT_WEEKDAYS[date.getDay()]}</span><br>`;
         // Only show value if not holiday
         if (!PT_HOLIDAYS_2025.includes(yyyy_mm_dd)) {
-          const total = getExpectedValueForDay(classValues, date);
+          const { total, details } = getExpectedValueAndDetailsForDay(classValues, date);
           if (total > 0) {
-            cell.innerHTML += `<span style="font-weight:bold">${total.toFixed(2)} €</span>`;
+            // Tooltip HTML
+            const tooltipHtml = details.map(d =>
+              `<div>
+                <span style="color:#2d6cdf;font-weight:500;">${d.classType || ''}</span>
+                <span style="margin-left:0.5em;">${d.value.toFixed(2)} €</span>
+                <span style="margin-left:0.5em;color:#888;">${nifsMap[d.nif] || d.nif || ''}</span>
+                <span style="margin-left:0.5em;color:#555;">${d.time ? '(' + d.time + ')' : ''}</span>
+              </div>`
+            ).join('');
+            cell.classList.add('calendar-tooltip');
+            cell.innerHTML += `
+              <span style="font-weight:bold">${total.toFixed(2)} €</span>
+              <div class="calendar-tooltip-panel">${tooltipHtml}</div>
+            `;
           }
         }
       }
@@ -359,15 +381,15 @@ function renderSalaryCalendar() {
   container.appendChild(table);
 }
 
-// Helper to get expected value for a given date
-function getExpectedValueForDay(classValues, date) {
+// Helper to get expected value and details for a given date
+function getExpectedValueAndDetailsForDay(classValues, date) {
   let total = 0;
   const weekday = PT_WEEKDAYS[date.getDay()];
-  const yyyy_mm_dd = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+  const details = [];
   classValues.forEach(entry => {
     entry.classes.forEach(cls => {
-      // Only count if weekday matches and date is within valuePeriod
-      if (cls.day && cls.day.toLowerCase().startsWith(weekday.slice(0,3).toLowerCase())) {
+    const weekdayEn = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+    if (cls.day && cls.day.toLowerCase() === weekdayEn) {
         // Check period
         let valid = true;
         if (cls.valuePeriod && cls.valuePeriod.startDate) {
@@ -380,11 +402,39 @@ function getExpectedValueForDay(classValues, date) {
           const end = new Date(`${y}-${m}-${d}`);
           if (date > end) valid = false;
         }
-        if (valid) total += Number(cls.value);
+        if (valid) {
+          total += Number(cls.value);
+          details.push({
+            classType: cls.classType,
+            value: Number(cls.value),
+            nif: entry.nif,
+            time: cls.time
+          });
+        }
       }
     });
   });
-  return total;
+  return { total, details };
+}
+
+function adjustCalendarTooltips() {
+  // For each tooltip cell, adjust the tooltip position if near the edges
+  document.querySelectorAll('.salary-calendar-table tr').forEach(row => {
+    row.querySelectorAll('.calendar-tooltip').forEach((cell, colIdx) => {
+      const tooltip = cell.querySelector('.calendar-tooltip-panel');
+      if (!tooltip) return;
+      // Remove all position classes first
+      tooltip.classList.remove('top', 'left', 'right');
+      // colIdx: 0 = <th>Dia</th>, 1 = Janeiro, ..., 12 = Dezembro
+      if (colIdx === 1) {
+        // First month column: align left and show above
+        tooltip.classList.add('top', 'left');
+      } else if (colIdx === 12) {
+        // Last month column: align right and show above
+        tooltip.classList.add('top', 'right');
+      }
+    });
+  });
 }
 
 document.getElementById('infoIcon').addEventListener('click', () => {
