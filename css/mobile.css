@@ -1,0 +1,36 @@
+/* Simple touch support - show tooltips on touch */
+/*
+@media (pointer: coarse) {
+  .quarter-tooltip:active .quarter-tooltip-panel,
+  .calendar-tooltip:active .calendar-tooltip-panel {
+    display: block !important;
+  }
+}
+*/
+
+/* Touch device support for tooltips */
+@media (pointer: coarse) {
+  .quarter-tooltip-panel,
+  .calendar-tooltip-panel {
+    display: none !important;
+  }
+  
+  .quarter-tooltip.active .quarter-tooltip-panel,
+  .calendar-tooltip.active .calendar-tooltip-panel {
+    display: block !important;
+  }
+}
+
+/* Ensure tooltips work on both hover and active states */
+.quarter-tooltip:hover .quarter-tooltip-panel,
+.quarter-tooltip:focus .quarter-tooltip-panel,
+.quarter-tooltip.active .quarter-tooltip-panel {
+  display: block;
+}
+
+.calendar-tooltip:hover .calendar-tooltip-panel,
+.calendar-tooltip:focus .calendar-tooltip-panel,
+.calendar-tooltip.active .calendar-tooltip-panel {
+  display: block;
+  pointer-events: auto;
+}

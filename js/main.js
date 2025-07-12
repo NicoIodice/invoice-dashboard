@@ -6,6 +6,7 @@ import { setupYearSelector, loadAndUpdateDashboard } from './invoiceDashboard.js
 import { renderClassesTable, classesInfoListeners } from './classesInfo.js';
 import { renderSalaryCalendar } from './salarySimulationCalendar.js';
 import { renderEntitiesTable, entitiesListListeners } from './entitiesList.js';
+import { setupMobileTooltips } from './mobileActions.js';
 
 const pageTitle = document.getElementById('pageTitle');
 
@@ -137,6 +138,9 @@ function hideAllPanels() {
   infoDialogListeners();
   classesInfoListeners(nifsMap, classValues);
   entitiesListListeners(nifsMap);
+
+  // Setup mobile tooltips
+  setupMobileTooltips();
 
   hideLoading();
 })();
