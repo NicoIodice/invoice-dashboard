@@ -82,7 +82,7 @@ export async function loadClassValues() {
     return cache.get(cacheKey);
   }
 
-  const fileName = 'class-values.json';
+  const fileName = 'school-info.json';
   let arr = [];
 
   if (config.loadFromDropbox) {

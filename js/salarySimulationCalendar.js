@@ -11,7 +11,6 @@ const PT_WEEKDAYS = [
 
 // Cache for performance
 let currentYearHolidays = [];
-let cachedYearData = null;
 let cachedYear = null;
 
 export async function renderSalaryCalendar(nifsMap, classValues) {
@@ -21,7 +20,6 @@ export async function renderSalaryCalendar(nifsMap, classValues) {
   if (cachedYear !== year) {
     currentYearHolidays = await loadYearHolidays(year);
     cachedYear = year;
-    cachedYearData = null; // Reset cached data when year changes
   }
 
   const container = document.getElementById('salaryCalendar');
@@ -85,8 +83,8 @@ export async function renderSalaryCalendar(nifsMap, classValues) {
         
         // Calculate values only if not holiday
         if (!holidaySet.has(yyyy_mm_dd)) {
-          const { total, details } = getExpectedValueForWeekday(classByWeekday, weekday, nifsMap);
-          
+          const { total, details } = getExpectedValueForWeekday(classByWeekday, weekday, date, classValues);
+
           if (total > 0) {
             addTooltipToCell(cell, total, details);
             monthlySums[monthIdx] += total;
@@ -131,7 +129,8 @@ function preCalculateClassesByWeekday(classValues) {
         if (weekdayIndex !== undefined) {
           classByWeekday[weekdayIndex].push({
             ...cls,
-            nif: entry.nif
+            nif: entry.nif,
+            vacationPeriods: entry.vacationPeriods || []
           });
         }
       }
@@ -142,20 +141,30 @@ function preCalculateClassesByWeekday(classValues) {
 }
 
 // Optimized value calculation for a specific weekday
-function getExpectedValueForWeekday(classByWeekday, weekday, nifsMap) {
+function getExpectedValueForWeekday(classByWeekday, weekday, date, classValues) {
   const classes = classByWeekday[weekday] || [];
   let total = 0;
   const details = [];
   
   classes.forEach(cls => {
-    // Simplified period check (you may want to add proper date validation)
-    total += Number(cls.value) || 0;
-    details.push({
-      classType: cls.classType,
-      value: Number(cls.value) || 0,
-      nif: cls.nif,
-      time: cls.time
+    // Check if this class is in vacation period
+    const entry = classValues.find(entry => entry.nif === cls.nif);
+    const isInVacation = entry && entry.vacationPeriods && entry.vacationPeriods.some(vacation => {
+      const startDate = new Date(vacation.startDate + 'T00:00:00');
+      const endDate = new Date(vacation.endDate + 'T23:59:59');
+      return date >= startDate && date <= endDate;
     });
+    
+    if (!isInVacation) {
+      // Only add to active classes if not in vacation
+      total += Number(cls.value) || 0;
+      details.push({
+        classType: cls.classType,
+        value: Number(cls.value) || 0,
+        nif: cls.nif,
+        time: cls.time
+      });
+    }
   });
   
   // Sort details by time once
