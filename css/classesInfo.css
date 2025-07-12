@@ -55,6 +55,37 @@
   background-color: rgba(45, 108, 223, 0.15) !important;
 }
 
+/* Value cell tooltip styling */
+#classesTable .quarter-tooltip {
+  position: relative;
+  cursor: help;
+}
+
+#classesTable .quarter-tooltip:hover {
+  color: #1abc9c;
+}
+
+#classesTable .quarter-tooltip .quarter-tooltip-panel {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 0.5em;
+  padding: 0.75em;
+  background: #f9fbff;
+  border: 0.09em solid #2d6cdf;
+  border-radius: 0.4em;
+  box-shadow: 0 0.25em 1em rgba(45, 108, 223, 0.15);
+  z-index: 1000;
+  white-space: nowrap;
+  display: none;
+  min-width: 12em;
+}
+
+#classesTable .quarter-tooltip:hover .quarter-tooltip-panel {
+  display: block;
+}
+
 /* Responsive adjustments for collapsed sidebar */
 body.sidebar-collapsed #classesPanel {
   margin-left: 3em;

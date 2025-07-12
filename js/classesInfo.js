@@ -11,8 +11,26 @@ export async function renderClassesTable(nifsMap, classValues) {
     const { nif, classes } = entry;
     const entidade = nifsMap[nif] || '-';
     const numClasses = classes.length;
-    // Get all unique values per class
-    const uniqueValues = [...new Set(classes.map(c => c.value))];
+    
+    // Get all unique values per class with their class types
+    const classDetails = classes.map(c => ({
+      classType: c.classType || 'Aula',
+      value: c.value
+    }));
+    
+    // Group by value to show unique values
+    const valueGroups = {};
+    classDetails.forEach(detail => {
+      if (!valueGroups[detail.value]) {
+        valueGroups[detail.value] = [];
+      }
+      if (!valueGroups[detail.value].includes(detail.classType)) {
+        valueGroups[detail.value].push(detail.classType);
+      }
+    });
+
+    const uniqueValues = Object.keys(valueGroups).map(Number).sort((a, b) => a - b);
+    
     // Get all endDates (if any)
     const endDates = classes.map(c => c.valuePeriod?.endDate).filter(Boolean);
     // Find the latest endDate (if any)
@@ -26,11 +44,13 @@ export async function renderClassesTable(nifsMap, classValues) {
     const allHaveEndDate = classes.every(c => c.valuePeriod && c.valuePeriod.endDate);
     const now = new Date();
     const expired = allHaveEndDate && latestEndDate && now > latestEndDate;
+    
     return {
       nif,
       entidade,
       numClasses,
       uniqueValues,
+      valueGroups,
       expired
     };
   });
@@ -52,15 +72,42 @@ export async function renderClassesTable(nifsMap, classValues) {
   });
 
   // Render rows
-  rows.forEach(({ nif, entidade, numClasses, uniqueValues, expired }) => {
+  rows.forEach(({ nif, entidade, numClasses, uniqueValues, valueGroups, expired }) => {
     const valueCell = uniqueValues.map(v => `${parseFloat(v).toFixed(2)} €`).join(', ');
     const tr = document.createElement('tr');
     if (expired) tr.style.background = '#eee';
+    
+    // Create tooltip content if there are multiple different values
+    const hasMultipleValues = uniqueValues.length > 1;
+    let tooltipContent = '';
+    
+    if (hasMultipleValues) {
+      const tooltipRows = uniqueValues.map(value => {
+        const classTypes = valueGroups[value];
+        return classTypes.map(classType => 
+          `<div class="quarter-tooltip-row">
+            <span class="quarter-tooltip-label">${classType}</span>
+            <span class="quarter-tooltip-value">${parseFloat(value).toFixed(2)} €</span>
+          </div>`
+        ).join('');
+      }).join('');
+      
+      tooltipContent = `<span class="quarter-tooltip-panel">${tooltipRows}</span>`;
+    }
+    
     tr.innerHTML = `
       <td>${nif}</td>
       <td>${entidade}</td>
       <td>${numClasses}</td>
-      <td>${valueCell}</td>
+      <td>
+        ${hasMultipleValues ? 
+          `<span class="quarter-tooltip">
+            ${valueCell}
+            ${tooltipContent}
+          </span>` : 
+          valueCell
+        }
+      </td>
     `;
     tbody.appendChild(tr);
   });

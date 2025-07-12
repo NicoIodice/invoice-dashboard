@@ -3,7 +3,7 @@ export function setupMobileTooltips() {
   const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   
   if (isTouchDevice) {
-    // Handle quarter tooltips and NIF tooltips
+    // Handle quarter tooltips, NIF tooltips, and class value tooltips
     document.addEventListener('click', (e) => {
       const quarterTooltip = e.target.closest('.quarter-tooltip');
       const calendarTooltip = e.target.closest('.calendar-tooltip');
