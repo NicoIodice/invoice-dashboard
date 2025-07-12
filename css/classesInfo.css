@@ -17,12 +17,6 @@
   margin-top: 1em;
 }
 
-body.sidebar-collapsed #classesPanel {
-  margin-left: 3em;
-  width: calc(100vw - 5em);
-  max-width: calc(100vw - 5em);
-}
-
 /* Update tables to fit within their containers */
 #classesTable {
   width: 100%;
@@ -37,4 +31,33 @@ body.sidebar-collapsed #classesPanel {
   text-align: left;
   word-wrap: break-word; /* Break long words */
   min-width: 0; /* Allow cells to shrink */
+}
+
+/* Hover effects for classes table rows */
+#classesTable tbody tr:hover {
+  background-color: rgba(45, 108, 223, 0.08);
+  transition: background-color 0.2s ease;
+}
+
+#classesTable tbody tr {
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+/* Optional: Add subtle hover effect to header for consistency */
+#classesTable th:hover {
+  background-color: rgba(45, 108, 223, 0.1);
+  transition: background-color 0.2s ease;
+}
+
+/* Special styling for expired rows (maintain existing functionality) */
+#classesTable tbody tr[style*="background: #eee"]:hover {
+  background-color: rgba(45, 108, 223, 0.15) !important;
+}
+
+/* Responsive adjustments for collapsed sidebar */
+body.sidebar-collapsed #classesPanel {
+  margin-left: 3em;
+  width: calc(100vw - 5em);
+  max-width: calc(100vw - 5em);
 }

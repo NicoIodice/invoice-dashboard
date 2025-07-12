@@ -42,6 +42,23 @@
   min-width: 0; /* Allow tables to shrink */
 }
 
+/* Hover effects for entities table rows */
+#entitiesTable tbody tr:hover {
+  background-color: rgba(45, 108, 223, 0.08);
+  transition: background-color 0.2s ease;
+}
+
+#entitiesTable tbody tr {
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+/* Optional: Add subtle hover effect to header for consistency */
+#entitiesTable th:hover {
+  background-color: rgba(45, 108, 223, 0.1);
+  transition: background-color 0.2s ease;
+}
+
 /* Responsive adjustments for collapsed sidebar */
 body.sidebar-collapsed #entitiesPanel {
   margin-left: 3em;
