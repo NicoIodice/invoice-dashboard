@@ -128,7 +128,7 @@ function hideAllPanels() {
   }
 
   // Load initial data
-  await setupYearSelector();
+  await setupYearSelector(nifsMap);
   await loadAndUpdateDashboard(nifsMap);
 
   menuDashboard.classList.add('active');

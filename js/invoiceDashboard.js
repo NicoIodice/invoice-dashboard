@@ -3,6 +3,7 @@ import { showLoading, hideLoading, formatCurrency } from './utils.js';
 import { loadCSV, getYearList } from './data.js';
 
 let currentYear = new Date().getFullYear();
+let globalNifsMap = {};
 
 const tableBody = document.querySelector("#invoiceTable tbody");
 const yearSelect = document.getElementById("yearSelect");
@@ -11,12 +12,12 @@ const refreshBtn = document.getElementById("refreshBtn");
 const quarterTotals = [0, 0, 0, 0];
 const nifCounts = {};
 
-export async function setupYearSelector() {
+export async function setupYearSelector(nifsMap) {
+  globalNifsMap = nifsMap;
   let years;
   try {
     years = await getYearList();
   } catch (err) {
-    //alert("❌ Não foi possível carregar a lista de anos.");
     resetDashboard(tableBody, quarterTotals, nifCounts, config);
     console.error("❌ Não foi possível carregar a lista de anos.", err);
     return;
@@ -31,18 +32,9 @@ export async function setupYearSelector() {
   });
   yearSelect.addEventListener("change", () => {
     currentYear = yearSelect.value;
-    loadAndUpdateDashboard();
+    loadAndUpdateDashboard(globalNifsMap);
   });
 }
-
-refreshBtn.addEventListener("click", async () => {
-  refreshBtn.classList.add("refreshing");
-  try {
-    await loadAndUpdateDashboard();
-  } finally {
-    setTimeout(() => refreshBtn.classList.remove("refreshing"), 700);
-  }
-});
 
 export async function loadAndUpdateDashboard(nifsMap) {
   showLoading();
@@ -110,6 +102,15 @@ function updateInvoicesTable(rows, tableBody, quarterTotals, nifCounts) {
     tableBody.appendChild(tr);
   }
 }
+
+refreshBtn.addEventListener("click", async () => {
+  refreshBtn.classList.add("refreshing");
+  try {
+    await loadAndUpdateDashboard(globalNifsMap);
+  } finally {
+    setTimeout(() => refreshBtn.classList.remove("refreshing"), 700);
+  }
+});
 
 // Updates the quarter summary panel with tooltips
 function updateQuarterSummaryPanel(quarterTotals, rows = []) {
