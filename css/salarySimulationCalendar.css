@@ -1,3 +1,13 @@
+#salarySimulationPanel {
+  margin-left: 4em; /* Same as main panel */
+  margin-right: 1em;
+  transition: margin-left 0.2s;
+}
+
+body.sidebar-collapsed #salarySimulationPanel {
+  margin-left: 3em !important; /* Match collapsed sidebar */
+}
+
 .salary-calendar-table {
   margin: 2em auto;
   border-collapse: collapse;
