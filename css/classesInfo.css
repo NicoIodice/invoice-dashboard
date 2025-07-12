@@ -139,6 +139,48 @@
   background-color: rgba(45, 108, 223, 0.1);
 }
 
+/* Add styling for the variation column */
+.variation-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3em;
+  font-weight: 500;
+}
+
+.variation-arrow {
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.variation-arrow.positive {
+  color: #28a745; /* Green for positive */
+}
+
+.variation-arrow.negative {
+  color: #dc3545; /* Red for negative */
+}
+
+.variation-arrow.neutral {
+  color: #6c757d; /* Gray for neutral */
+}
+
+.variation-percentage {
+  font-size: 0.95em;
+}
+
+.variation-percentage.positive {
+  color: #28a745;
+}
+
+.variation-percentage.negative {
+  color: #dc3545;
+}
+
+.variation-percentage.neutral {
+  color: #000;
+}
+
 /* Responsive adjustments for collapsed sidebar */
 body.sidebar-collapsed #classesInfoPanel {
   margin-left: 3em;

@@ -3,7 +3,7 @@ import { showLoading, hideLoading } from './utils.js';
 import { loadNifsMap, loadClassValues } from './data.js';
 import { infoDialogListeners } from './infoDialog.js';
 import { setupYearSelector, loadAndUpdateDashboard } from './invoiceDashboard.js';
-import { renderclassesInfoTable, classesInfoListeners } from './classesInfo.js';
+import { renderClassesInfoTable, classesInfoListeners } from './classesInfo.js';
 import { renderSalaryCalendar } from './salarySimulationCalendar.js';
 import { renderEntitiesTable, entitiesListListeners } from './entitiesList.js';
 import { setupMobileTooltips } from './mobileActions.js';
@@ -67,7 +67,7 @@ menuClassesInfo.addEventListener('click', async () => {
     menuSalarySimulation.classList.remove('active');
     menuEntities.classList.remove('active');
     if (pageTitle) pageTitle.innerHTML = '🏷️ Valores por Aula';
-    renderclassesInfoTable(nifsMap, classValues);
+    renderClassesInfoTable(nifsMap, classValues);
   } finally {
     hideLoading();
   }

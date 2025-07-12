@@ -1,6 +1,6 @@
 let classSortKey = 'entidade';
 let classSortAsc = true;
-let selectedClassesYear = null; // Add this line
+let selectedClassesYear = null;
 
 // Add this function to extract years from class value periods
 function extractYearsFromClassValues(classValues) {
@@ -40,7 +40,7 @@ function extractYearsFromClassValues(classValues) {
   return Array.from(yearsSet).sort((a, b) => b - a);
 }
 
-// Also update the filterClassesByYear function:
+// Update the filterClassesByYear function to not remove rows
 function filterClassesByYear(classValues, year) {
   if (!year) {
     return classValues; // Return all if no year selected
@@ -79,31 +79,41 @@ function filterClassesByYear(classValues, year) {
       ...entry,
       classes: filteredClasses
     };
-  }).filter(entry => entry.classes.length > 0); // Only include entries with classes
+  }); // Remove the filter that was removing entries with no classes
 }
 
 // Add this function to setup year selector
 function setupClassesYearSelector(classValues) {
   const yearSelect = document.getElementById('classesYearSelect');
   const years = extractYearsFromClassValues(classValues);
+  const currentYear = new Date().getFullYear();
+  
+  // Filter out the current year from the options
+  const filteredYears = years.filter(year => year !== currentYear);
   
   // Clear existing options
   yearSelect.innerHTML = '';
   
-  // Add year options
-  years.forEach(year => {
+  // Add year options (excluding current year)
+  filteredYears.forEach(year => {
     const option = document.createElement('option');
     option.value = year;
     option.textContent = year;
     yearSelect.appendChild(option);
   });
   
-  // Set default to current year if available, otherwise "All Years"
-  const currentYear = new Date().getFullYear();
-  if (years.includes(currentYear)) {
-    yearSelect.value = currentYear;
-    selectedClassesYear = currentYear;
+  // Set default to the previous year (highest year that's not current year)
+  if (filteredYears.length > 0) {
+    // Get the most recent year (first in descending order)
+    const previousYear = filteredYears[0];
+    yearSelect.value = previousYear;
+    selectedClassesYear = previousYear;
   } else {
+    // If no other years available, add a placeholder
+    const placeholderOption = document.createElement('option');
+    placeholderOption.value = '';
+    placeholderOption.textContent = 'Nenhum ano disponível';
+    yearSelect.appendChild(placeholderOption);
     yearSelect.value = '';
     selectedClassesYear = null;
   }
@@ -112,12 +122,13 @@ function setupClassesYearSelector(classValues) {
   yearSelect.addEventListener('change', (e) => {
     selectedClassesYear = e.target.value ? parseInt(e.target.value) : null;
     // Re-render table with filtered data
-    renderclassesInfoTable(document.classesNifsMap, document.classesClassValues);
+    renderClassesInfoTable(document.classesNifsMap, document.classesClassValues);
   });
 }
 
-// Update the renderclassesInfoTable function
-export async function renderclassesInfoTable(nifsMap, classValues) {
+// Update the renderClassesInfoTable function
+// Update the renderClassesInfoTable function
+export async function renderClassesInfoTable(nifsMap, classValues) {
   // Store references for year filtering
   document.classesNifsMap = nifsMap;
   document.classesClassValues = classValues;
@@ -128,26 +139,61 @@ export async function renderclassesInfoTable(nifsMap, classValues) {
     setupClassesYearSelector(classValues);
   }
   
-  // Filter classes by selected year
-  const filteredClassValues = filterClassesByYear(classValues, selectedClassesYear);
+  // Filter classes to show only CURRENT YEAR data
+  const currentYear = new Date().getFullYear();
+  const currentYearClassValues = classValues.map(entry => {
+    const currentYearClasses = entry.classes.filter(cls => {
+      if (!cls.valuePeriod) return false;
+      
+      let startYear = null;
+      let endYear = null;
+      
+      if (cls.valuePeriod.startDate) {
+        const startDateParts = cls.valuePeriod.startDate.split('-');
+        if (startDateParts.length === 3) {
+          startYear = parseInt(startDateParts[2]);
+        }
+      }
+      
+      if (cls.valuePeriod.endDate) {
+        const endDateParts = cls.valuePeriod.endDate.split('-');
+        if (endDateParts.length === 3) {
+          endYear = parseInt(endDateParts[2]);
+        }
+      }
+      
+      // Include class if it overlaps with the current year
+      return (startYear <= currentYear && (!endYear || endYear >= currentYear)) ||
+             (startYear === currentYear || endYear === currentYear);
+    });
+    
+    return {
+      ...entry,
+      classes: currentYearClasses
+    };
+  });
   
   const tbody = document.querySelector('#classesInfoTable tbody');
   tbody.innerHTML = '';
-  const arr = [...filteredClassValues];
+  const arr = [...currentYearClassValues]; // Use current year filtered data
 
   // Prepare a flat array for sorting and rendering
   const rows = arr.map(entry => {
     const { nif, classes } = entry;
     const entidade = nifsMap[nif] || '-';
-    const numClasses = classes.length;
+    const numClasses = classes.length; // Current year classes only
     
-    // Get all unique values per class with their class types
+    // Calculate variation based on selected year vs current year
+    const allClassesForNif = classValues.find(cv => cv.nif === nif)?.classes || [];
+    const variation = calculateVariation(allClassesForNif, selectedClassesYear);
+    
+    // Get current year class details only
     const classDetails = classes.map(c => ({
       classType: c.classType || 'Aula',
       value: c.value
     }));
     
-    // Group by value to show unique values
+    // Group by value to show unique values (current year only)
     const valueGroups = {};
     classDetails.forEach(detail => {
       if (!valueGroups[detail.value]) {
@@ -158,7 +204,7 @@ export async function renderclassesInfoTable(nifsMap, classValues) {
       }
     });
 
-    // Group by class type for the "Nº Aulas/Semana" tooltip
+    // Group by class type for the "Nº Aulas/Semana" tooltip (current year only)
     const classTypeGroups = {};
     classDetails.forEach(detail => {
       if (!classTypeGroups[detail.classType]) {
@@ -169,7 +215,7 @@ export async function renderclassesInfoTable(nifsMap, classValues) {
 
     const uniqueValues = Object.keys(valueGroups).map(Number).sort((a, b) => a - b);
     
-    // Get all endDates (if any)
+    // Get all endDates (if any) - current year only
     const endDates = classes.map(c => c.valuePeriod?.endDate).filter(Boolean);
     // Find the latest endDate (if any)
     let latestEndDate = null;
@@ -190,11 +236,12 @@ export async function renderclassesInfoTable(nifsMap, classValues) {
       uniqueValues,
       valueGroups,
       classTypeGroups,
+      variation, // Compares current year to selected year
       expired
     };
   });
 
-  // Sorting
+  // Sorting (add variation sorting)
   rows.sort((a, b) => {
     let cmp;
     if (classSortKey === 'nif') {
@@ -203,6 +250,8 @@ export async function renderclassesInfoTable(nifsMap, classValues) {
       cmp = a.entidade.localeCompare(b.entidade, 'pt');
     } else if (classSortKey === 'numClasses') {
       cmp = a.numClasses - b.numClasses;
+    } else if (classSortKey === 'variation') {
+      cmp = a.variation.percentage - b.variation.percentage;
     } else {
       // Sort by first value per class
       cmp = (a.uniqueValues[0] || 0) - (b.uniqueValues[0] || 0);
@@ -211,8 +260,12 @@ export async function renderclassesInfoTable(nifsMap, classValues) {
   });
 
   // Render rows
-  rows.forEach(({ nif, entidade, numClasses, uniqueValues, valueGroups, classTypeGroups, expired }) => {
-    const valueCell = uniqueValues.map(v => `${parseFloat(v).toFixed(2)} €`).join(', ');
+  rows.forEach(({ nif, entidade, numClasses, uniqueValues, valueGroups, classTypeGroups, variation, expired }) => {
+    // Show current year values only
+    const valueCell = uniqueValues.length > 0 
+      ? uniqueValues.map(v => `${parseFloat(v).toFixed(2)} €`).join(', ')
+      : '-';
+    
     const tr = document.createElement('tr');
     if (expired) tr.style.background = '#eee';
     
@@ -234,33 +287,153 @@ export async function renderclassesInfoTable(nifsMap, classValues) {
       valueTooltipContent = `<span class="quarter-tooltip-panel">${tooltipRows}</span>`;
     }
     
-    // Create tooltip content for class types (always show)
+    // Create tooltip content for class types (current year only)
     const classTypeNames = Object.keys(classTypeGroups);
     let classTypeTooltipContent = '';
     
-    const classTypeRows = classTypeNames.map(classType => 
-      `<div class="quarter-tooltip-row">
-        <span class="quarter-tooltip-label">${classType}</span>
-        <span class="quarter-tooltip-value">${classTypeGroups[classType]}</span>
-      </div>`
-    ).join('');
-      
-    classTypeTooltipContent = `<span class="quarter-tooltip-panel">${classTypeRows}</span>`;
+    if (classTypeNames.length > 0) {
+      const classTypeRows = classTypeNames.map(classType => 
+        `<div class="quarter-tooltip-row">
+          <span class="quarter-tooltip-label">${classType}</span>
+          <span class="quarter-tooltip-value">${classTypeGroups[classType]}</span>
+        </div>`
+      ).join('');
+        
+      classTypeTooltipContent = `<span class="quarter-tooltip-panel">${classTypeRows}</span>`;
+    }
+
+    // Create variation cell content (compares current year to selected year)
+    const getArrowIcon = (arrow) => {
+      switch (arrow) {
+        case 'positive': return '↗';
+        case 'negative': return '↘';
+        default: return '-';
+      }
+    };
+
+    const variationContent = variation.display === '-' 
+      ? '<span class="variation-percentage neutral">-</span>'
+      : `<span class="variation-arrow ${variation.arrow}">${getArrowIcon(variation.arrow)}</span>
+         <span class="variation-percentage ${variation.arrow}">${variation.display}</span>`;
 
     tr.innerHTML = `
       <td>${nif}</td>
       <td>${entidade}</td>
-      <td class="quarter-tooltip">
+      <td ${numClasses > 0 ? 'class="quarter-tooltip"' : ''}>
         ${numClasses}
-        ${classTypeTooltipContent}
+        ${numClasses > 0 ? classTypeTooltipContent : ''}
       </td>
       <td ${hasMultipleValues ? 'class="quarter-tooltip"' : ''}>
         ${valueCell}
         ${hasMultipleValues ? valueTooltipContent : ''}
       </td>
+      <td>
+        <div class="variation-cell">
+          ${variationContent}
+        </div>
+      </td>
     `;
     tbody.appendChild(tr);
   });
+}
+
+// Add this function to calculate variation percentage
+function calculateVariation(classesForNif, selectedYear) {
+  if (!selectedYear) return { percentage: 0, arrow: 'neutral', display: '-' };
+  
+  const currentYear = new Date().getFullYear();
+  
+  // If selected year is the current year, no variation to show
+  if (selectedYear === currentYear) {
+    return { percentage: 0, arrow: 'neutral', display: '-' };
+  }
+  
+  // Get classes for the selected year
+  const selectedYearClasses = classesForNif.filter(cls => {
+    if (!cls.valuePeriod) return false;
+    
+    let startYear = null;
+    let endYear = null;
+    
+    if (cls.valuePeriod.startDate) {
+      const startDateParts = cls.valuePeriod.startDate.split('-');
+      if (startDateParts.length === 3) {
+        startYear = parseInt(startDateParts[2]);
+      }
+    }
+    
+    if (cls.valuePeriod.endDate) {
+      const endDateParts = cls.valuePeriod.endDate.split('-');
+      if (endDateParts.length === 3) {
+        endYear = parseInt(endDateParts[2]);
+      }
+    }
+    
+    // Include class if it overlaps with the selected year
+    return (startYear <= selectedYear && (!endYear || endYear >= selectedYear)) ||
+           (startYear === selectedYear || endYear === selectedYear);
+  });
+  
+  // Get the current year's classes
+  const currentYearClasses = classesForNif.filter(cls => {
+    if (!cls.valuePeriod) return false;
+    
+    let startYear = null;
+    let endYear = null;
+    
+    if (cls.valuePeriod.startDate) {
+      const startDateParts = cls.valuePeriod.startDate.split('-');
+      if (startDateParts.length === 3) {
+        startYear = parseInt(startDateParts[2]);
+      }
+    }
+    
+    if (cls.valuePeriod.endDate) {
+      const endDateParts = cls.valuePeriod.endDate.split('-');
+      if (endDateParts.length === 3) {
+        endYear = parseInt(endDateParts[2]);
+      }
+    }
+    
+    // Include class if it overlaps with the current year
+    return (startYear <= currentYear && (!endYear || endYear >= currentYear)) ||
+           (startYear === currentYear || endYear === currentYear);
+  });
+  
+  // Calculate average value per class for each year
+  const selectedYearAvg = selectedYearClasses.length > 0 
+    ? selectedYearClasses.reduce((sum, cls) => sum + (cls.value || 0), 0) / selectedYearClasses.length
+    : 0;
+    
+  const currentYearAvg = currentYearClasses.length > 0 
+    ? currentYearClasses.reduce((sum, cls) => sum + (cls.value || 0), 0) / currentYearClasses.length
+    : 0;
+  
+  // If no data for selected year OR no data for current year, return neutral
+  if (selectedYearAvg === 0 || currentYearAvg === 0) {
+    return { percentage: 0, arrow: 'neutral', display: '-' };
+  }
+  
+  // Calculate percentage change: (current - selected) / selected * 100
+  // This shows how much the current year changed compared to the selected year
+  const percentageChange = ((currentYearAvg - selectedYearAvg) / selectedYearAvg) * 100;
+  
+  // Determine arrow and formatting
+  let arrow = 'neutral';
+  let display = '-';
+  
+  if (Math.abs(percentageChange) < 0.01) { // Very small difference, treat as no change
+    arrow = 'neutral';
+    display = '-';
+  } else if (percentageChange > 0) {
+    arrow = 'positive';
+    display = `${percentageChange.toFixed(2)}%`;
+  } else if (percentageChange < 0) {
+    arrow = 'negative';
+    display = `${Math.abs(percentageChange).toFixed(2)}%`;
+  }
+  
+  return { percentage: percentageChange, arrow, display };
 }
 
 // Keep your existing classesInfoListeners function unchanged
@@ -268,24 +441,31 @@ export function classesInfoListeners(nifsMap, classValues) {
   document.getElementById('sortClassNif').addEventListener('click', () => {
     classSortKey = 'nif';
     classSortAsc = !classSortAsc;
-    renderclassesInfoTable(nifsMap, classValues);
+    renderClassesInfoTable(nifsMap, classValues);
   });
 
   document.getElementById('sortClassEntidade').addEventListener('click', () => {
     classSortKey = 'entidade';
     classSortAsc = !classSortAsc;
-    renderclassesInfoTable(nifsMap, classValues);
+    renderClassesInfoTable(nifsMap, classValues);
   });
 
   document.getElementById('sortClassCount').addEventListener('click', () => {
     classSortKey = 'numClasses';
     classSortAsc = !classSortAsc;
-    renderclassesInfoTable(nifsMap, classValues);
+    renderClassesInfoTable(nifsMap, classValues);
   });
 
   document.getElementById('sortClassValue').addEventListener('click', () => {
     classSortKey = 'value';
     classSortAsc = !classSortAsc;
-    renderclassesInfoTable(nifsMap, classValues);
+    renderClassesInfoTable(nifsMap, classValues);
+  });
+
+  // Add the new variation sorting listener
+  document.getElementById('sortClassVariation').addEventListener('click', () => {
+    classSortKey = 'variation';
+    classSortAsc = !classSortAsc;
+    renderClassesInfoTable(nifsMap, classValues);
   });
 }
