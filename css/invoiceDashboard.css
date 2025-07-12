@@ -117,6 +117,45 @@ tr:last-child td {
   box-shadow: 0 0.25em 1em rgba(45, 108, 223, 0.15);
 }
 
+/* Quarter row styling with light background colors */
+.quarter-1 {
+  background-color: #f0f8ff !important; /* Light blue for Q1 */
+  border-left: 3px solid #87ceeb;
+}
+
+.quarter-2 {
+  background-color: #f0fff0 !important; /* Light green for Q2 */
+  border-left: 3px solid #90ee90;
+}
+
+.quarter-3 {
+  background-color: #fff8dc !important; /* Light yellow for Q3 */
+  border-left: 3px solid #f0e68c;
+}
+
+.quarter-4 {
+  background-color: #ffe4e1 !important; /* Light pink for Q4 */
+  border-left: 3px solid #ffb6c1;
+}
+
+/* Ensure colors are visible on hover */
+.quarter-1:hover {
+  background-color: #e6f3ff !important;
+}
+
+.quarter-2:hover {
+  background-color: #e6ffe6 !important;
+}
+
+.quarter-3:hover {
+  background-color: #fff5d1 !important;
+}
+
+.quarter-4:hover {
+  background-color: #ffd9d6 !important;
+}
+
+
 #quarterSummary {
   display: flex;
   flex-direction: column;
