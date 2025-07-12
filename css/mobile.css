@@ -8,7 +8,7 @@
 }
 */
 
-/* Touch device support for tooltips */
+/* Touch device support for tooltips (Safari is not supported) */
 @media (pointer: coarse) {
   .quarter-tooltip-panel,
   .calendar-tooltip-panel {
