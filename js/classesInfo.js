@@ -29,6 +29,15 @@ export async function renderClassesTable(nifsMap, classValues) {
       }
     });
 
+    // Group by class type for the "Nº Aulas/Semana" tooltip
+    const classTypeGroups = {};
+    classDetails.forEach(detail => {
+      if (!classTypeGroups[detail.classType]) {
+        classTypeGroups[detail.classType] = 0;
+      }
+      classTypeGroups[detail.classType]++;
+    });
+
     const uniqueValues = Object.keys(valueGroups).map(Number).sort((a, b) => a - b);
     
     // Get all endDates (if any)
@@ -51,6 +60,7 @@ export async function renderClassesTable(nifsMap, classValues) {
       numClasses,
       uniqueValues,
       valueGroups,
+      classTypeGroups,
       expired
     };
   });
@@ -72,14 +82,14 @@ export async function renderClassesTable(nifsMap, classValues) {
   });
 
   // Render rows
-  rows.forEach(({ nif, entidade, numClasses, uniqueValues, valueGroups, expired }) => {
+  rows.forEach(({ nif, entidade, numClasses, uniqueValues, valueGroups, classTypeGroups, expired }) => {
     const valueCell = uniqueValues.map(v => `${parseFloat(v).toFixed(2)} €`).join(', ');
     const tr = document.createElement('tr');
     if (expired) tr.style.background = '#eee';
     
-    // Create tooltip content if there are multiple different values
+    // Create tooltip content for values if there are multiple different values
     const hasMultipleValues = uniqueValues.length > 1;
-    let tooltipContent = '';
+    let valueTooltipContent = '';
     
     if (hasMultipleValues) {
       const tooltipRows = uniqueValues.map(value => {
@@ -92,25 +102,37 @@ export async function renderClassesTable(nifsMap, classValues) {
         ).join('');
       }).join('');
       
-      tooltipContent = `<span class="quarter-tooltip-panel">${tooltipRows}</span>`;
+      valueTooltipContent = `<span class="quarter-tooltip-panel">${tooltipRows}</span>`;
     }
     
+    // Create tooltip content for class types (always show if more than one class type)
+    const classTypeNames = Object.keys(classTypeGroups);
+    let classTypeTooltipContent = '';
+    
+    const classTypeRows = classTypeNames.map(classType => 
+      `<div class="quarter-tooltip-row">
+        <span class="quarter-tooltip-label">${classType}</span>
+        <span class="quarter-tooltip-value">${classTypeGroups[classType]}</span>
+      </div>`
+    ).join('');
+      
+    classTypeTooltipContent = `<span class="quarter-tooltip-panel">${classTypeRows}</span>`;
+
     tr.innerHTML = `
       <td>${nif}</td>
       <td>${entidade}</td>
-      <td>${numClasses}</td>
-      <td>
-        ${hasMultipleValues ? 
-          `<span class="quarter-tooltip">
-            ${valueCell}
-            ${tooltipContent}
-          </span>` : 
-          valueCell
-        }
+      <td class="quarter-tooltip">
+        ${numClasses}
+        ${classTypeTooltipContent}
+      </td>
+      <td ${hasMultipleValues ? 'class="quarter-tooltip"' : ''}>
+        ${valueCell}
+        ${hasMultipleValues ? valueTooltipContent : ''}
       </td>
     `;
     tbody.appendChild(tr);
   });
+
 }
 
 export function classesInfoListeners(nifsMap, classValues) {

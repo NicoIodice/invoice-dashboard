@@ -208,7 +208,7 @@ tr:last-child td {
 
 .quarter-tooltip {
   position: relative;
-  cursor: pointer;
+  cursor: help;
 }
 
 .quarter-tooltip-panel {
@@ -324,7 +324,7 @@ tr:last-child td {
 
 .nif-item,
 .quarter-item {
-  cursor: pointer;
+  cursor: help;
 }
 
 /* Smooth transitions for better UX */

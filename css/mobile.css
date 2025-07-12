@@ -31,7 +31,7 @@
 }
 
 @media (pointer: coarse) {
-  #classesTable .quarter-tooltip.active .quarter-tooltip-panel {
+  #classesTable td.quarter-tooltip.active .quarter-tooltip-panel {
     display: block !important;
   }
 }

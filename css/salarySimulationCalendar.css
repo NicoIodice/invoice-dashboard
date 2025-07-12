@@ -33,7 +33,7 @@ body.sidebar-collapsed #salarySimulationPanel {
 /* Tooltip for calendar cells */
 .calendar-tooltip {
   position: relative;
-  cursor: pointer;
+  cursor: help;
 }
 
 .calendar-tooltip-panel {
