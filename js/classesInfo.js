@@ -1,10 +1,139 @@
 let classSortKey = 'entidade';
 let classSortAsc = true;
+let selectedClassesYear = null; // Add this line
 
-export async function renderClassesTable(nifsMap, classValues) {
-  const tbody = document.querySelector('#classesTable tbody');
+// Add this function to extract years from class value periods
+function extractYearsFromClassValues(classValues) {
+  const yearsSet = new Set();
+  
+  classValues.forEach(entry => {
+    entry.classes.forEach(cls => {
+      if (cls.valuePeriod) {
+        // Extract year from startDate
+        if (cls.valuePeriod.startDate) {
+          // Parse DD-MM-YYYY format correctly
+          const startDateParts = cls.valuePeriod.startDate.split('-');
+          if (startDateParts.length === 3) {
+            const startYear = parseInt(startDateParts[2]); // Year is the third part
+            if (!isNaN(startYear)) {
+              yearsSet.add(startYear);
+            }
+          }
+        }
+        
+        // Extract year from endDate
+        if (cls.valuePeriod.endDate) {
+          // Parse DD-MM-YYYY format correctly
+          const endDateParts = cls.valuePeriod.endDate.split('-');
+          if (endDateParts.length === 3) {
+            const endYear = parseInt(endDateParts[2]); // Year is the third part
+            if (!isNaN(endYear)) {
+              yearsSet.add(endYear);
+            }
+          }
+        }
+      }
+    });
+  });
+  
+  // Convert to array and sort in descending order
+  return Array.from(yearsSet).sort((a, b) => b - a);
+}
+
+// Also update the filterClassesByYear function:
+function filterClassesByYear(classValues, year) {
+  if (!year) {
+    return classValues; // Return all if no year selected
+  }
+  
+  return classValues.map(entry => {
+    const filteredClasses = entry.classes.filter(cls => {
+      if (!cls.valuePeriod) return false;
+      
+      // Check if the class period overlaps with the selected year
+      let startYear = null;
+      let endYear = null;
+      
+      if (cls.valuePeriod.startDate) {
+        // Parse DD-MM-YYYY format correctly
+        const startDateParts = cls.valuePeriod.startDate.split('-');
+        if (startDateParts.length === 3) {
+          startYear = parseInt(startDateParts[2]);
+        }
+      }
+      
+      if (cls.valuePeriod.endDate) {
+        // Parse DD-MM-YYYY format correctly
+        const endDateParts = cls.valuePeriod.endDate.split('-');
+        if (endDateParts.length === 3) {
+          endYear = parseInt(endDateParts[2]);
+        }
+      }
+      
+      // Include class if it overlaps with the selected year
+      return (startYear <= year && (!endYear || endYear >= year)) ||
+             (startYear === year || endYear === year);
+    });
+    
+    return {
+      ...entry,
+      classes: filteredClasses
+    };
+  }).filter(entry => entry.classes.length > 0); // Only include entries with classes
+}
+
+// Add this function to setup year selector
+function setupClassesYearSelector(classValues) {
+  const yearSelect = document.getElementById('classesYearSelect');
+  const years = extractYearsFromClassValues(classValues);
+  
+  // Clear existing options
+  yearSelect.innerHTML = '';
+  
+  // Add year options
+  years.forEach(year => {
+    const option = document.createElement('option');
+    option.value = year;
+    option.textContent = year;
+    yearSelect.appendChild(option);
+  });
+  
+  // Set default to current year if available, otherwise "All Years"
+  const currentYear = new Date().getFullYear();
+  if (years.includes(currentYear)) {
+    yearSelect.value = currentYear;
+    selectedClassesYear = currentYear;
+  } else {
+    yearSelect.value = '';
+    selectedClassesYear = null;
+  }
+  
+  // Add event listener for year changes
+  yearSelect.addEventListener('change', (e) => {
+    selectedClassesYear = e.target.value ? parseInt(e.target.value) : null;
+    // Re-render table with filtered data
+    renderclassesInfoTable(document.classesNifsMap, document.classesClassValues);
+  });
+}
+
+// Update the renderclassesInfoTable function
+export async function renderclassesInfoTable(nifsMap, classValues) {
+  // Store references for year filtering
+  document.classesNifsMap = nifsMap;
+  document.classesClassValues = classValues;
+  
+  // Setup year selector if not already done
+  const yearSelect = document.getElementById('classesYearSelect');
+  if (yearSelect && !yearSelect.hasChildNodes()) {
+    setupClassesYearSelector(classValues);
+  }
+  
+  // Filter classes by selected year
+  const filteredClassValues = filterClassesByYear(classValues, selectedClassesYear);
+  
+  const tbody = document.querySelector('#classesInfoTable tbody');
   tbody.innerHTML = '';
-  const arr = [...classValues];
+  const arr = [...filteredClassValues];
 
   // Prepare a flat array for sorting and rendering
   const rows = arr.map(entry => {
@@ -105,7 +234,7 @@ export async function renderClassesTable(nifsMap, classValues) {
       valueTooltipContent = `<span class="quarter-tooltip-panel">${tooltipRows}</span>`;
     }
     
-    // Create tooltip content for class types (always show if more than one class type)
+    // Create tooltip content for class types (always show)
     const classTypeNames = Object.keys(classTypeGroups);
     let classTypeTooltipContent = '';
     
@@ -132,31 +261,31 @@ export async function renderClassesTable(nifsMap, classValues) {
     `;
     tbody.appendChild(tr);
   });
-
 }
 
+// Keep your existing classesInfoListeners function unchanged
 export function classesInfoListeners(nifsMap, classValues) {
   document.getElementById('sortClassNif').addEventListener('click', () => {
     classSortKey = 'nif';
     classSortAsc = !classSortAsc;
-    renderClassesTable(nifsMap, classValues);
+    renderclassesInfoTable(nifsMap, classValues);
   });
 
   document.getElementById('sortClassEntidade').addEventListener('click', () => {
     classSortKey = 'entidade';
     classSortAsc = !classSortAsc;
-    renderClassesTable(nifsMap, classValues);
+    renderclassesInfoTable(nifsMap, classValues);
   });
 
   document.getElementById('sortClassCount').addEventListener('click', () => {
     classSortKey = 'numClasses';
     classSortAsc = !classSortAsc;
-    renderClassesTable(nifsMap, classValues);
+    renderclassesInfoTable(nifsMap, classValues);
   });
 
   document.getElementById('sortClassValue').addEventListener('click', () => {
     classSortKey = 'value';
     classSortAsc = !classSortAsc;
-    renderClassesTable(nifsMap, classValues);
+    renderclassesInfoTable(nifsMap, classValues);
   });
 }

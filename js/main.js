@@ -3,36 +3,49 @@ import { showLoading, hideLoading } from './utils.js';
 import { loadNifsMap, loadClassValues } from './data.js';
 import { infoDialogListeners } from './infoDialog.js';
 import { setupYearSelector, loadAndUpdateDashboard } from './invoiceDashboard.js';
-import { renderClassesTable, classesInfoListeners } from './classesInfo.js';
+import { renderclassesInfoTable, classesInfoListeners } from './classesInfo.js';
 import { renderSalaryCalendar } from './salarySimulationCalendar.js';
 import { renderEntitiesTable, entitiesListListeners } from './entitiesList.js';
 import { setupMobileTooltips } from './mobileActions.js';
 
-const pageTitle = document.getElementById('pageTitle');
+const sidebarToggle = document.getElementById('sidebarToggle');
+const sidebarToggleIcon = document.getElementById('sidebarToggleIcon');
 
-const menuDashboard = document.getElementById('menuDashboard');
-const menuClasses = document.getElementById('menuClasses');
+const menuInvoiceDashboard = document.getElementById('menuInvoiceDashboard');
+const menuClassesInfo = document.getElementById('menuClassesInfo');
 const menuSalarySimulation = document.getElementById('menuSalarySimulation');
 const menuEntities = document.getElementById('menuEntities');
 
+const pageTitle = document.getElementById('pageTitle');
+const yearToggleInvoiceDashboard = document.getElementById('year-toggle-id');
+
 const invoiceDashboardPanel = document.querySelector('main');
-const classesPanel = document.getElementById('classesPanel');
+const classesInfoPanel = document.getElementById('classesInfoPanel');
 const salarySimulationPanel = document.getElementById('salarySimulationPanel');
 const entitiesPanel = document.getElementById('entitiesPanel');
-
-const yearToggle = document.getElementById('year-toggle');
 
 let nifsMap = {};
 let classValues = [];
 
-menuDashboard.addEventListener('click', async () => {
+sidebarToggle.addEventListener('click', () => {
+  document.body.classList.toggle('sidebar-collapsed');
+  // Change icon direction
+  if (document.body.classList.contains('sidebar-collapsed')) {
+    sidebarToggleIcon.textContent = '➡️';
+  } else {
+    sidebarToggleIcon.textContent = '⬅️';
+  }
+});
+
+menuInvoiceDashboard.addEventListener('click', async () => {
   showLoading();
   try {
     hideAllPanels();
     invoiceDashboardPanel.style.display = '';
-    if (yearToggle) yearToggle.style.display = '';
-    menuDashboard.classList.add('active');
-    menuClasses.classList.remove('active');
+    // Show the header year toggle for dashboard panel
+    if (yearToggleInvoiceDashboard) yearToggleInvoiceDashboard.style.display = 'flex'; // Changed from '' to 'flex'
+    menuInvoiceDashboard.classList.add('active');
+    menuClassesInfo.classList.remove('active');
     menuSalarySimulation.classList.remove('active');
     menuEntities.classList.remove('active');
     if (pageTitle) pageTitle.innerHTML = '📊 Faturas-Recibo Emitidas';
@@ -42,19 +55,19 @@ menuDashboard.addEventListener('click', async () => {
   }
 });
 
-// Repeat for other menu handlers:
-menuClasses.addEventListener('click', async () => {
+menuClassesInfo.addEventListener('click', async () => {
   showLoading();
   try {
     hideAllPanels();
-    classesPanel.style.display = '';
-    if (yearToggle) yearToggle.style.display = 'none';
-    menuDashboard.classList.remove('active');
-    menuClasses.classList.add('active');
+    classesInfoPanel.style.display = 'block'; // Changed from '' to 'block'
+    // Hide the header year toggle for classes panel
+    if (yearToggleInvoiceDashboard) yearToggleInvoiceDashboard.style.display = 'none';
+    menuInvoiceDashboard.classList.remove('active');
+    menuClassesInfo.classList.add('active');
     menuSalarySimulation.classList.remove('active');
     menuEntities.classList.remove('active');
     if (pageTitle) pageTitle.innerHTML = '🏷️ Valores por Aula';
-    renderClassesTable(nifsMap, classValues);
+    renderclassesInfoTable(nifsMap, classValues);
   } finally {
     hideLoading();
   }
@@ -64,10 +77,11 @@ menuSalarySimulation.addEventListener('click', async () => {
   showLoading();
   try {
     hideAllPanels();
-    salarySimulationPanel.style.display = '';
-    if (yearToggle) yearToggle.style.display = 'none';
-    menuDashboard.classList.remove('active');
-    menuClasses.classList.remove('active');
+    salarySimulationPanel.style.display = 'block'; // Changed from '' to 'block'
+    // Hide the header year toggle for salary simulation panel
+    if (yearToggleInvoiceDashboard) yearToggleInvoiceDashboard.style.display = 'none';
+    menuInvoiceDashboard.classList.remove('active');
+    menuClassesInfo.classList.remove('active');
     menuSalarySimulation.classList.add('active');
     menuEntities.classList.remove('active');
     if (pageTitle) pageTitle.innerHTML = '🗓️ Simulação Vencimento';
@@ -83,10 +97,11 @@ menuEntities.addEventListener('click', async () => {
   showLoading();
   try {
     hideAllPanels();
-    entitiesPanel.style.display = '';
-    if (yearToggle) yearToggle.style.display = 'none';
-    menuDashboard.classList.remove('active');
-    menuClasses.classList.remove('active');
+    entitiesPanel.style.display = 'block'; // Changed from '' to 'block'
+    // Hide the header year toggle for entities panel
+    if (yearToggleInvoiceDashboard) yearToggleInvoiceDashboard.style.display = 'none';
+    menuInvoiceDashboard.classList.remove('active');
+    menuClassesInfo.classList.remove('active');
     menuSalarySimulation.classList.remove('active');
     menuEntities.classList.add('active');
     if (pageTitle) pageTitle.innerHTML = '🏢 Lista de Entidades';
@@ -96,21 +111,9 @@ menuEntities.addEventListener('click', async () => {
   }
 });
 
-const sidebarToggle = document.getElementById('sidebarToggle');
-const sidebarToggleIcon = document.getElementById('sidebarToggleIcon');
-sidebarToggle.addEventListener('click', () => {
-  document.body.classList.toggle('sidebar-collapsed');
-  // Change icon direction
-  if (document.body.classList.contains('sidebar-collapsed')) {
-    sidebarToggleIcon.textContent = '➡️';
-  } else {
-    sidebarToggleIcon.textContent = '⬅️';
-  }
-});
-
 function hideAllPanels() {
   invoiceDashboardPanel.style.display = 'none';
-  classesPanel.style.display = 'none';
+  classesInfoPanel.style.display = 'none';
   salarySimulationPanel.style.display = 'none';
   entitiesPanel.style.display = 'none';
 }
@@ -123,7 +126,7 @@ function hideAllPanels() {
     await loadConfig();
     
     // Show basic UI immediately
-    menuDashboard.classList.add('active');
+    menuInvoiceDashboard.classList.add('active');
     infoDialogListeners();
     setupMobileTooltips();
 

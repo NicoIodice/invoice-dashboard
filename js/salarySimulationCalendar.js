@@ -147,16 +147,42 @@ function getExpectedValueForWeekday(classByWeekday, weekday, date, classValues, 
   const details = [];
   
   classes.forEach(cls => {
-    // Check if this class is in vacation period
+    // Check if this class is valid for the current date
     const entry = classValues.find(entry => entry.nif === cls.nif);
+    
+    // 1. Check if the class period is valid for this date
+    let isClassPeriodValid = true;
+    if (cls.valuePeriod) {
+      if (cls.valuePeriod.startDate) {
+        const startDate = parseDate(cls.valuePeriod.startDate);
+        if (startDate && date < startDate) {
+          isClassPeriodValid = false;
+        }
+      }
+      if (cls.valuePeriod.endDate) {
+        const endDate = parseDate(cls.valuePeriod.endDate);
+        if (endDate && date > endDate) {
+          isClassPeriodValid = false;
+        }
+      }
+    }
+    
+    // 2. Check if this class is in vacation period
     const isInVacation = entry && entry.vacationPeriods && entry.vacationPeriods.some(vacation => {
-      const startDate = new Date(vacation.startDate + 'T00:00:00');
-      const endDate = new Date(vacation.endDate + 'T23:59:59');
-      return date >= startDate && date <= endDate;
+      const startDate = parseDate(vacation.startDate);
+      const endDate = parseDate(vacation.endDate);
+      
+      if (!startDate || !endDate) return false;
+      
+      // Set time to compare dates properly
+      const startOfDay = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+      const endOfDay = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 23, 59, 59);
+      
+      return date >= startOfDay && date <= endOfDay;
     });
     
-    if (!isInVacation) {
-      // Only add to active classes if not in vacation
+    // Only add to active classes if class period is valid AND not in vacation
+    if (isClassPeriodValid && !isInVacation) {
       total += Number(cls.value) || 0;
       details.push({
         classType: cls.classType,
@@ -263,4 +289,27 @@ function adjustCalendarTooltips() {
       tooltip.classList.add('top', 'right');
     }
   });
+}
+
+function parseDate(dateString) {
+  if (dateString.includes('-')) {
+    const parts = dateString.split('-');
+    if (parts.length === 3) {
+      // Check if it's ISO format (YYYY-MM-DD)
+      if (parts[0].length === 4) {
+        const year = parseInt(parts[0]);
+        const month = parseInt(parts[1]) - 1; // Month is 0-indexed
+        const day = parseInt(parts[2]);
+        return new Date(year, month, day);
+      }
+      // European format (DD-MM-YYYY)
+      else {
+        const day = parseInt(parts[0]);
+        const month = parseInt(parts[1]) - 1; // Month is 0-indexed
+        const year = parseInt(parts[2]);
+        return new Date(year, month, day);
+      }
+    }
+  }
+  return null;
 }

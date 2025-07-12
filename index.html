@@ -18,11 +18,11 @@
   <!-- Sidebar Menu (hidden by default) -->
   <div id="sidebar">
     <div>
-      <div class="sidebar-menu" id="menuDashboard">
+      <div class="sidebar-menu" id="menuInvoiceDashboard">
         <span class="sidebar-icon">📊</span>
         <span class="sidebar-label">Dashboard</span>
       </div>
-      <div class="sidebar-menu" id="menuClasses">
+      <div class="sidebar-menu" id="menuClassesInfo">
         <span class="sidebar-icon">🏷️</span>
         <span class="sidebar-label">Valores por Aula</span>
       </div>
@@ -45,9 +45,9 @@
     <h1 id="pageTitle">📊 Faturas-Recibo Emitidas
       <span id="infoIcon" title="Informação" style="cursor:pointer; margin-left:0.5em; font-size:0.8em;">ℹ️</span>
     </h1>
-    <div id="year-toggle">
-        <label for="yearSelect">Ano:</label>
-        <select id="yearSelect"></select>
+    <div id="year-toggle-id" class="year-toggle">
+      <label for="yearSelect">Ano:</label>
+      <select id="yearSelect" class="year-select"></select>
         <span id="refreshBtn" title="Atualizar Dados" tabindex="0" role="button"></span>
     </div>
   </header>
@@ -101,8 +101,13 @@
   </main>
 
   <!-- Classes Table Panel (hidden by default) -->
-  <div id="classesPanel" style="display:none;">
-    <table id="classesTable">
+  <div id="classesInfoPanel" style="display:none;">
+    <div class="year-toggle">
+      <label for="classesYearSelect">Ano:</label>
+      <select id="classesYearSelect" class="year-select"></select>
+    </div>
+    
+    <table id="classesInfoTable">
       <thead>
         <tr>
           <th id="sortClassNif" style="cursor:pointer;">NIF ▲▼</th>

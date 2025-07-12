@@ -1,4 +1,4 @@
-#classesPanel {
+#classesInfoPanel {
   margin-left: 4em;
   margin-top: 2em;
   padding: 2em;
@@ -11,21 +11,43 @@
   overflow-x: auto; /* Allow horizontal scrolling if needed */
 }
 
-#classesTable {
+/* Align the classes year selector to the right */
+#classesInfoPanel .year-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  background: #f9fbff;
+  border: 0.09em solid #2d6cdf;
+  border-radius: 0.5em;
+  padding: 0.25em 0.6em;
+  box-shadow: 0 0.13em 0.75em rgba(45, 108, 223, 0.07);
+  margin-bottom: 1rem;
+  /* Align to the right */
+  margin-left: auto;
+  width: fit-content;
+}
+
+#classesInfoPanel .year-toggle label {
+  color: #2d6cdf;
+  font-weight: 500;
+  margin-right: 0.13em;
+}
+
+#classesInfoTable {
   width: 100%;
   border-collapse: collapse;
   margin-top: 1em;
 }
 
 /* Update tables to fit within their containers */
-#classesTable {
+#classesInfoTable {
   width: 100%;
   border-collapse: collapse;
   margin-top: 1em;
   min-width: 0; /* Allow tables to shrink */
 }
 
-#classesTable th, #classesTable td {
+#classesInfoTable th, #classesInfoTable td {
   border: 0.09em solid #e0e6ed;
   padding: 0.5em 1em;
   text-align: left;
@@ -34,38 +56,38 @@
 }
 
 /* Hover effects for classes table rows */
-#classesTable tbody tr:hover {
+#classesInfoTable tbody tr:hover {
   background-color: rgba(45, 108, 223, 0.08);
   transition: background-color 0.2s ease;
 }
 
-#classesTable tbody tr {
+#classesInfoTable tbody tr {
   transition: background-color 0.2s ease;
   cursor: pointer;
 }
 
 /* Optional: Add subtle hover effect to header for consistency */
-#classesTable th:hover {
+#classesInfoTable th:hover {
   background-color: rgba(45, 108, 223, 0.1);
   transition: background-color 0.2s ease;
 }
 
 /* Special styling for expired rows (maintain existing functionality) */
-#classesTable tbody tr[style*="background: #eee"]:hover {
+#classesInfoTable tbody tr[style*="background: #eee"]:hover {
   background-color: rgba(45, 108, 223, 0.15) !important;
 }
 
 /* Value cell tooltip styling - CSS-only smart positioning */
-#classesTable td.quarter-tooltip {
+#classesInfoTable td.quarter-tooltip {
   position: relative;
   cursor: help;
 }
 
-#classesTable td.quarter-tooltip:hover {
+#classesInfoTable td.quarter-tooltip:hover {
   background-color: rgba(45, 108, 223, 0.05);
 }
 
-#classesTable td.quarter-tooltip .quarter-tooltip-panel {
+#classesInfoTable td.quarter-tooltip .quarter-tooltip-panel {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -86,8 +108,8 @@
 }
 
 /* Force tooltip above for last 2 rows */
-#classesTable tbody tr:nth-last-child(1) td.quarter-tooltip .quarter-tooltip-panel,
-#classesTable tbody tr:nth-last-child(2) td.quarter-tooltip .quarter-tooltip-panel {
+#classesInfoTable tbody tr:nth-last-child(1) td.quarter-tooltip .quarter-tooltip-panel,
+#classesInfoTable tbody tr:nth-last-child(2) td.quarter-tooltip .quarter-tooltip-panel {
   top: auto;
   bottom: 100%;
   margin-top: 0;
@@ -95,30 +117,30 @@
 }
 
 /* Adjust for right edge (last column) */
-#classesTable td.quarter-tooltip:nth-child(4) .quarter-tooltip-panel {
+#classesInfoTable td.quarter-tooltip:nth-child(4) .quarter-tooltip-panel {
   left: auto;
   right: 0;
   transform: none;
 }
 
 /* Adjust for left edge (first column with tooltip) */
-#classesTable td.quarter-tooltip:nth-child(3) .quarter-tooltip-panel {
+#classesInfoTable td.quarter-tooltip:nth-child(3) .quarter-tooltip-panel {
   left: 0;
   right: auto;
   transform: none;
 }
 
-#classesTable td.quarter-tooltip:hover .quarter-tooltip-panel {
+#classesInfoTable td.quarter-tooltip:hover .quarter-tooltip-panel {
   display: block;
 }
 
 /* Override the general row hover for tooltip cells */
-#classesTable tbody tr:hover td.quarter-tooltip {
+#classesInfoTable tbody tr:hover td.quarter-tooltip {
   background-color: rgba(45, 108, 223, 0.1);
 }
 
 /* Responsive adjustments for collapsed sidebar */
-body.sidebar-collapsed #classesPanel {
+body.sidebar-collapsed #classesInfoPanel {
   margin-left: 3em;
   width: calc(100vw - 5em);
   max-width: calc(100vw - 5em);
