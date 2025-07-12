@@ -1,0 +1,257 @@
+main {
+  display: flex;
+  gap: 2rem;
+  margin-left: 4em; /* Same as #sidebar width */
+  transition: margin-left 0.2s;
+}
+
+#year-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  background: #f9fbff;
+  border: 0.09em solid #2d6cdf;
+  border-radius: 0.5em;
+  padding: 0.25em 0.6em;
+  box-shadow: 0 0.13em 0.75em rgba(45, 108, 223, 0.07);
+}
+
+#year-toggle label {
+  color: #2d6cdf;
+  font-weight: 500;
+  margin-right: 0.13em;
+}
+
+#yearSelect {
+  border: 0.09em solid #2d6cdf;
+  border-radius: 0.4em;
+  padding: 0.13em 0.5em;
+  font-size: 1em;
+  background: #fff;
+  color: #2d6cdf;
+  font-weight: 500;
+  outline: none;
+  transition: border 0.2s;
+}
+
+#yearSelect:focus {
+  border-color: #1abc9c;
+}
+
+#refreshBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4em;
+  height: 1.4em;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2d6cdf 60%, #1abc9c 100%);
+  color: #fff;
+  font-size: 1.1em;
+  cursor: pointer;
+  border: none;
+  transition: box-shadow 0.2s, background 0.2s;
+  box-shadow: 0 0.13em 0.75em rgba(45, 108, 223, 0.10);
+  outline: none;
+}
+
+#refreshBtn:focus, #refreshBtn:hover {
+  box-shadow: 0 0.25em 1em rgba(45, 108, 223, 0.18);
+  background: linear-gradient(135deg, #1abc9c 60%, #2d6cdf 100%);
+}
+
+#refreshBtn::before {
+  content: "🔄";
+  font-size: 1.1em;
+  display: block;
+  line-height: 1;
+}
+
+@keyframes rotate-refresh {
+  0% { transform: rotate(0deg);}
+  100% { transform: rotate(-360deg);}
+}
+
+#refreshBtn.refreshing {
+  animation: rotate-refresh 0.7s linear;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 0.09em solid #2d6cdf;
+  border-radius: 0.6em;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 0.13em 0.75em rgba(45, 108, 223, 0.07);
+}
+
+th, td {
+  padding: 0.6em;
+  border-bottom: 0.09em solid #e3eaf7;
+  text-align: center;
+}
+
+th {
+  background: #e3eaf7;
+  color: #2d6cdf;
+  font-weight: 600;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+.panel {
+  border: 0.09em solid #2d6cdf;
+  border-radius: 0.6em;
+  background-color: #f9fbff;
+  box-shadow: 0 0.13em 0.75em rgba(45, 108, 223, 0.08);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: box-shadow 0.2s;
+}
+
+.panel:hover {
+  box-shadow: 0 0.25em 1em rgba(45, 108, 223, 0.15);
+}
+
+#quarterSummary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.quarter-item {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  border-bottom: 0.07em solid #eee;
+  padding: 0.25rem 0;
+}
+
+.quarter-label {
+  flex: 1;
+  color: #2d6cdf;
+  font-weight: 500;
+}
+
+.quarter-value {
+  flex-shrink: 0;
+  color: #222;
+}
+
+.total-value {
+  color: #fff;
+  background: #2d6cdf;
+  padding: 0.2em 0.7em;
+  border-radius: 0.6em;
+  font-size: 1.15em;
+  font-weight: bold;
+  letter-spacing: 0.03em;
+  margin-left: 0.5em;
+}
+
+.quarter-tooltip {
+  position: relative;
+  cursor: pointer;
+}
+
+.quarter-tooltip-panel {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 120%;
+  z-index: 10;
+  min-width: 11em;
+  background: #fff;
+  color: #222;
+  border: 0.09em solid #2d6cdf;
+  border-radius: 0.5em;
+  box-shadow: 0 0.25em 1em rgba(45, 108, 223, 0.13);
+  padding: 0.7em 1em;
+  font-size: 0.98em;
+  white-space: nowrap;
+}
+
+.quarter-tooltip:hover .quarter-tooltip-panel,
+.quarter-tooltip:focus .quarter-tooltip-panel {
+  display: block;
+}
+
+.quarter-tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.1em 0;
+  min-width: 11em;
+}
+
+.quarter-tooltip-label {
+  color: #2d6cdf;
+  font-weight: 500;
+  flex: 1;
+  text-align: left;
+}
+
+.quarter-tooltip-value {
+  color: #222;
+  font-weight: 500;
+  flex-shrink: 0;
+  text-align: right;
+  margin-left: 1.5em;
+}
+
+#fiscalStatus {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.fiscal-item {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  border-bottom: 0.07em solid #eee;
+  padding: 0.25rem 0;
+}
+
+.fiscal-label {
+  flex: 1;
+}
+
+.fiscal-icon {
+  flex-shrink: 0;
+}
+
+#nifStats {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.nif-item {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  border-bottom: 0.07em solid #eee;
+  padding: 0.25rem 0;
+  font-size: 1em;
+}
+
+.nif-label {
+  flex: 1;
+  color: #2d6cdf;
+  font-weight: 500;
+}
+
+.nif-count {
+  flex-shrink: 0;
+  color: #222;
+}

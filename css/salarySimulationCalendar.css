@@ -1,0 +1,73 @@
+.salary-calendar-table {
+  margin: 2em auto;
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 75em;
+  background: #fff;
+  box-shadow: 0 0.13em 0.75em rgba(45, 108, 223, 0.07);
+}
+
+.salary-calendar-table th, .salary-calendar-table td {
+  border: 0.09em solid #e0e6ed;
+  padding: 0.3em 0.5em;
+  text-align: center;
+  min-width: 4.5em;
+  min-height: 2.5em;
+}
+
+.salary-calendar-table th {
+  background: #e3eaf7;
+  color: #2d6cdf;
+}
+
+/* Tooltip for calendar cells */
+.calendar-tooltip {
+  position: relative;
+  cursor: pointer;
+}
+
+.calendar-tooltip-panel {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 110%;
+  transform: translateX(-50%);
+  width: auto;
+  min-width: 0;
+  background: #fff;
+  color: #222;
+  border: 0.09em solid #2d6cdf;
+  border-radius: 0.5em;
+  box-shadow: 0 0.25em 1em rgba(45, 108, 223, 0.13);
+  padding: 0.7em 1em;
+  font-size: 0.98em;
+  z-index: 100;
+  white-space: normal;
+  pointer-events: none;
+}
+
+.calendar-tooltip:hover .calendar-tooltip-panel,
+.calendar-tooltip:focus .calendar-tooltip-panel {
+  display: block;
+  pointer-events: auto;
+}
+
+.calendar-tooltip-panel.top {
+  top: auto;
+  bottom: 110%;
+}
+.calendar-tooltip-panel.left {
+  left: 0;
+  transform: none;
+}
+.calendar-tooltip-panel.right {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+.calendar-tooltip-panel div {
+  text-align: left;
+  font-family: monospace;
+  white-space: nowrap;
+}

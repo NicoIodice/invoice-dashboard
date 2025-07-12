@@ -10,16 +10,18 @@ import { setupMobileTooltips } from './mobileActions.js';
 
 const pageTitle = document.getElementById('pageTitle');
 
-const yearToggle = document.getElementById('year-toggle');
 const menuDashboard = document.getElementById('menuDashboard');
 const menuClasses = document.getElementById('menuClasses');
 const menuSalarySimulation = document.getElementById('menuSalarySimulation');
-const salarySimulationPanel = document.getElementById('salarySimulationPanel');
 const menuEntities = document.getElementById('menuEntities');
-const entitiesPanel = document.getElementById('entitiesPanel');
-const mainContent = document.querySelector('main');
 
+const invoiceDashboardPanel = document.querySelector('main');
 const classesPanel = document.getElementById('classesPanel');
+const salarySimulationPanel = document.getElementById('salarySimulationPanel');
+const entitiesPanel = document.getElementById('entitiesPanel');
+
+const yearToggle = document.getElementById('year-toggle');
+
 let nifsMap = {};
 let classValues = [];
 
@@ -27,12 +29,12 @@ menuDashboard.addEventListener('click', async () => {
   showLoading();
   try {
     hideAllPanels();
-    mainContent.style.display = '';
+    invoiceDashboardPanel.style.display = '';
     if (yearToggle) yearToggle.style.display = '';
     menuDashboard.classList.add('active');
-    menuEntities.classList.remove('active');
     menuClasses.classList.remove('active');
     menuSalarySimulation.classList.remove('active');
+    menuEntities.classList.remove('active');
     if (pageTitle) pageTitle.innerHTML = '📊 Faturas-Recibo Emitidas';
     await loadAndUpdateDashboard(nifsMap);
   } finally {
@@ -47,10 +49,10 @@ menuClasses.addEventListener('click', async () => {
     hideAllPanels();
     classesPanel.style.display = '';
     if (yearToggle) yearToggle.style.display = 'none';
-    menuClasses.classList.add('active');
     menuDashboard.classList.remove('active');
-    menuEntities.classList.remove('active');
+    menuClasses.classList.add('active');
     menuSalarySimulation.classList.remove('active');
+    menuEntities.classList.remove('active');
     if (pageTitle) pageTitle.innerHTML = '🏷️ Valores por Aula';
     renderClassesTable(nifsMap, classValues);
   } finally {
@@ -64,10 +66,10 @@ menuSalarySimulation.addEventListener('click', async () => {
     hideAllPanels();
     salarySimulationPanel.style.display = '';
     if (yearToggle) yearToggle.style.display = 'none';
-    menuSalarySimulation.classList.add('active');
     menuDashboard.classList.remove('active');
-    menuEntities.classList.remove('active');
     menuClasses.classList.remove('active');
+    menuSalarySimulation.classList.add('active');
+    menuEntities.classList.remove('active');
     if (pageTitle) pageTitle.innerHTML = '🗓️ Simulação Vencimento';
     // Load class values if not loaded
     if (!classValues.length) classValues = await loadClassValues();
@@ -83,10 +85,10 @@ menuEntities.addEventListener('click', async () => {
     hideAllPanels();
     entitiesPanel.style.display = '';
     if (yearToggle) yearToggle.style.display = 'none';
-    menuEntities.classList.add('active');
     menuDashboard.classList.remove('active');
     menuClasses.classList.remove('active');
     menuSalarySimulation.classList.remove('active');
+    menuEntities.classList.add('active');
     if (pageTitle) pageTitle.innerHTML = '🏢 Lista de Entidades';
     renderEntitiesTable(nifsMap);
   } finally {
@@ -107,10 +109,10 @@ sidebarToggle.addEventListener('click', () => {
 });
 
 function hideAllPanels() {
-  mainContent.style.display = 'none';
-  entitiesPanel.style.display = 'none';
+  invoiceDashboardPanel.style.display = 'none';
   classesPanel.style.display = 'none';
   salarySimulationPanel.style.display = 'none';
+  entitiesPanel.style.display = 'none';
 }
 
 (async function init() {
