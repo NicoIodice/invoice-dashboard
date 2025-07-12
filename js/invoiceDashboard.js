@@ -195,8 +195,7 @@ function updateFiscalStatusPanel(config) {
   });
 }
 
-// Updates the NIF stats panel
-// Updates the NIF stats panel with entity tooltips
+// Updates the NIF stats panel with tooltips
 function updateInvoicesByNifPanel(rows, nifCounts) {
   const sortedNifs = Object.entries(nifCounts)
     .sort((a, b) => b[1] - a[1]);
@@ -207,10 +206,12 @@ function updateInvoicesByNifPanel(rows, nifCounts) {
       return `
         <li class="nif-item">
           <span class="nif-label quarter-tooltip">
-            ${nif}
+            ${entityName}
             <span class="quarter-tooltip-panel" style="min-width: 15em; white-space: normal;">
-              <div style="color: #2d6cdf; font-weight: 500; margin-bottom: 0.3em;">Entidade:</div>
-              <div style="color: #222;">${entityName}</div>
+              <div class="quarter-tooltip-row">
+                <span class="quarter-tooltip-label">NIF</span>
+                <span class="quarter-tooltip-value">${nif}</span>
+              </div>
             </span>
           </span>
           <span class="nif-count">${count} fatura(s)</span>
