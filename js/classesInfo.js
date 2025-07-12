@@ -66,27 +66,28 @@ export async function renderClassesTable(nifsMap, classValues) {
   });
 }
 
-// Sorting event listeners
-document.getElementById('sortClassNif').addEventListener('click', () => {
-  classSortKey = 'nif';
-  classSortAsc = !classSortAsc;
-  renderClassesTable();
-});
+export function classesInfoListeners(nifsMap, classValues) {
+  document.getElementById('sortClassNif').addEventListener('click', () => {
+    classSortKey = 'nif';
+    classSortAsc = !classSortAsc;
+    renderClassesTable(nifsMap, classValues);
+  });
 
-document.getElementById('sortClassEntidade').addEventListener('click', () => {
-  classSortKey = 'entidade';
-  classSortAsc = !classSortAsc;
-  renderClassesTable();
-});
+  document.getElementById('sortClassEntidade').addEventListener('click', () => {
+    classSortKey = 'entidade';
+    classSortAsc = !classSortAsc;
+    renderClassesTable(nifsMap, classValues);
+  });
 
-document.getElementById('sortClassCount').addEventListener('click', () => {
-  classSortKey = 'numClasses';
-  classSortAsc = !classSortAsc;
-  renderClassesTable();
-});
+  document.getElementById('sortClassCount').addEventListener('click', () => {
+    classSortKey = 'numClasses';
+    classSortAsc = !classSortAsc;
+    renderClassesTable(nifsMap, classValues);
+  });
 
-document.getElementById('sortClassValue').addEventListener('click', () => {
-  classSortKey = 'value';
-  classSortAsc = !classSortAsc;
-  renderClassesTable();
-});
+  document.getElementById('sortClassValue').addEventListener('click', () => {
+    classSortKey = 'value';
+    classSortAsc = !classSortAsc;
+    renderClassesTable(nifsMap, classValues);
+  });
+}

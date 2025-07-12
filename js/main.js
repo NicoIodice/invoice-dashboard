@@ -3,7 +3,7 @@ import { showLoading, hideLoading } from './utils.js';
 import { loadNifsMap, loadClassValues } from './data.js';
 import { infoDialogListeners } from './infoDialog.js';
 import { setupYearSelector, loadAndUpdateDashboard } from './invoiceDashboard.js';
-import { renderClassesTable } from './classesInfo.js';
+import { renderClassesTable, classesInfoListeners } from './classesInfo.js';
 import { renderSalaryCalendar } from './salarySimulationCalendar.js';
 import { renderEntitiesTable, entitiesListListeners } from './entitiesList.js';
 
@@ -114,8 +114,11 @@ function hideAllPanels() {
 
 (async function init() {
   showLoading();
+
+  // Load configuration
   await loadConfig();
 
+  // Load common data for all pages and panels
   if (!Object.keys(nifsMap).length) {
     nifsMap = await loadNifsMap();
   }
@@ -124,12 +127,16 @@ function hideAllPanels() {
     classValues = await loadClassValues();
   }
 
+  // Load initial data
   await setupYearSelector();
   await loadAndUpdateDashboard(nifsMap);
 
   menuDashboard.classList.add('active');
 
+  // Setup listeners
   infoDialogListeners();
+  classesInfoListeners(nifsMap, classValues);
   entitiesListListeners(nifsMap);
+
   hideLoading();
 })();
