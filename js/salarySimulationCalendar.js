@@ -83,7 +83,7 @@ export async function renderSalaryCalendar(nifsMap, classValues) {
         
         // Calculate values only if not holiday
         if (!holidaySet.has(yyyy_mm_dd)) {
-          const { total, details } = getExpectedValueForWeekday(classByWeekday, weekday, date, classValues);
+          const { total, details } = getExpectedValueForWeekday(classByWeekday, weekday, date, classValues, nifsMap);
 
           if (total > 0) {
             addTooltipToCell(cell, total, details);
@@ -141,7 +141,7 @@ function preCalculateClassesByWeekday(classValues) {
 }
 
 // Optimized value calculation for a specific weekday
-function getExpectedValueForWeekday(classByWeekday, weekday, date, classValues) {
+function getExpectedValueForWeekday(classByWeekday, weekday, date, classValues, nifsMap) {
   const classes = classByWeekday[weekday] || [];
   let total = 0;
   const details = [];
@@ -162,6 +162,7 @@ function getExpectedValueForWeekday(classByWeekday, weekday, date, classValues) 
         classType: cls.classType,
         value: Number(cls.value) || 0,
         nif: cls.nif,
+        entity: nifsMap[cls.nif] || cls.nif,
         time: cls.time
       });
     }
@@ -197,7 +198,7 @@ function addTooltipToCell(cell, total, details) {
   const tooltipHtml = details.map(d =>
     `<div>
       ${d.time ? `<span style="color:#2d6cdf;">${d.time}</span> - ` : ''}
-      <span style="color:#888;">${d.nif || ''}</span>
+      <span style="color:#888;">${d.entity || ''}</span>
       <span style="color:#2d6cdf; font-weight:500;"> ${d.classType || ''}</span>
       <span style="color:#222;"> [${d.value.toFixed(2)} €]</span>
     </div>`
