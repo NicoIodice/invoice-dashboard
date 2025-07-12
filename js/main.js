@@ -118,31 +118,37 @@ function hideAllPanels() {
 (async function init() {
   showLoading();
 
-  // Load configuration
-  await loadConfig();
+  try {
+    // Load config first
+    await loadConfig();
+    
+    // Show basic UI immediately
+    menuDashboard.classList.add('active');
+    infoDialogListeners();
+    setupMobileTooltips();
 
-  // Load common data for all pages and panels
-  if (!Object.keys(nifsMap).length) {
-    nifsMap = await loadNifsMap();
+    // Load data progressively
+    const dataPromises = [
+      loadNifsMap(),
+      loadClassValues()
+    ];
+
+    // Update UI as data becomes available
+    const [nifsMapResult, classValuesResult] = await Promise.all(dataPromises);
+    nifsMap = nifsMapResult;
+    classValues = classValuesResult;
+
+    // Setup dashboard
+    await setupYearSelector(nifsMap);
+    await loadAndUpdateDashboard(nifsMap);
+
+    // Setup remaining listeners
+    classesInfoListeners(nifsMap, classValues);
+    entitiesListListeners(nifsMap);
+
+  } catch (error) {
+    console.error('❌ Erro durante inicialização:', error);
+  } finally {
+    hideLoading();
   }
-
-  if (!classValues.length) {
-    classValues = await loadClassValues();
-  }
-
-  // Load initial data
-  await setupYearSelector(nifsMap);
-  await loadAndUpdateDashboard(nifsMap);
-
-  menuDashboard.classList.add('active');
-
-  // Setup listeners
-  infoDialogListeners();
-  classesInfoListeners(nifsMap, classValues);
-  entitiesListListeners(nifsMap);
-
-  // Setup mobile tooltips
-  setupMobileTooltips();
-
-  hideLoading();
 })();

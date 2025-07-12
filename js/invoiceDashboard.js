@@ -74,11 +74,10 @@ function updateUI(rows, tableBody, quarterTotals, nifCounts, config) {
 
 // Updates the invoice table
 function updateInvoicesTable(rows, tableBody, quarterTotals, nifCounts) {
+  const fragment = document.createDocumentFragment();
+  
   for (const row of rows) {
-    if (!validateRow(row)) {
-      console.warn("Linha inválida ignorada:", row);
-      continue;
-    }
+    if (!validateRow(row)) continue;
 
     const date = new Date(row['DATA SERVICO']);
     const month = date.getMonth();
@@ -90,7 +89,7 @@ function updateInvoicesTable(rows, tableBody, quarterTotals, nifCounts) {
     nifCounts[row.NIF] = (nifCounts[row.NIF] || 0) + 1;
 
     const tr = document.createElement("tr");
-    tr.classList.add(`quarter-${quarter}`); // Add this line
+    tr.classList.add(`quarter-${quarter}`);
     tr.innerHTML = `
       <td>${row.NIF}</td>
       <td>${row.ENTIDADE || '-'}</td>
@@ -99,8 +98,10 @@ function updateInvoicesTable(rows, tableBody, quarterTotals, nifCounts) {
       <td>${row['DATA SERVICO']}</td>
       <td>T${quarter}</td>
     `;
-    tableBody.appendChild(tr);
+    fragment.appendChild(tr);
   }
+  
+  tableBody.appendChild(fragment); // Single DOM operation
 }
 
 refreshBtn.addEventListener("click", async () => {

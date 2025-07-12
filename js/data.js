@@ -1,6 +1,9 @@
 import { config } from './config.js';
 import { dropboxListFolder, dropboxDownload, dropboxDownloadJSON } from './dropbox.js';
 
+// Simple in-memory cache
+const cache = new Map();
+
 export async function loadCSV(year, nifsMap) {
   let text;
 
@@ -43,7 +46,13 @@ export function parseCSV(text, nifsMap = {}) {
 }
 
 export async function getYearList() {
+  const cacheKey = 'yearList';
+  if (cache.has(cacheKey)) {
+    return cache.get(cacheKey);
+  }
+
   let files;
+
   if (config.loadFromDropbox) {
     const indexPath = `${config.dropboxFolder}`;
     files = await dropboxListFolder(indexPath);
@@ -52,19 +61,30 @@ export async function getYearList() {
     const filePath = `${config.dataFolder}`.replace('./', '');
     const res = await fetch(filePath);
   }
+
   const yearPattern = /^(\d{4})\.csv$/;
-  return files
+
+  const yearList = files
     .map(f => {
       const match = f.match(yearPattern);
       return match ? match[1] : null;
     })
     .filter(Boolean)
     .sort((a, b) => b - a);
+
+  cache.set(cacheKey, yearList);
+  return yearList;
 }
 
 export async function loadClassValues() {
+  const cacheKey = 'classValues';
+  if (cache.has(cacheKey)) {
+    return cache.get(cacheKey);
+  }
+
   const fileName = 'class-values.json';
   let arr = [];
+
   if (config.loadFromDropbox) {
     const path = `${config.dropboxFolder}/${fileName}`;
     arr = await dropboxDownloadJSON(path);
@@ -73,12 +93,20 @@ export async function loadClassValues() {
     const res = await fetch(filePath);
     arr = await res.json();
   }
+
+  cache.set(cacheKey, arr);
   return arr;
 }
 
 export async function loadNifsMap() {
+  const cacheKey = 'nifsMap';
+  if (cache.has(cacheKey)) {
+    return cache.get(cacheKey);
+  }
+
   const fileName = 'nifs.json';
   let nifsArr = [];
+
   if (config.loadFromDropbox) {
     const nifsPath = `${config.dropboxFolder}/${fileName}`;
     nifsArr = await dropboxDownloadJSON(nifsPath);
@@ -87,17 +115,26 @@ export async function loadNifsMap() {
     const res = await fetch(filePath);
     nifsArr = await res.json();
   }
+
   // Convert array to map: { [id]: entity }
   const nifsMap = {};
   nifsArr.forEach(item => {
     nifsMap[item.id] = item.entity;
   });
+
+  cache.set(cacheKey, nifsMap);
   return nifsMap;
 }
 
 export async function loadHolidays() {
+  const cacheKey = 'holidays';
+  if (cache.has(cacheKey)) {
+    return cache.get(cacheKey);
+  }
+
   const fileName = 'holidays.json';
   let holidays = {};
+
   if (config.loadFromDropbox) {
     const path = `${config.dropboxFolder}/${fileName}`;
     holidays = await dropboxDownloadJSON(path);
@@ -106,5 +143,7 @@ export async function loadHolidays() {
     const res = await fetch(filePath);
     holidays = await res.json();
   }
+
+  cache.set(cacheKey, holidays);
   return holidays;
 }
