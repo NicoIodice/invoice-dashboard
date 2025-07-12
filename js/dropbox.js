@@ -1,22 +1,40 @@
 import { config } from './config.js';
 
 const DROPBOX_CONFIG = 'config/dropbox.env';
+let cachedAccessToken = null;
+let tokenExpiry = null;
+let envVarsCache = null;
 
 async function getDropboxEnvVar(name) {
-  // If running on GitHub Pages (window.DROPBOX_CONFIG exists), use it
-  if (typeof window !== 'undefined' && window.DROPBOX_CONFIG && window.DROPBOX_CONFIG[name]) {
-    return window.DROPBOX_CONFIG[name];
+  // Cache env vars to avoid multiple requests
+  if (!envVarsCache) {
+    if (typeof window !== 'undefined' && window.DROPBOX_CONFIG) {
+      envVarsCache = window.DROPBOX_CONFIG;
+    } else {
+      const res = await fetch(DROPBOX_CONFIG);
+      const text = await res.text();
+      envVarsCache = {};
+      text.split('\n').forEach(line => {
+        const [key, value] = line.split('=');
+        if (key && value) {
+          envVarsCache[key.trim()] = value.trim();
+        }
+      });
+    }
   }
   
-  // Otherwise, try to read from dropbox.env (local dev)
-  const res = await fetch(DROPBOX_CONFIG); // this only works locally
-  const text = await res.text();
-  const match = text.match(new RegExp(`^${name}\\s*=\\s*(.+)$`, 'm'));
-  if (!match) throw new Error(`❌ ${name} não encontrado em ${DROPBOX_CONFIG}`);
-  return match[1].trim();
+  if (!envVarsCache[name]) {
+    throw new Error(`❌ ${name} não encontrado em ${DROPBOX_CONFIG}`);
+  }
+  return envVarsCache[name];
 }
 
 export async function getDropboxAccessToken() {
+  // Return cached token if still valid
+  if (cachedAccessToken && tokenExpiry && Date.now() < tokenExpiry) {
+    return cachedAccessToken;
+  }
+
   const refreshToken = await getDropboxEnvVar('DROPBOX_REFRESH_TOKEN');
   const appKey = await getDropboxEnvVar('DROPBOX_APP_KEY');
   const appSecret = await getDropboxEnvVar('DROPBOX_APP_SECRET');
@@ -36,7 +54,12 @@ export async function getDropboxAccessToken() {
   if (!res.ok) throw new Error('❌ Erro ao obter access token do Dropbox');
   
   const data = await res.json();
-  return data.access_token;
+  
+  // Cache the token (typically valid for 4 hours)
+  cachedAccessToken = data.access_token;
+  tokenExpiry = Date.now() + (data.expires_in * 1000) - 60000; // 1 minute buffer
+  
+  return cachedAccessToken;
 }
 
 export async function dropboxDownload(path) {
