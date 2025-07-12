@@ -18,6 +18,18 @@
   display: block;
 }
 
+@media (pointer: coarse) {
+  .nif-label.quarter-tooltip.active .quarter-tooltip-panel {
+    display: block !important;
+  }
+}
+
+.nif-label.quarter-tooltip:hover .quarter-tooltip-panel,
+.nif-label.quarter-tooltip:focus .quarter-tooltip-panel,
+.nif-label.quarter-tooltip.active .quarter-tooltip-panel {
+  display: block;
+}
+
 .calendar-tooltip:hover .calendar-tooltip-panel,
 .calendar-tooltip:focus .calendar-tooltip-panel,
 .calendar-tooltip.active .calendar-tooltip-panel {

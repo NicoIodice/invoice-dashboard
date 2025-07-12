@@ -196,17 +196,27 @@ function updateFiscalStatusPanel(config) {
 }
 
 // Updates the NIF stats panel
+// Updates the NIF stats panel with entity tooltips
 function updateInvoicesByNifPanel(rows, nifCounts) {
   const sortedNifs = Object.entries(nifCounts)
     .sort((a, b) => b[1] - a[1]);
 
   const nifList = sortedNifs
-    .map(([nif, count]) => `
-      <li class="nif-item">
-        <span class="nif-label">${nif}</span>
-        <span class="nif-count">${count} fatura(s)</span>
-      </li>
-    `)
+    .map(([nif, count]) => {
+      const entityName = globalNifsMap[nif] || 'Entidade não encontrada';
+      return `
+        <li class="nif-item">
+          <span class="nif-label quarter-tooltip">
+            ${nif}
+            <span class="quarter-tooltip-panel" style="min-width: 15em; white-space: normal;">
+              <div style="color: #2d6cdf; font-weight: 500; margin-bottom: 0.3em;">Entidade:</div>
+              <div style="color: #222;">${entityName}</div>
+            </span>
+          </span>
+          <span class="nif-count">${count} fatura(s)</span>
+        </li>
+      `;
+    })
     .join("");
   document.getElementById("nifStats").innerHTML = nifList;
   document.getElementById("totalInvoices").innerHTML =
