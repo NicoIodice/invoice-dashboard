@@ -401,8 +401,9 @@ tr:last-child td {
 
 /* Pie Chart Panel Styles */
 #pieChartPanel {
-  margin-top: auto;
+  margin-top: 0;
   margin-bottom: 0;
+  height: calc(100vh + 60em);
 }
 
 #pieChartContainer {

@@ -452,7 +452,7 @@ function createPieLegend(data, legend) {
     legendItem.addEventListener('mouseleave', () => {
       pieChart.hoveredSlice = null;
       drawPieChart();
-      hideTooltip();
+      hidePieChartTooltip();
     });
     
     legend.appendChild(legendItem);
@@ -472,18 +472,18 @@ function setupPieChartEvents() {
     if (hoveredIndex !== null) {
       pieChart.hoveredSlice = hoveredIndex;
       drawPieChart();
-      showTooltip(e, hoveredIndex);
+      showPieChartTooltip(e, hoveredIndex);
     } else {
       pieChart.hoveredSlice = null;
       drawPieChart();
-      hideTooltip();
+      hidePieChartTooltip();
     }
   });
   
   canvas.addEventListener('mouseleave', () => {
     pieChart.hoveredSlice = null;
     drawPieChart();
-    hideTooltip();
+    hidePieChartTooltip();
   });
 }
 
@@ -516,7 +516,7 @@ function getHoveredSlice(x, y) {
   return null;
 }
 
-function showTooltip(e, sliceIndex) {
+function showPieChartTooltip(e, sliceIndex) {
   const { tooltip, data } = pieChart;
   const slice = data[sliceIndex];
   
@@ -551,7 +551,7 @@ function showTooltip(e, sliceIndex) {
   tooltip.classList.add('visible');
 }
 
-function hideTooltip() {
+function hidePieChartTooltip() {
   const { tooltip } = pieChart;
   tooltip.classList.remove('visible');
 }
