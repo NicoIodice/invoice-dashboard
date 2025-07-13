@@ -39,6 +39,7 @@ export async function setupYearSelector(nifsMap) {
 export async function loadAndUpdateDashboard(nifsMap) {
   showLoading();
   try {
+    window.totalValue = 0;
     const rows = await loadCSV(currentYear, nifsMap);
     updateUI(rows, tableBody, quarterTotals, nifCounts, config);
   } catch (err) {
