@@ -10,6 +10,7 @@ import { setupMobileTooltips } from './mobileActions.js';
 
 const sidebarToggle = document.getElementById('sidebarToggle');
 const sidebarToggleIcon = document.getElementById('sidebarToggleIcon');
+const sidebar = document.getElementById('sidebar');
 
 const menuInvoiceDashboard = document.getElementById('menuInvoiceDashboard');
 const menuClassesInfo = document.getElementById('menuClassesInfo');
@@ -27,15 +28,53 @@ const entitiesPanel = document.getElementById('entitiesPanel');
 let nifsMap = {};
 let classValues = [];
 
+// Toggle sidebar manually
 sidebarToggle.addEventListener('click', () => {
   document.body.classList.toggle('sidebar-collapsed');
-  // Change icon direction
+  updateSidebarIcon();
+});
+
+// Function to update the icon based on sidebar state
+function updateSidebarIcon() {
   if (document.body.classList.contains('sidebar-collapsed')) {
     sidebarToggleIcon.textContent = '➡️';
   } else {
     sidebarToggleIcon.textContent = '⬅️';
   }
+}
+
+// Listen for clicks outside the sidebar when it's expanded
+document.addEventListener('click', (e) => {
+  // Only handle this when sidebar is NOT manually collapsed
+  if (!document.body.classList.contains('sidebar-collapsed')) {
+    // Check if click is outside the sidebar
+    if (!sidebar.contains(e.target)) {
+      // Sidebar will close due to CSS :hover, so update icon
+      // Use a small delay to ensure CSS transition has started
+      setTimeout(() => {
+        sidebarToggleIcon.textContent = '➡️';
+      }, 50);
+    }
+  }
 });
+
+// Listen for mouse enter/leave on sidebar to update icon
+sidebar.addEventListener('mouseenter', () => {
+  // Only update icon if sidebar is not manually collapsed
+  if (!document.body.classList.contains('sidebar-collapsed')) {
+    sidebarToggleIcon.textContent = '⬅️';
+  }
+});
+
+sidebar.addEventListener('mouseleave', () => {
+  // Only update icon if sidebar is not manually collapsed
+  if (!document.body.classList.contains('sidebar-collapsed')) {
+    sidebarToggleIcon.textContent = '➡️';
+  }
+});
+
+// Initialize icon state
+updateSidebarIcon();
 
 menuInvoiceDashboard.addEventListener('click', async () => {
   showLoading();

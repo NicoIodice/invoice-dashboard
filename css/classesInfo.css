@@ -22,7 +22,6 @@
   padding: 0.25em 0.6em;
   box-shadow: 0 0.13em 0.75em rgba(45, 108, 223, 0.07);
   margin-bottom: 1rem;
-  /* Align to the right */
   margin-left: auto;
   width: fit-content;
 }
