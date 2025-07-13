@@ -1,137 +1,434 @@
-/* Touch device support for tooltips (Safari is not supported) */
-@media (pointer: coarse) {
-  .quarter-tooltip-panel,
-  .calendar-tooltip-panel {
-    display: none !important;
-  }
-  
-  .quarter-tooltip.active .quarter-tooltip-panel,
-  .calendar-tooltip.active .calendar-tooltip-panel {
-    display: block !important;
-  }
-}
-
-/* Ensure tooltips work on both hover and active states */
-.quarter-tooltip:hover .quarter-tooltip-panel,
-.quarter-tooltip:focus .quarter-tooltip-panel,
-.quarter-tooltip.active .quarter-tooltip-panel {
-  display: block;
-}
-
-@media (pointer: coarse) {
-  .nif-label.quarter-tooltip.active .quarter-tooltip-panel {
-    display: block !important;
-  }
-}
-
-.nif-label.quarter-tooltip:hover .quarter-tooltip-panel,
-.nif-label.quarter-tooltip:focus .quarter-tooltip-panel,
-.nif-label.quarter-tooltip.active .quarter-tooltip-panel {
-  display: block;
-}
-
-/* Mobile adjustments */
+/* Mobile breakpoints */
 @media (max-width: 768px) {
-  #pieChart {
-    width: 220px;
-    height: 220px;
-  }
-  
-  .pie-legend {
-    max-height: 150px;
-  }
-  
-  .pie-legend-item {
-    font-size: 0.8em;
-  }
-}
-
-@media (pointer: coarse) {
-  #classesInfoTable td.quarter-tooltip.active .quarter-tooltip-panel {
-    display: block !important;
-  }
-}
-
-.calendar-tooltip:hover .calendar-tooltip-panel,
-.calendar-tooltip:focus .calendar-tooltip-panel,
-.calendar-tooltip.active .calendar-tooltip-panel {
-  display: block;
-  pointer-events: auto;
-}
-
-/* Simple touch support - show tooltips on touch */
-/*
-@media (pointer: coarse) {
-  .quarter-tooltip:active .quarter-tooltip-panel,
-  .calendar-tooltip:active .calendar-tooltip-panel {
-    display: block !important;
-  }
-}
-*/
-
-/* iPhone devices responsive styles */
-/*
-@media (max-width: 56em) {
-  main {
-    flex-direction: column;
-    gap: 0;
-  }
-  .left, .right {
-    width: 100%;
-    min-width: 0;
-  }
-  #entitiesPanel {
-    margin-left: 0;
-    margin-top: 1em;
-    padding: 1em;
-    max-width: 100vw;
-  }
+  /* Reset header positioning */
   header {
-    margin-left: 0;
+    margin-left: 1em !important;
+    margin-right: 1em !important;
     margin-top: 1em;
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5em;
   }
-}
-
-@media (max-width: 37.5em) {
-  #sidebar {
-    width: 2.5em;
-    padding-top: 2.5em;
+  
+  header h1 {
+    font-size: 1.5em;
+    margin: 0;
   }
-  #sidebar:hover {
-    width: 7.5em;
+  
+  /* Main layout adjustments */
+  main {
+    flex-direction: column !important;
+    gap: 1rem !important;
+    height: auto !important;
+    margin-left: 1em !important;
+    margin-right: 1em !important;
+    padding: 0;
   }
-  .sidebar-label {
-    max-width: 3.75em;
-    font-size: 0.95em;
+  
+  /* Left and right sections */
+  .left,
+  .right {
+    flex: 1 !important;
+    max-width: none !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
   }
-  main, #entitiesPanel {
-    margin-left: 0;
-    margin-top: 1em;
-    padding: 0.5em;
+  
+  /* Invoice table mobile fixes */
+  #invoiceTable {
+    height: 50vh !important;
+    font-size: 0.85em !important;
+    min-height: 300px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
   }
-  table, th, td {
-    font-size: 0.95em;
-    padding: 0.4em;
+  
+  #invoiceTable thead {
+    flex-shrink: 0 !important;
+    display: block !important;
+    width: 100% !important;
   }
-  #year-toggle {
-    flex-direction: column;
-    gap: 0.3em;
-    padding: 0.3em 0.5em;
+  
+  #invoiceTable tbody {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    display: block !important;
+    width: 100% !important;
   }
-}
-
-@media (max-width: 37.5em) {
-  table {
-    display: block;
-    overflow-x: auto;
-    width: 100%;
+  
+  #invoiceTable thead tr,
+  #invoiceTable tbody tr {
+    display: table !important;
+    width: 100% !important;
+    table-layout: fixed !important;
   }
+  
+  /* Mobile column widths */
+  #invoiceTable th:nth-child(1),
+  #invoiceTable td:nth-child(1) { width: 15% !important; } /* NIF */
+  #invoiceTable th:nth-child(2),
+  #invoiceTable td:nth-child(2) { width: 25% !important; } /* ENTIDADE */
+  #invoiceTable th:nth-child(3),
+  #invoiceTable td:nth-child(3) { width: 15% !important; } /* VALOR */
+  #invoiceTable th:nth-child(4),
+  #invoiceTable td:nth-child(4) { width: 20% !important; } /* DATA EMISSÃO */
+  #invoiceTable th:nth-child(5),
+  #invoiceTable td:nth-child(5) { width: 15% !important; } /* DATA SERVIÇO */
+  #invoiceTable th:nth-child(6),
+  #invoiceTable td:nth-child(6) { width: 10% !important; } /* Trimestre */
+  
+  /* Mobile table cells */
   th, td {
-    min-width: 5.6em;
-    white-space: nowrap;
+    padding: 0.4em 0.2em !important;
+    font-size: 0.8em !important;
+    text-overflow: ellipsis !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+  }
+  
+  /* Mobile scrollbar */
+  #invoiceTable tbody::-webkit-scrollbar {
+    width: 3px !important;
+  }
+  
+  #invoiceTable tbody::-webkit-scrollbar-thumb {
+    background: rgba(45, 108, 223, 0.4) !important;
+  }
+  
+  /* Panel adjustments */
+  .panel {
+    padding: 0.8rem !important;
+    margin-bottom: 0.8rem !important;
+    border-radius: 0.5em !important;
+  }
+  
+  .panel h3 {
+    font-size: 1.1em !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  /* Quarter summary mobile */
+  #quarterSummary {
+    gap: 0.3rem !important;
+  }
+  
+  .quarter-item {
+    padding: 0.2rem 0 !important;
+    font-size: 0.9em !important;
+  }
+  
+  .quarter-label {
+    font-size: 0.85em !important;
+  }
+  
+  .quarter-value {
+    font-size: 0.85em !important;
+  }
+  
+  /* NIF stats mobile */
+  .nif-item {
+    padding: 0.2rem 0 !important;
+    font-size: 0.85em !important;
+  }
+  
+  .nif-label {
+    font-size: 0.8em !important;
+  }
+  
+  .nif-count {
+    font-size: 0.8em !important;
+  }
+  
+  /* Fiscal status mobile */
+  .fiscal-item {
+    padding: 0.2rem 0 !important;
+    font-size: 0.85em !important;
+  }
+  
+  .fiscal-label {
+    font-size: 0.8em !important;
+  }
+  
+  .fiscal-icon {
+    font-size: 0.9em !important;
+  }
+  
+  /* Pie chart mobile */
+  #pieChartPanel {
+    height: auto !important;
+    margin-top: 1rem !important;
+  }
+  
+  #pieChart {
+    width: 200px !important;
+    height: 200px !important;
+  }
+  
+  .pie-legend {
+    max-height: 120px !important;
+    font-size: 0.8em !important;
+  }
+  
+  .pie-legend-item {
+    padding: 0.2em 0.3em !important;
+    font-size: 0.75em !important;
+  }
+  
+  .pie-legend-label,
+  .pie-legend-value {
+    font-size: 0.75em !important;
+  }
+  
+  /* Tooltips mobile adjustments */
+  .quarter-tooltip-panel {
+    font-size: 0.85em !important;
+    padding: 0.5em 0.7em !important;
+    min-width: 8em !important;
+  }
+  
+  .pie-tooltip {
+    font-size: 0.8em !important;
+    padding: 0.4em 0.6em !important;
+  }
+  
+  /* Year toggle mobile */
+  .year-toggle {
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    width: fit-content !important;
+    flex-shrink: 0 !important;
+    gap: 0.5em !important;
+    padding: 0.2em 0.5em !important;
+  }
+  
+  .year-toggle label {
+    font-size: 0.9em !important;
+  }
+  
+  .year-select {
+    padding: 0.1em 0.4em !important;
+    font-size: 0.9em !important;
+  }
+  
+  /* Refresh button mobile */
+  #refreshBtn {
+    width: 1.6em !important;
+    height: 1.6em !important;
+    font-size: 1.2em !important;
+  }
+  
+  /* Sidebar mobile */
+  #sidebar {
+    width: 3em !important;
+    padding-top: 1em !important;
+  }
+  
+  #sidebar:hover {
+    width: 8em !important;
+  }
+  
+  .sidebar-menu {
+    padding: 0.5em 0.5em 0.5em 0.7em !important;
+    margin-bottom: 0.2em !important;
+  }
+  
+  .sidebar-icon {
+    font-size: 1.2em !important;
+    margin-right: 0.5em !important;
+  }
+  
+  .sidebar-label {
+    font-size: 0.9em !important;
+    max-width: 5em !important;
+  }
+  
+  /* Collapsed sidebar mobile */
+  body.sidebar-collapsed main {
+    margin-left: 1em !important;
+    margin-right: 1em !important;
+  }
+  
+  body.sidebar-collapsed header {
+    margin-left: 1em !important;
   }
 }
-*/
+
+/* Very small screens (phones in portrait) */
+@media (max-width: 480px) {
+  body {
+    padding: 0.5rem !important;
+  }
+  
+  main {
+    margin-left: 0.5em !important;
+    margin-right: 0.5em !important;
+    gap: 0.5rem !important;
+  }
+  
+  .panel {
+    padding: 0.6rem !important;
+    margin-bottom: 0.6rem !important;
+  }
+  
+  /* Extra small table adjustments */
+  #invoiceTable {
+    height: 40vh !important;
+    min-height: 250px !important;
+    font-size: 0.75em !important;
+  }
+  
+  th, td {
+    padding: 0.3em 0.1em !important;
+    font-size: 0.7em !important;
+  }
+  
+  /* Hide DATA SERVIÇO column on very small screens */
+  #invoiceTable th:nth-child(5),
+  #invoiceTable td:nth-child(5) { 
+    display: none !important;
+  }
+  
+  /* Adjust remaining columns */
+  #invoiceTable th:nth-child(1),
+  #invoiceTable td:nth-child(1) { width: 18% !important; } /* NIF */
+  #invoiceTable th:nth-child(2),
+  #invoiceTable td:nth-child(2) { width: 30% !important; } /* ENTIDADE */
+  #invoiceTable th:nth-child(3),
+  #invoiceTable td:nth-child(3) { width: 20% !important; } /* VALOR */
+  #invoiceTable th:nth-child(4),
+  #invoiceTable td:nth-child(4) { width: 25% !important; } /* DATA EMISSÃO */
+  #invoiceTable th:nth-child(6),
+  #invoiceTable td:nth-child(6) { width: 7% !important; } /* Trimestre */
+  
+  /* Pie chart extra small */
+  #pieChart {
+    width: 150px !important;
+    height: 150px !important;
+  }
+  
+  .pie-legend {
+    max-height: 100px !important;
+  }
+  
+  .pie-legend-item {
+    font-size: 0.7em !important;
+  }
+  
+  /* Panel titles */
+  .panel h3 {
+    font-size: 1em !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  /* Total value styling */
+  .total-value {
+    font-size: 0.9em !important;
+    padding: 0.15em 0.5em !important;
+  }
+  
+  /* Header adjustments */
+  header {
+    margin-left: 0.5em !important;
+    margin-right: 0.5em !important;
+  }
+  
+  header h1 {
+    font-size: 1.2em !important;
+  }
+  
+  .year-toggle {
+    gap: 0.3em !important;
+    padding: 0.15em 0.4em !important;
+  }
+  
+  .year-toggle label {
+    font-size: 0.8em !important;
+  }
+  
+  .year-select {
+    font-size: 0.8em !important;
+  }
+  
+  /* Sidebar extra small */
+  #sidebar {
+    width: 2.5em !important;
+  }
+  
+  #sidebar:hover {
+    width: 6em !important;
+  }
+  
+  .sidebar-menu {
+    padding: 0.4em 0.4em 0.4em 0.5em !important;
+  }
+  
+  .sidebar-icon {
+    font-size: 1em !important;
+  }
+  
+  .sidebar-label {
+    font-size: 0.8em !important;
+    max-width: 4em !important;
+  }
+}
+
+/* Tablet adjustments */
+@media (max-width: 1024px) and (min-width: 769px) {
+  main {
+    gap: 1.5rem !important;
+    margin-left: 3em !important;
+    margin-right: 1em !important;
+  }
+  
+  .right {
+    min-width: 250px !important;
+    max-width: 300px !important;
+  }
+  
+  .panel {
+    padding: 0.9rem !important;
+  }
+  
+  #invoiceTable {
+    height: 60vh !important;
+  }
+  
+  th, td {
+    padding: 0.5em 0.4em !important;
+    font-size: 0.9em !important;
+  }
+  
+  #pieChart {
+    width: 240px !important;
+    height: 240px !important;
+  }
+}
+
+/* Landscape mobile adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  main {
+    flex-direction: row !important;
+    gap: 1rem !important;
+  }
+  
+  .left {
+    flex: 2 !important;
+  }
+  
+  .right {
+    flex: 1 !important;
+    max-width: 300px !important;
+  }
+  
+  #invoiceTable {
+    height: 60vh !important;
+  }
+  
+  #pieChart {
+    width: 160px !important;
+    height: 160px !important;
+  }
+}
