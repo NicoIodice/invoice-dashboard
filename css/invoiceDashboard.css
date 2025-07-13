@@ -4,6 +4,8 @@ main {
   margin-left: 4em; /* Same as #sidebar width */
   transition: margin-left 0.2s;
   align-items: flex-start;
+  height: calc(100vh + 60em); /* Adjust based on header height */
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 #refreshBtn {
@@ -59,6 +61,9 @@ th, td {
   padding: 0.6em;
   border-bottom: 0.09em solid #e3eaf7;
   text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 th {
@@ -69,6 +74,87 @@ th {
 
 tr:last-child td {
   border-bottom: none;
+}
+
+/* Make the table container scrollable */
+#invoiceTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 0.09em solid #2d6cdf;
+  border-radius: 0.6em;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 0.13em 0.75em rgba(45, 108, 223, 0.07);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0; /* Important: prevents table from expanding beyond container */
+}
+
+#invoiceTable thead {
+  flex-shrink: 0;
+}
+
+#invoiceTable tbody {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+  display: block;
+  width: 100%;
+}
+
+#invoiceTable thead,
+#invoiceTable tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+/* Specific column widths to prevent overflow */
+#invoiceTable th:nth-child(1),
+#invoiceTable td:nth-child(1) { width: 7%; } /* NIF */
+#invoiceTable th:nth-child(2),
+#invoiceTable td:nth-child(2) { width: 10%; } /* ENTIDADE */
+#invoiceTable th:nth-child(3),
+#invoiceTable td:nth-child(3) { width: 7%; } /* VALOR */
+#invoiceTable th:nth-child(4),
+#invoiceTable td:nth-child(4) { width: 7%; } /* DATA EMISSÃO */
+#invoiceTable th:nth-child(5),
+#invoiceTable td:nth-child(5) { width: 7%; } /* DATA SERVIÇO */
+#invoiceTable th:nth-child(6),
+#invoiceTable td:nth-child(6) { width: 5%; } /* Trimestre */
+
+/* Custom scrollbar styling for the table */
+/* Ultra-subtle scrollbar option */
+#invoiceTable tbody::-webkit-scrollbar {
+  width: 4px;
+}
+
+#invoiceTable tbody::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#invoiceTable tbody::-webkit-scrollbar-thumb {
+  background: rgba(45, 108, 223, 0.2);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+#invoiceTable tbody::-webkit-scrollbar-thumb:hover {
+  background: rgba(45, 108, 223, 0.4);
+  width: 6px;
+}
+
+/* Auto-hide scrollbar when not needed */
+#invoiceTable tbody {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(45, 108, 223, 0.2) transparent;
+}
+
+/* Show scrollbar only on hover */
+#invoiceTable:hover tbody::-webkit-scrollbar-thumb {
+  background: rgba(45, 108, 223, 0.3);
 }
 
 .panel {
@@ -306,9 +392,17 @@ tr:last-child td {
   transition: all 0.2s ease;
 }
 
+/* Adjust other panels to not take up extra space */
+#quarterPanel,
+#taxPanel,
+#nifStatsPanel {
+  flex-shrink: 0;
+}
+
 /* Pie Chart Panel Styles */
 #pieChartPanel {
-  margin-top: 0;
+  margin-top: auto;
+  margin-bottom: 0;
 }
 
 #pieChartContainer {
@@ -388,4 +482,24 @@ tr:last-child td {
   font-size: 0.85em;
   color: #222;
   font-weight: 500;
+}
+
+/* Subtle scrollbar for pie chart legend */
+.pie-legend::-webkit-scrollbar {
+  width: 4px;
+}
+
+.pie-legend::-webkit-scrollbar-track {
+  background: rgba(45, 108, 223, 0.05);
+  border-radius: 2px;
+}
+
+.pie-legend::-webkit-scrollbar-thumb {
+  background: rgba(45, 108, 223, 0.25);
+  border-radius: 2px;
+  transition: background 0.2s ease;
+}
+
+.pie-legend::-webkit-scrollbar-thumb:hover {
+  background: rgba(45, 108, 223, 0.4);
 }
