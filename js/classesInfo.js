@@ -1,3 +1,5 @@
+import { addEmptyStateRow } from './utils.js';
+
 let classSortKey = 'entidade';
 let classSortAsc = true;
 let selectedClassesYear = null;
@@ -112,7 +114,7 @@ function setupClassesYearSelector(classValues) {
     // If no other years available, add a placeholder
     const placeholderOption = document.createElement('option');
     placeholderOption.value = '';
-    placeholderOption.textContent = 'Nenhum ano disponível';
+    placeholderOption.textContent = '-';
     yearSelect.appendChild(placeholderOption);
     yearSelect.value = '';
     selectedClassesYear = null;
@@ -139,6 +141,15 @@ export async function renderClassesInfoTable(nifsMap, classValues) {
     setupClassesYearSelector(classValues);
   }
   
+  const tbody = document.querySelector('#classesInfoTable tbody');
+  tbody.innerHTML = '';
+  
+  // Check if classValues is empty or null
+  if (!classValues || classValues.length === 0) {
+    addEmptyStateRow(tbody, 5); // 5 columns in classes table
+    return;
+  }
+
   // Filter classes to show only CURRENT YEAR data
   const currentYear = new Date().getFullYear();
   const currentYearClassValues = classValues.map(entry => {
@@ -173,8 +184,15 @@ export async function renderClassesInfoTable(nifsMap, classValues) {
     };
   });
   
-  const tbody = document.querySelector('#classesInfoTable tbody');
-  tbody.innerHTML = '';
+  // Filter out entries with no classes for current year
+  const validEntries = currentYearClassValues.filter(entry => entry.classes.length > 0);
+  
+  // Check if no valid entries after filtering
+  if (validEntries.length === 0) {
+    addEmptyStateRow(tbody, 5); // 5 columns in classes table
+    return;
+  }
+  
   const arr = [...currentYearClassValues]; // Use current year filtered data
 
   // Prepare a flat array for sorting and rendering

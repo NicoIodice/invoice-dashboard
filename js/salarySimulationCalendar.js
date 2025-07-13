@@ -1,4 +1,5 @@
 import { loadHolidays } from './data.js';
+import { addEmptyStateRow } from './utils.js';
 
 const PT_MONTHS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -15,15 +16,24 @@ let cachedYear = null;
 
 export async function renderSalaryCalendar(nifsMap, classValues) {
   const year = new Date().getFullYear();
+
+  const container = document.getElementById('salaryCalendar');
+  container.innerHTML = '';
+  
+  // Check if classValues is empty or null
+  if (!classValues || classValues.length === 0) {
+    const emptyMessage = document.createElement('div');
+    emptyMessage.style.cssText = 'text-align: center; padding: 3em; color: #888; font-style: italic; background: #fff; border-radius: 1em; box-shadow: 0 0.13em 0.75em rgba(45, 108, 223, 0.07);';
+    emptyMessage.textContent = 'No data available';
+    container.appendChild(emptyMessage);
+    return;
+  }
   
   // Check if we need to reload holidays
   if (cachedYear !== year) {
     currentYearHolidays = await loadYearHolidays(year);
     cachedYear = year;
   }
-
-  const container = document.getElementById('salaryCalendar');
-  container.innerHTML = '';
 
   const today = new Date();
   const todayDay = today.getDate();

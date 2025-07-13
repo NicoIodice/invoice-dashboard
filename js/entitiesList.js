@@ -1,3 +1,4 @@
+import { addEmptyStateRow } from './utils.js';
 
 let entitiesSortKey = 'ENTIDADE';
 let entitiesSortAsc = true;
@@ -5,6 +6,13 @@ let entitiesSortAsc = true;
 export async function renderEntitiesTable(nifsMap) {
   const tbody = document.querySelector('#entitiesTable tbody');
   tbody.innerHTML = '';
+
+  // Check if nifsMap is empty or null
+  if (!nifsMap || Object.keys(nifsMap).length === 0) {
+    addEmptyStateRow(tbody, 2); // 2 columns in entities table
+    return;
+  }
+
   // Convert map to array for sorting
   const entitiesArr = Object.entries(nifsMap).map(([id, entity]) => ({ id, entity }));
   entitiesArr.sort((a, b) => {
@@ -16,6 +24,7 @@ export async function renderEntitiesTable(nifsMap) {
     }
     return entitiesSortAsc ? cmp : -cmp;
   });
+  
   entitiesArr.forEach(({ id, entity }) => {
     const tr = document.createElement('tr');
     tr.innerHTML = `<td>${id}</td><td>${entity}</td>`;
