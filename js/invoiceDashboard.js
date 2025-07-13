@@ -525,16 +525,29 @@ function showTooltip(e, sliceIndex) {
     ${formatCurrency(slice.value)} (${slice.percentage.toFixed(1)}%)
   `;
   
-  // Position tooltip relative to the mouse within the canvas
-  const rect = pieChart.canvas.getBoundingClientRect();
-  const containerRect = document.getElementById('pieChartContainer').getBoundingClientRect();
+  // Get the mouse position relative to the viewport
+  const mouseX = e.clientX;
+  const mouseY = e.clientY;
   
-  // Calculate position relative to the container
-  const x = e.clientX - containerRect.left;
-  const y = e.clientY - containerRect.top;
+  // Position tooltip relative to the mouse cursor
+  tooltip.style.left = (mouseX + 10) + 'px';
+  tooltip.style.top = (mouseY - 10) + 'px';
   
-  tooltip.style.left = (x + 10) + 'px';
-  tooltip.style.top = (y - 10) + 'px';
+  // Ensure tooltip doesn't go off-screen
+  const rect = tooltip.getBoundingClientRect();
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  
+  // Adjust horizontal position if tooltip goes off right edge
+  if (mouseX + rect.width + 10 > viewportWidth) {
+    tooltip.style.left = (mouseX - rect.width - 10) + 'px';
+  }
+  
+  // Adjust vertical position if tooltip goes off bottom edge
+  if (mouseY + rect.height + 10 > viewportHeight) {
+    tooltip.style.top = (mouseY - rect.height - 10) + 'px';
+  }
+  
   tooltip.classList.add('visible');
 }
 
