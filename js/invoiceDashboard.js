@@ -1,6 +1,6 @@
 import { config } from './config.js';
 import { showLoading, hideLoading, formatCurrency } from './utils.js';
-import { loadCSV, getYearList } from './data.js';
+import { loadInvoiceDataFromCSV, getYearList, clearRefreshableCache } from './data.js';
 
 let currentYear = new Date().getFullYear();
 let globalNifsMap = {};
@@ -40,7 +40,7 @@ export async function loadAndUpdateDashboard(nifsMap) {
   showLoading();
   try {
     window.totalValue = 0;
-    const rows = await loadCSV(currentYear, nifsMap);
+    const rows = await loadInvoiceDataFromCSV(currentYear, nifsMap);
     updateUI(rows, tableBody, quarterTotals, nifCounts, config);
   } catch (err) {
     //alert("❌ Erro ao carregar CSV para o ano selecionado.");
@@ -50,6 +50,7 @@ export async function loadAndUpdateDashboard(nifsMap) {
     hideLoading();
   }
 }
+
 // Resets all dashboard panels and table
 function resetDashboard(tableBody, quarterTotals, nifCounts, config) {
   tableBody.innerHTML = "";
@@ -107,10 +108,24 @@ function updateInvoicesTable(rows, tableBody, quarterTotals, nifCounts) {
 
 refreshBtn.addEventListener("click", async () => {
   refreshBtn.classList.add("refreshing");
+  showLoading();
   try {
+    // Clear cache before refreshing
+    clearRefreshableCache();
+    
+    // Reset totalValue immediately
+    window.totalValue = 0;
+    
+    // Reload year list (in case new CSV files were added)
+    await setupYearSelector(globalNifsMap);
+    
+    // Reload current dashboard data
     await loadAndUpdateDashboard(globalNifsMap);
+    } catch (error) {
+    console.error('❌ Erro durante refresh:', error);
   } finally {
     setTimeout(() => refreshBtn.classList.remove("refreshing"), 700);
+    hideLoading();
   }
 });
 

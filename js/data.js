@@ -4,7 +4,12 @@ import { dropboxListFolder, dropboxDownload, dropboxDownloadJSON } from './dropb
 // Simple in-memory cache
 const cache = new Map();
 
-export async function loadCSV(year, nifsMap) {
+export async function loadInvoiceDataFromCSV(year, nifsMap) {
+  const cacheKey = `invoiceData_${year}`;
+  if (cache.has(cacheKey)) {
+    return cache.get(cacheKey);
+  }
+
   let text;
 
   if (config.loadFromDropbox) {
@@ -16,10 +21,13 @@ export async function loadCSV(year, nifsMap) {
     if (!res.ok) throw new Error(`❌ Erro ao carregar CSV local para o ano ${year}.csv`);
     text = await res.text();
   }
-  return parseCSV(text, nifsMap);
+
+  const result = parseInvoiceDataCSV(text, nifsMap);
+  cache.set(cacheKey, result);
+  return result;
 }
 
-export function parseCSV(text, nifsMap = {}) {
+export function parseInvoiceDataCSV(text, nifsMap = {}) {
   const lines = text.trim().split("\n").slice(1); // Skip headers
   return lines
     .map(line => {
@@ -146,4 +154,43 @@ export async function loadHolidays() {
 
   cache.set(cacheKey, holidays);
   return holidays;
+}
+
+export function clearInvoiceDataCache(year = null) {
+  if (year) {
+    // Clear specific year
+    cache.delete(`invoiceData_${year}`);
+  } else {
+    // Clear all invoice data cache
+    for (const key of cache.keys()) {
+      if (key.startsWith('invoiceData_')) {
+        cache.delete(key);
+      }
+    }
+  }
+}
+
+export function clearNifsMapCache() {
+  cache.delete('nifsMap');
+}
+
+export function clearYearListCache() {
+  cache.delete('yearList');
+}
+
+// Clear all relevant caches for refresh
+export function clearRefreshableCache() {
+  // Clear all invoice data
+  clearInvoiceDataCache();
+  
+  // Clear NIFs map
+  clearNifsMapCache();
+  
+  // Clear year list
+  clearYearListCache();
+}
+
+// Optional: Clear all cache
+export function clearAllCache() {
+  cache.clear();
 }
