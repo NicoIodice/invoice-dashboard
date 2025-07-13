@@ -66,10 +66,12 @@ body.sidebar-collapsed #salarySimulationPanel {
   top: auto;
   bottom: 110%;
 }
+
 .calendar-tooltip-panel.left {
   left: 0;
   transform: none;
 }
+
 .calendar-tooltip-panel.right {
   left: auto;
   right: 0;

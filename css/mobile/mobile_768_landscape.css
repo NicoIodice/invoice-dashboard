@@ -1,0 +1,27 @@
+/* Landscape mobile adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  main {
+    flex-direction: row !important;
+    gap: 1rem !important;
+  }
+  
+  .left,
+  .right {
+    flex: 1 !important;
+    max-width: none !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  
+  #invoiceTable {
+    height: 60vh !important;
+  }
+  
+  #pieChart {
+    width: 10em !important;
+    height: 10em !important;
+  }
+}

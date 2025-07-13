@@ -1,3 +1,15 @@
+#infoIcon {
+  display: inline-block;
+  margin-left: 0.3em;
+  font-size: 0.8em;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+#infoIcon:hover {
+  transform: scale(1.1);
+}
+
 main {
   display: flex;
   gap: 2rem;

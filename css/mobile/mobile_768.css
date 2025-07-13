@@ -2,7 +2,7 @@
 @media (max-width: 768px) {
   /* Reset header positioning */
   header {
-    margin-left: 1em !important;
+    margin-left: 2.5em !important;
     margin-right: 1em !important;
     margin-top: 1em;
     flex-direction: column;
@@ -14,13 +14,18 @@
     font-size: 1.5em;
     margin: 0;
   }
+
+  #infoIcon {
+    margin-left: 0.2em;
+    font-size: 0.7em;
+  }
   
   /* Main layout adjustments */
   main {
     flex-direction: column !important;
     gap: 1rem !important;
     height: auto !important;
-    margin-left: 1em !important;
+    margin-left: 2.5em !important;
     margin-right: 1em !important;
     padding: 0;
   }
@@ -33,13 +38,15 @@
     width: 100% !important;
     height: auto !important;
     overflow: visible !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
   }
   
   /* Invoice table mobile fixes */
   #invoiceTable {
     height: 50vh !important;
     font-size: 0.85em !important;
-    min-height: 300px !important;
+    min-height: 18.75em !important;
     display: flex !important;
     flex-direction: column !important;
     width: 100% !important;
@@ -91,7 +98,7 @@
   
   /* Mobile scrollbar */
   #invoiceTable tbody::-webkit-scrollbar {
-    width: 3px !important;
+    width: 0.1875em !important;
   }
   
   #invoiceTable tbody::-webkit-scrollbar-thumb {
@@ -102,7 +109,11 @@
   .panel {
     padding: 0.8rem !important;
     margin-bottom: 0.8rem !important;
-    border-radius: 0.5em !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
   
   .panel h3 {
@@ -156,19 +167,27 @@
     font-size: 0.9em !important;
   }
   
+  #quarterPanel,
+  #taxPanel,
+  #nifStatsPanel,
+  #pieChartPanel {
+    width: 100% !important; /* Changed from 'auto' to '100%' */
+    max-width: 100% !important; /* Added */
+    box-sizing: border-box !important; /* Added */
+  }
+
   /* Pie chart mobile */
   #pieChartPanel {
     height: auto !important;
-    margin-top: 1rem !important;
   }
   
   #pieChart {
-    width: 200px !important;
-    height: 200px !important;
+    width: 12.5em !important;
+    height: 12.5em !important;
   }
   
   .pie-legend {
-    max-height: 120px !important;
+    max-height: 7.5em !important;
     font-size: 0.8em !important;
   }
   
@@ -194,7 +213,69 @@
     padding: 0.4em 0.6em !important;
   }
   
-  /* Year toggle mobile */
+  .year-toggle label {
+    font-size: 0.8em !important; /* Reduced from 0.9em */
+  }
+  
+  .year-select {
+    padding: 0.08em 0.3em !important; /* Reduced from 0.1em 0.4em */
+    font-size: 0.8em !important; /* Reduced from 0.9em */
+    min-width: 3.5em !important; /* Added to control width */
+  }
+  
+  /* Refresh button mobile */
+  #refreshBtn {
+    width: 1.4em !important; /* Reduced from 1.6em */
+    height: 1.4em !important; /* Reduced from 1.6em */
+    font-size: 1em !important; /* Reduced from 1.2em */
+  }
+  
+  /* Sidebar mobile */
+  #sidebar {
+    width: 2.5em !important;
+    padding-top: 1em !important;
+    z-index: 1000 !important;
+  }
+  
+  #sidebar:hover {
+    width: 5em !important;
+  }
+  
+  .sidebar-menu {
+    padding: 0.4em 0.4em 0.4em 0.5em !important;
+    margin-bottom: 0.2em !important;
+  }
+  
+  .sidebar-icon {
+    font-size: 1em !important;
+    margin-right: 0.4em !important;
+  }
+  
+  .sidebar-label {
+    font-size: 0.8em !important;
+    max-width: 3em !important;
+  }
+  
+  /* Collapsed sidebar mobile */
+  body.sidebar-collapsed main {
+    margin-left: 2.5em !important;
+    margin-right: 1em !important;
+  }
+  
+  body.sidebar-collapsed header {
+    margin-left: 2.5em !important;
+    margin-right: 1em !important;
+  }
+
+  /* Table containers */
+  #classesInfoTable,
+  #entitiesTable,
+  .salary-calendar-table {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+  
+  /* Year toggle positioning */
   .year-toggle {
     margin-left: auto !important;
     margin-right: 0 !important;
@@ -202,233 +283,5 @@
     flex-shrink: 0 !important;
     gap: 0.5em !important;
     padding: 0.2em 0.5em !important;
-  }
-  
-  .year-toggle label {
-    font-size: 0.9em !important;
-  }
-  
-  .year-select {
-    padding: 0.1em 0.4em !important;
-    font-size: 0.9em !important;
-  }
-  
-  /* Refresh button mobile */
-  #refreshBtn {
-    width: 1.6em !important;
-    height: 1.6em !important;
-    font-size: 1.2em !important;
-  }
-  
-  /* Sidebar mobile */
-  #sidebar {
-    width: 3em !important;
-    padding-top: 1em !important;
-  }
-  
-  #sidebar:hover {
-    width: 8em !important;
-  }
-  
-  .sidebar-menu {
-    padding: 0.5em 0.5em 0.5em 0.7em !important;
-    margin-bottom: 0.2em !important;
-  }
-  
-  .sidebar-icon {
-    font-size: 1.2em !important;
-    margin-right: 0.5em !important;
-  }
-  
-  .sidebar-label {
-    font-size: 0.9em !important;
-    max-width: 5em !important;
-  }
-  
-  /* Collapsed sidebar mobile */
-  body.sidebar-collapsed main {
-    margin-left: 1em !important;
-    margin-right: 1em !important;
-  }
-  
-  body.sidebar-collapsed header {
-    margin-left: 1em !important;
-  }
-}
-
-/* Very small screens (phones in portrait) */
-@media (max-width: 480px) {
-  body {
-    padding: 0.5rem !important;
-  }
-  
-  main {
-    margin-left: 0.5em !important;
-    margin-right: 0.5em !important;
-    gap: 0.5rem !important;
-  }
-  
-  .panel {
-    padding: 0.6rem !important;
-    margin-bottom: 0.6rem !important;
-  }
-  
-  /* Extra small table adjustments */
-  #invoiceTable {
-    height: 40vh !important;
-    min-height: 250px !important;
-    font-size: 0.75em !important;
-  }
-  
-  th, td {
-    padding: 0.3em 0.1em !important;
-    font-size: 0.7em !important;
-  }
-  
-  /* Hide DATA SERVIÇO column on very small screens */
-  #invoiceTable th:nth-child(5),
-  #invoiceTable td:nth-child(5) { 
-    display: none !important;
-  }
-  
-  /* Adjust remaining columns */
-  #invoiceTable th:nth-child(1),
-  #invoiceTable td:nth-child(1) { width: 18% !important; } /* NIF */
-  #invoiceTable th:nth-child(2),
-  #invoiceTable td:nth-child(2) { width: 30% !important; } /* ENTIDADE */
-  #invoiceTable th:nth-child(3),
-  #invoiceTable td:nth-child(3) { width: 20% !important; } /* VALOR */
-  #invoiceTable th:nth-child(4),
-  #invoiceTable td:nth-child(4) { width: 25% !important; } /* DATA EMISSÃO */
-  #invoiceTable th:nth-child(6),
-  #invoiceTable td:nth-child(6) { width: 7% !important; } /* Trimestre */
-  
-  /* Pie chart extra small */
-  #pieChart {
-    width: 150px !important;
-    height: 150px !important;
-  }
-  
-  .pie-legend {
-    max-height: 100px !important;
-  }
-  
-  .pie-legend-item {
-    font-size: 0.7em !important;
-  }
-  
-  /* Panel titles */
-  .panel h3 {
-    font-size: 1em !important;
-    margin-bottom: 0.5rem !important;
-  }
-  
-  /* Total value styling */
-  .total-value {
-    font-size: 0.9em !important;
-    padding: 0.15em 0.5em !important;
-  }
-  
-  /* Header adjustments */
-  header {
-    margin-left: 0.5em !important;
-    margin-right: 0.5em !important;
-  }
-  
-  header h1 {
-    font-size: 1.2em !important;
-  }
-  
-  .year-toggle {
-    gap: 0.3em !important;
-    padding: 0.15em 0.4em !important;
-  }
-  
-  .year-toggle label {
-    font-size: 0.8em !important;
-  }
-  
-  .year-select {
-    font-size: 0.8em !important;
-  }
-  
-  /* Sidebar extra small */
-  #sidebar {
-    width: 2.5em !important;
-  }
-  
-  #sidebar:hover {
-    width: 6em !important;
-  }
-  
-  .sidebar-menu {
-    padding: 0.4em 0.4em 0.4em 0.5em !important;
-  }
-  
-  .sidebar-icon {
-    font-size: 1em !important;
-  }
-  
-  .sidebar-label {
-    font-size: 0.8em !important;
-    max-width: 4em !important;
-  }
-}
-
-/* Tablet adjustments */
-@media (max-width: 1024px) and (min-width: 769px) {
-  main {
-    gap: 1.5rem !important;
-    margin-left: 3em !important;
-    margin-right: 1em !important;
-  }
-  
-  .right {
-    min-width: 250px !important;
-    max-width: 300px !important;
-  }
-  
-  .panel {
-    padding: 0.9rem !important;
-  }
-  
-  #invoiceTable {
-    height: 60vh !important;
-  }
-  
-  th, td {
-    padding: 0.5em 0.4em !important;
-    font-size: 0.9em !important;
-  }
-  
-  #pieChart {
-    width: 240px !important;
-    height: 240px !important;
-  }
-}
-
-/* Landscape mobile adjustments */
-@media (max-width: 768px) and (orientation: landscape) {
-  main {
-    flex-direction: row !important;
-    gap: 1rem !important;
-  }
-  
-  .left {
-    flex: 2 !important;
-  }
-  
-  .right {
-    flex: 1 !important;
-    max-width: 300px !important;
-  }
-  
-  #invoiceTable {
-    height: 60vh !important;
-  }
-  
-  #pieChart {
-    width: 160px !important;
-    height: 160px !important;
   }
 }

@@ -295,14 +295,14 @@ export async function renderClassesInfoTable(nifsMap, classValues) {
       const tooltipRows = uniqueValues.map(value => {
         const classTypes = valueGroups[value];
         return classTypes.map(classType => 
-          `<div class="quarter-tooltip-row">
-            <span class="quarter-tooltip-label">${classType}</span>
-            <span class="quarter-tooltip-value">${parseFloat(value).toFixed(2)} €</span>
+          `<div class="class-info-tooltip-row">
+            <span class="class-info-tooltip-label">${classType}</span>
+            <span class="class-info-tooltip-value">${parseFloat(value).toFixed(2)} €</span>
           </div>`
         ).join('');
       }).join('');
       
-      valueTooltipContent = `<span class="quarter-tooltip-panel">${tooltipRows}</span>`;
+      valueTooltipContent = `<span class="class-info-tooltip-panel">${tooltipRows}</span>`;
     }
     
     // Create tooltip content for class types (current year only)
@@ -311,13 +311,13 @@ export async function renderClassesInfoTable(nifsMap, classValues) {
     
     if (classTypeNames.length > 0) {
       const classTypeRows = classTypeNames.map(classType => 
-        `<div class="quarter-tooltip-row">
-          <span class="quarter-tooltip-label">${classType}</span>
-          <span class="quarter-tooltip-value">${classTypeGroups[classType]}</span>
+        `<div class="class-info-tooltip-row">
+          <span class="class-info-tooltip-label">${classType}</span>
+          <span class="class-info-tooltip-value">${classTypeGroups[classType]}</span>
         </div>`
       ).join('');
         
-      classTypeTooltipContent = `<span class="quarter-tooltip-panel">${classTypeRows}</span>`;
+      classTypeTooltipContent = `<span class="class-info-tooltip-panel">${classTypeRows}</span>`;
     }
 
     // Create variation cell content (compares current year to selected year)
@@ -337,11 +337,11 @@ export async function renderClassesInfoTable(nifsMap, classValues) {
     tr.innerHTML = `
       <td>${nif}</td>
       <td>${entidade}</td>
-      <td ${numClasses > 0 ? 'class="quarter-tooltip"' : ''}>
+      <td ${numClasses > 0 ? 'class="class-info-tooltip"' : ''}>
         ${numClasses}
         ${numClasses > 0 ? classTypeTooltipContent : ''}
       </td>
-      <td ${hasMultipleValues ? 'class="quarter-tooltip"' : ''}>
+      <td ${hasMultipleValues ? 'class="class-info-tooltip"' : ''}>
         ${valueCell}
         ${hasMultipleValues ? valueTooltipContent : ''}
       </td>

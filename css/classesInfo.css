@@ -77,16 +77,16 @@
 }
 
 /* Value cell tooltip styling - CSS-only smart positioning */
-#classesInfoTable td.quarter-tooltip {
+#classesInfoTable td.class-info-tooltip {
   position: relative;
   cursor: help;
 }
 
-#classesInfoTable td.quarter-tooltip:hover {
+#classesInfoTable td.class-info-tooltip:hover {
   background-color: rgba(45, 108, 223, 0.05);
 }
 
-#classesInfoTable td.quarter-tooltip .quarter-tooltip-panel {
+#classesInfoTable td.class-info-tooltip .class-info-tooltip-panel {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -107,8 +107,8 @@
 }
 
 /* Force tooltip above for last 2 rows */
-#classesInfoTable tbody tr:nth-last-child(1) td.quarter-tooltip .quarter-tooltip-panel,
-#classesInfoTable tbody tr:nth-last-child(2) td.quarter-tooltip .quarter-tooltip-panel {
+#classesInfoTable tbody tr:nth-last-child(1) td.class-info-tooltip .class-info-tooltip-panel,
+#classesInfoTable tbody tr:nth-last-child(2) td.class-info-tooltip .class-info-tooltip-panel {
   top: auto;
   bottom: 100%;
   margin-top: 0;
@@ -116,25 +116,25 @@
 }
 
 /* Adjust for right edge (last column) */
-#classesInfoTable td.quarter-tooltip:nth-child(4) .quarter-tooltip-panel {
+#classesInfoTable td.class-info-tooltip:nth-child(4) .class-info-tooltip-panel {
   left: auto;
   right: 0;
   transform: none;
 }
 
 /* Adjust for left edge (first column with tooltip) */
-#classesInfoTable td.quarter-tooltip:nth-child(3) .quarter-tooltip-panel {
+#classesInfoTable td.class-info-tooltip:nth-child(3) .class-info-tooltip-panel {
   left: 0;
   right: auto;
   transform: none;
 }
 
-#classesInfoTable td.quarter-tooltip:hover .quarter-tooltip-panel {
+#classesInfoTable td.class-info-tooltip:hover .class-info-tooltip-panel {
   display: block;
 }
 
 /* Override the general row hover for tooltip cells */
-#classesInfoTable tbody tr:hover td.quarter-tooltip {
+#classesInfoTable tbody tr:hover td.class-info-tooltip {
   background-color: rgba(45, 108, 223, 0.1);
 }
 
