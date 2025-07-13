@@ -267,6 +267,38 @@
     margin-right: 1em !important;
   }
 
+    /* Classes info table spacing */
+  #classesInfoTable th,
+  #classesInfoTable td {
+    padding: 0.5em 0.7em !important; /* Increased from default */
+    font-size: 0.85em !important;
+    min-width: 0 !important;
+    word-wrap: break-word !important;
+  }
+  
+  #classesInfoTable {
+    font-size: 0.9em !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+    table-layout: fixed !important; /* Fixed layout for better column control */
+  }
+  
+  /* Entities table spacing */
+  #entitiesTable th,
+  #entitiesTable td {
+    padding: 0.5em 0.7em !important; /* Increased from default */
+    font-size: 0.85em !important;
+    min-width: 0 !important;
+    word-wrap: break-word !important;
+  }
+  
+  #entitiesTable {
+    font-size: 0.9em !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+    table-layout: fixed !important; /* Fixed layout for better column control */
+  }
+  
   /* Table containers */
   #classesInfoTable,
   #entitiesTable,
