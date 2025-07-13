@@ -114,7 +114,8 @@ header {
 }
 
 .left {
-  flex: 3;
+  flex: 5;
+  min-width: 0;
 }
 
 .right {

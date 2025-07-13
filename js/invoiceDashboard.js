@@ -525,8 +525,16 @@ function showTooltip(e, sliceIndex) {
     ${formatCurrency(slice.value)} (${slice.percentage.toFixed(1)}%)
   `;
   
-  tooltip.style.left = e.clientX + 10 + 'px';
-  tooltip.style.top = e.clientY - 10 + 'px';
+  // Position tooltip relative to the mouse within the canvas
+  const rect = pieChart.canvas.getBoundingClientRect();
+  const containerRect = document.getElementById('pieChartContainer').getBoundingClientRect();
+  
+  // Calculate position relative to the container
+  const x = e.clientX - containerRect.left;
+  const y = e.clientY - containerRect.top;
+  
+  tooltip.style.left = (x + 10) + 'px';
+  tooltip.style.top = (y - 10) + 'px';
   tooltip.classList.add('visible');
 }
 
