@@ -30,6 +30,22 @@
   display: block;
 }
 
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  #pieChart {
+    width: 220px;
+    height: 220px;
+  }
+  
+  .pie-legend {
+    max-height: 150px;
+  }
+  
+  .pie-legend-item {
+    font-size: 0.8em;
+  }
+}
+
 @media (pointer: coarse) {
   #classesInfoTable td.quarter-tooltip.active .quarter-tooltip-panel {
     display: block !important;

@@ -304,3 +304,87 @@ tr:last-child td {
 .quarter-label {
   transition: all 0.2s ease;
 }
+
+/* Pie Chart Panel Styles */
+#pieChartPanel {
+  margin-top: 1rem;
+}
+
+#pieChartContainer {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+#pieChart {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.pie-tooltip {
+  position: absolute;
+  background: #fff;
+  border: 0.09em solid #2d6cdf;
+  border-radius: 0.5em;
+  padding: 0.5em 0.8em;
+  box-shadow: 0 0.25em 1em rgba(45, 108, 223, 0.15);
+  font-size: 0.9em;
+  font-weight: 500;
+  color: #222;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.pie-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.pie-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+  margin-top: 1rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.pie-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.3em 0.5em;
+  border-radius: 0.3em;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.pie-legend-item:hover {
+  background-color: rgba(45, 108, 223, 0.08);
+}
+
+.pie-legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.pie-legend-label {
+  flex: 1;
+  font-size: 0.85em;
+  color: #2d6cdf;
+  font-weight: 500;
+}
+
+.pie-legend-value {
+  font-size: 0.85em;
+  color: #222;
+  font-weight: 500;
+}

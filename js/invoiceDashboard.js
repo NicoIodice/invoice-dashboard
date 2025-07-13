@@ -12,6 +12,8 @@ const refreshBtn = document.getElementById("refreshBtn");
 const quarterTotals = [0, 0, 0, 0];
 const nifCounts = {};
 
+let pieChart = null;
+
 export async function setupYearSelector(nifsMap) {
   globalNifsMap = nifsMap;
   let years;
@@ -89,7 +91,8 @@ function resetDashboard(tableBody, quarterTotals, nifCounts, config) {
   updateFiscalStatusPanel(config);
   updateInvoicesByNifPanel([], nifCounts);
   document.getElementById("totalYearValue").textContent = formatCurrency(0);
-  addEmptyStateRow(tableBody, 6); // 6 columns in invoice table
+  addEmptyStateRow(tableBody, 6);
+  updatePieChart([]);
 }
 
 // Updates the main UI with new rows
@@ -103,6 +106,7 @@ function updateUI(rows, tableBody, quarterTotals, nifCounts, config) {
   updateQuarterSummaryPanel(quarterTotals, rows);
   updateFiscalStatusPanel(config);
   updateInvoicesByNifPanel(rows, nifCounts);
+  updatePieChart(rows); // Add this line
 }
 
 // Updates the invoice table
@@ -302,4 +306,271 @@ function validateRow(row) {
   const valueValid = /^\d+(\.\d{1,2})?$/.test(row.VALOR);
   const dateValid = /^\d{4}-\d{2}-\d{2}$/.test(row['DATA SERVICO']);
   return nifValid && valueValid && dateValid;
+}
+
+// Helper function to generate distinct colors
+function generateColors(count) {
+  const colors = [];
+  const hueStep = 360 / count;
+  
+  for (let i = 0; i < count; i++) {
+    const hue = i * hueStep;
+    const saturation = 65 + (i % 3) * 10; // Vary saturation slightly
+    const lightness = 50 + (i % 2) * 10;  // Vary lightness slightly
+    colors.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
+  }
+  
+  return colors;
+}
+
+// Pie chart creation and management
+function createPieChart(data) {
+  const canvas = document.getElementById('pieChart');
+  const ctx = canvas.getContext('2d');
+  const tooltip = document.getElementById('pieChartTooltip');
+  const legend = document.getElementById('pieChartLegend');
+  
+  // Clear previous chart
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  legend.innerHTML = '';
+  
+  if (!data || data.length === 0) {
+    // Show empty state
+    ctx.fillStyle = '#ccc';
+    ctx.font = '16px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Sem dados disponíveis', canvas.width / 2, canvas.height / 2);
+    return;
+  }
+  
+  // Calculate total and percentages
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+  const colors = generateColors(data.length);
+  
+  // Chart configuration
+  const centerX = canvas.width / 2;
+  const centerY = canvas.height / 2;
+  const radius = Math.min(centerX, centerY) - 20;
+  
+  // Create pie chart data with colors and angles
+  let currentAngle = -Math.PI / 2; // Start from top
+  const pieData = data.map((item, index) => {
+    const percentage = (item.value / total) * 100;
+    const sliceAngle = (item.value / total) * 2 * Math.PI;
+    
+    const slice = {
+      ...item,
+      color: colors[index],
+      percentage: percentage,
+      startAngle: currentAngle,
+      endAngle: currentAngle + sliceAngle,
+      centerAngle: currentAngle + sliceAngle / 2
+    };
+    
+    currentAngle += sliceAngle;
+    return slice;
+  });
+  
+  // Store for mouse events
+  pieChart = {
+    data: pieData,
+    centerX,
+    centerY,
+    radius,
+    canvas,
+    ctx,
+    tooltip,
+    hoveredSlice: null
+  };
+  
+  // Draw pie chart
+  drawPieChart();
+  
+  // Create legend
+  createPieLegend(pieData, legend);
+  
+  // Add mouse events
+  setupPieChartEvents();
+}
+
+function drawPieChart() {
+  const { data, ctx, centerX, centerY, radius, hoveredSlice } = pieChart;
+  
+  ctx.clearRect(0, 0, pieChart.canvas.width, pieChart.canvas.height);
+  
+  // Draw slices
+  data.forEach((slice, index) => {
+    const isHovered = hoveredSlice === index;
+    const sliceRadius = isHovered ? radius + 10 : radius;
+    
+    // Draw slice
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, sliceRadius, slice.startAngle, slice.endAngle);
+    ctx.lineTo(centerX, centerY);
+    ctx.closePath();
+    
+    // Fill slice
+    ctx.fillStyle = slice.color;
+    ctx.fill();
+    
+    // Add stroke
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    // Add shadow for hovered slice
+    if (isHovered) {
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetX = 3;
+      ctx.shadowOffsetY = 3;
+    } else {
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+    }
+  });
+}
+
+function createPieLegend(data, legend) {
+  data.forEach((slice, index) => {
+    const legendItem = document.createElement('div');
+    legendItem.className = 'pie-legend-item';
+    legendItem.innerHTML = `
+      <div class="pie-legend-color" style="background-color: ${slice.color}"></div>
+      <span class="pie-legend-label">${slice.label}</span>
+      <span class="pie-legend-value">${formatCurrency(slice.value)}</span>
+    `;
+    
+    // Add hover events for legend items
+    legendItem.addEventListener('mouseenter', () => {
+      pieChart.hoveredSlice = index;
+      drawPieChart();
+    });
+    
+    legendItem.addEventListener('mouseleave', () => {
+      pieChart.hoveredSlice = null;
+      drawPieChart();
+      hideTooltip();
+    });
+    
+    legend.appendChild(legendItem);
+  });
+}
+
+function setupPieChartEvents() {
+  const { canvas, tooltip } = pieChart;
+  
+  canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const hoveredIndex = getHoveredSlice(x, y);
+    
+    if (hoveredIndex !== null) {
+      pieChart.hoveredSlice = hoveredIndex;
+      drawPieChart();
+      showTooltip(e, hoveredIndex);
+    } else {
+      pieChart.hoveredSlice = null;
+      drawPieChart();
+      hideTooltip();
+    }
+  });
+  
+  canvas.addEventListener('mouseleave', () => {
+    pieChart.hoveredSlice = null;
+    drawPieChart();
+    hideTooltip();
+  });
+}
+
+function getHoveredSlice(x, y) {
+  const { data, centerX, centerY, radius } = pieChart;
+  
+  // Check if point is within circle
+  const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+  if (distance > radius + 10) return null;
+  
+  // Calculate angle
+  const angle = Math.atan2(y - centerY, x - centerX);
+  const normalizedAngle = angle < -Math.PI / 2 ? angle + 2 * Math.PI : angle;
+  
+  // Find which slice the angle belongs to
+  for (let i = 0; i < data.length; i++) {
+    const slice = data[i];
+    let startAngle = slice.startAngle;
+    let endAngle = slice.endAngle;
+    
+    // Normalize angles
+    if (startAngle < -Math.PI / 2) startAngle += 2 * Math.PI;
+    if (endAngle < -Math.PI / 2) endAngle += 2 * Math.PI;
+    
+    if (normalizedAngle >= startAngle && normalizedAngle <= endAngle) {
+      return i;
+    }
+  }
+  
+  return null;
+}
+
+function showTooltip(e, sliceIndex) {
+  const { tooltip, data } = pieChart;
+  const slice = data[sliceIndex];
+  
+  tooltip.innerHTML = `
+    <strong>${slice.label}</strong><br>
+    ${formatCurrency(slice.value)} (${slice.percentage.toFixed(1)}%)
+  `;
+  
+  tooltip.style.left = e.clientX + 10 + 'px';
+  tooltip.style.top = e.clientY - 10 + 'px';
+  tooltip.classList.add('visible');
+}
+
+function hideTooltip() {
+  const { tooltip } = pieChart;
+  tooltip.classList.remove('visible');
+}
+
+// Update the pie chart with invoice data
+function updatePieChart(rows) {
+  if (!rows || rows.length === 0) {
+    createPieChart([]);
+    return;
+  }
+  
+  // Group invoices by entity and sum values
+  const entityTotals = {};
+  
+  rows.forEach(row => {
+    if (!validateRow(row)) return;
+    
+    const entity = row.ENTIDADE || globalNifsMap[row.NIF] || `NIF ${row.NIF}`;
+    const value = parseFloat(row.VALOR);
+    
+    if (!entityTotals[entity]) {
+      entityTotals[entity] = 0;
+    }
+    entityTotals[entity] += value;
+  });
+  
+  // Convert to array and sort by value
+  const pieData = Object.entries(entityTotals)
+    .map(([label, value]) => ({ label, value }))
+    .sort((a, b) => b.value - a.value);
+  
+  // Limit to top 10 entities to avoid overcrowding
+  const maxEntities = 10;
+  let finalData = pieData.slice(0, maxEntities);
+  
+  // If there are more entities, group the rest as "Outros"
+  if (pieData.length > maxEntities) {
+    const othersValue = pieData.slice(maxEntities).reduce((sum, item) => sum + item.value, 0);
+    finalData.push({ label: 'Outros', value: othersValue });
+  }
+  
+  createPieChart(finalData);
 }
