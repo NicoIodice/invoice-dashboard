@@ -1,5 +1,21 @@
+@font-face {
+    font-family: "Roobert-Regular";
+    src: url("../fonts/Roobert-Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap; /* Improves loading performance */
+}
+
+/* You can also add other font weights if you have them */
+@font-face {
+    font-family: "Roobert";
+    src: url("../fonts/Roobert-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
 body {
-  font-family: sans-serif;
+  font-family: 'Roobert-Regular',  sans-serif;
   padding: 1rem;
   background: #f5f7fa;
 }
