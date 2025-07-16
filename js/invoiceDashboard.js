@@ -124,11 +124,14 @@ function updateInvoicesTable(rows, tableBody, quarterTotals, nifCounts) {
     quarterTotals[quarter - 1] += value;
     window.totalValue += value;
     nifCounts[row.NIF] = (nifCounts[row.NIF] || 0) + 1;
-
+    
+    // Get entity name from NIF map, fallback to NIF if no match
+    const entityName = globalNifsMap[row.NIF] || row.NIF;
+    
     const tr = document.createElement("tr");
     tr.classList.add(`quarter-${quarter}`);
     tr.innerHTML = `
-      <td>${row.ENTIDADE || '-'}</td>
+      <td>${entityName}</td>
       <td>${formatCurrency(value)}</td>
       <td>${row['DATA EMISSAO']}</td>
       <td>${row['DATA SERVICO']}</td>

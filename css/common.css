@@ -15,6 +15,22 @@
     font-display: swap; /* Improves loading performance */
 }
 
+@font-face {
+    font-family: "RobertENEL";
+    src: url("/css/fonts/RoobertENEL-Light.woff2") format('woff2');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap; /* Improves loading performance */
+}
+
+@font-face {
+    font-family: "RobertENEL";
+    src: url("/css/fonts/RoobertENEL-Bold.woff2") format('woff2');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap; /* Improves loading performance */
+}
+
 body {
   font-family: 'Nunito', sans-serif;
   padding: 1rem;
