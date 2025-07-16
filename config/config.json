@@ -2,7 +2,7 @@
   "ivaThreshold": 13500.00,
   "retencaoFonteThreshold": 12500.00,
   "irsThreshold": 10640.00,
-  "dataFolder": "./data",
+  "dataFolder": "/data",
   "loadFromDropbox": true,
   "dropboxFolder": "/invoice-dashboard-data"
 }

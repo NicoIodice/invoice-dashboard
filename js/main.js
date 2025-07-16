@@ -1,13 +1,13 @@
-import { loadConfig } from './config.js';
-import { showLoading, hideLoading } from './utils.js';
-import { loadNifsMap, loadClassValues } from './data.js';
-import { showErrorToaster, showSuccessToaster, showInfoToaster } from './toaster.js';
-import { infoDialogListeners } from './infoDialog.js';
-import { setupYearSelector, loadAndUpdateDashboard } from './invoiceDashboard.js';
-import { renderClassesInfoTable, classesInfoListeners } from './classesInfo.js';
-import { renderSalaryCalendar } from './salarySimulationCalendar.js';
-import { renderEntitiesTable, entitiesListListeners } from './entitiesList.js';
-import { setupMobileTooltips } from './mobileActions.js';
+import { loadConfig } from '/js/config.js';
+import { showLoading, hideLoading } from '/js/utils.js';
+import { loadNifsMap, loadClassValues } from '/js/data.js';
+import { showErrorToaster, showSuccessToaster, showInfoToaster } from '/js/toaster.js';
+import { infoDialogListeners } from '/js/modals/info-dialog.js';
+import { setupYearSelector, loadAndUpdateDashboard } from '/js/pages/invoice-dashboard.js';
+import { renderClassesInfoTable, classesInfoListeners } from '/js/pages/classes-info.js';
+import { renderSalaryCalendar } from '/js/pages/salary-simulation-calendar.js';
+import { renderEntitiesTable, entitiesListListeners } from '/js/pages/entities.js';
+import { setupMobileTooltips } from '/js/mobile-actions.js';
 
 // Make toaster functions globally available
 window.showErrorToaster = showErrorToaster;

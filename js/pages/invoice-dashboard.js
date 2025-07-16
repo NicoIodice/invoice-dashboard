@@ -1,7 +1,7 @@
-import { config } from './config.js';
-import { showLoading, hideLoading, formatCurrency, addEmptyStateRow } from './utils.js';
-import { loadInvoiceDataFromCSV, getYearList, clearRefreshableCache } from './data.js';
-import { showErrorToaster, showSuccessToaster } from './toaster.js';
+import { config } from '/js/config.js';
+import { showLoading, hideLoading, formatCurrency, addEmptyStateRow } from '/js/utils.js';
+import { loadInvoiceDataFromCSV, getYearList, clearRefreshableCache } from '/js/data.js';
+import { showErrorToaster, showSuccessToaster } from '/js/toaster.js';
 
 let currentYear = new Date().getFullYear();
 let globalNifsMap = {};

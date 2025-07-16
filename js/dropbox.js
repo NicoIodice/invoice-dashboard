@@ -1,5 +1,3 @@
-import { config } from './config.js';
-
 const DROPBOX_CONFIG = 'config/dropbox.env';
 let cachedAccessToken = null;
 let tokenExpiry = null;

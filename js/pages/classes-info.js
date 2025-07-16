@@ -1,5 +1,4 @@
-import { addEmptyStateRow } from './utils.js';
-import { showErrorToaster } from './toaster.js';
+import { addEmptyStateRow } from '/js/utils.js';
 
 let classSortKey = 'entidade';
 let classSortAsc = true;
