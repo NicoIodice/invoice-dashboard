@@ -1,4 +1,5 @@
 import { addEmptyStateRow } from './utils.js';
+import { showErrorToaster } from './toaster.js';
 
 let classSortKey = 'entidade';
 let classSortAsc = true;
@@ -128,7 +129,6 @@ function setupClassesYearSelector(classValues) {
   });
 }
 
-// Update the renderClassesInfoTable function
 // Update the renderClassesInfoTable function
 export async function renderClassesInfoTable(nifsMap, classValues) {
   // Store references for year filtering

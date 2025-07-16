@@ -4,5 +4,5 @@
   "irsThreshold": 10640.00,
   "dataFolder": "./data",
   "loadFromDropbox": true,
-  "dropboxFolder": "/invoice-dashboard-data"
+  "dropboxFolder": "/invoice-dashboard-datas"
 }

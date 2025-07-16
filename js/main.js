@@ -1,12 +1,18 @@
 import { loadConfig } from './config.js';
 import { showLoading, hideLoading } from './utils.js';
 import { loadNifsMap, loadClassValues } from './data.js';
+import { showErrorToaster, showSuccessToaster, showInfoToaster } from './toaster.js';
 import { infoDialogListeners } from './infoDialog.js';
 import { setupYearSelector, loadAndUpdateDashboard } from './invoiceDashboard.js';
 import { renderClassesInfoTable, classesInfoListeners } from './classesInfo.js';
 import { renderSalaryCalendar } from './salarySimulationCalendar.js';
 import { renderEntitiesTable, entitiesListListeners } from './entitiesList.js';
 import { setupMobileTooltips } from './mobileActions.js';
+
+// Make toaster functions globally available
+window.showErrorToaster = showErrorToaster;
+window.showSuccessToaster = showSuccessToaster;
+window.showInfoToaster = showInfoToaster;
 
 const sidebarToggle = document.getElementById('sidebarToggle');
 const sidebarToggleIcon = document.getElementById('sidebarToggleIcon');

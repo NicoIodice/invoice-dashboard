@@ -217,4 +217,21 @@
     height: 1.2em !important;
     font-size: 0.9em !important;
   }
+
+  .toaster-container {
+    top: 0.25rem;
+    right: 0.25rem;
+    left: 0.25rem;
+  }
+
+  .toaster {
+    padding: 0.5rem 0.7rem;
+    font-size: 0.8rem;
+  }
+
+  .toaster-close {
+    width: 1.3rem;
+    height: 1.3rem;
+    font-size: 1rem;
+  }
 }

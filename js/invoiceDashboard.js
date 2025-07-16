@@ -1,6 +1,7 @@
 import { config } from './config.js';
 import { showLoading, hideLoading, formatCurrency, addEmptyStateRow } from './utils.js';
 import { loadInvoiceDataFromCSV, getYearList, clearRefreshableCache } from './data.js';
+import { showErrorToaster, showSuccessToaster } from './toaster.js';
 
 let currentYear = new Date().getFullYear();
 let globalNifsMap = {};
@@ -22,6 +23,8 @@ export async function setupYearSelector(nifsMap) {
   } catch (err) {
     resetDashboard(tableBody, quarterTotals, nifCounts, config);
     console.error("❌ Não foi possível carregar a lista de anos.", err);
+    showErrorToaster("Erro ao carregar lista de anos: " + (err.message || "Erro desconhecido"));
+    
     // Add placeholder option when year list fails to load
     yearSelect.innerHTML = "";
     const placeholderOption = document.createElement("option");
@@ -76,7 +79,8 @@ export async function loadAndUpdateDashboard(nifsMap) {
     globalNifsMap = {};
     resetDashboard(tableBody, quarterTotals, nifCounts, config);
     console.error("❌ Erro ao carregar CSV para o ano selecionado:", err);
-  } finally {
+    showErrorToaster(`Erro ao carregar dados para ${currentYear}: ${err.message || "Erro desconhecido"}`);
+  }finally {
     hideLoading();
   }
 }
@@ -127,7 +131,7 @@ function updateInvoicesTable(rows, tableBody, quarterTotals, nifCounts) {
     
     // Get entity name from NIF map, fallback to NIF if no match
     const entityName = globalNifsMap[row.NIF] || row.NIF;
-    
+
     const tr = document.createElement("tr");
     tr.classList.add(`quarter-${quarter}`);
     tr.innerHTML = `
@@ -157,8 +161,10 @@ refreshBtn.addEventListener("click", async () => {
     
     // Reload current dashboard data
     await loadAndUpdateDashboard(globalNifsMap);
+    showSuccessToaster("Dados atualizados com sucesso!");
     } catch (error) {
     console.error('❌ Erro durante refresh:', error);
+    showErrorToaster("Erro ao atualizar dados: " + (error.message || "Erro desconhecido"));
   } finally {
     setTimeout(() => refreshBtn.classList.remove("refreshing"), 700);
     hideLoading();

@@ -1,5 +1,6 @@
 import { config } from './config.js';
 import { dropboxListFolder, dropboxDownload, dropboxDownloadJSON } from './dropbox.js';
+import { showErrorToaster } from './toaster.js';
 
 // Simple in-memory cache
 const cache = new Map();
@@ -18,7 +19,10 @@ export async function loadInvoiceDataFromCSV(year, nifsMap) {
   } else {
     const filePath = `${config.dataFolder}/${year}.csv`.replace('./', '');
     const res = await fetch(filePath);
-    if (!res.ok) throw new Error(`❌ Erro ao carregar CSV local para o ano ${year}.csv`);
+    if (!res.ok) {
+      showErrorToaster(`Erro ao carregar CSV para o ano ${year}: ${error.message}`);
+      throw new Error(`❌ Erro ao carregar CSV para o ano ${year}.csv`);
+    }
     text = await res.text();
   }
 

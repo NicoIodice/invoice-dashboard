@@ -316,4 +316,24 @@
     gap: 0.5em !important;
     padding: 0.2em 0.5em !important;
   }
+
+  .toaster-container {
+    top: 0.5rem;
+    right: 0.5rem;
+    left: 0.5rem;
+    max-width: none;
+  }
+
+  .toaster {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  .toaster-message {
+    max-width: none;
+  }
+
+  .toaster-icon {
+    font-size: 1rem;
+  }
 }
