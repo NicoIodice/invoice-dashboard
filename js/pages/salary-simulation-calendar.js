@@ -1,4 +1,4 @@
-import { loadHolidays } from 'js/data.js';
+import { loadHolidays } from '../data.js';
 
 const PT_MONTHS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
