@@ -1,0 +1,151 @@
+
+import { 
+  dropboxListFolder, 
+  dropboxDownload, 
+  dropboxDownloadJSON } from './dropbox.js';
+import { showErrorToaster } from './toaster.js';
+
+export async function loadInvoiceData(config, year, nifsMap = {}) {
+  if (!config) {
+    throw new Error('Config is required to load invoice data');
+  }
+
+  let text;
+
+  if (config.loadFromDropbox) {
+    const filePath = `${config.dropboxFolder}/${year}.csv`;
+    text = await dropboxDownload(filePath);
+  } else {
+    const filePath = `${config.dataFolder}/${year}.csv`.replace('./', '');
+    const res = await fetch(filePath);
+    if (!res.ok) {
+      showErrorToaster(`Erro ao carregar CSV para o ano ${year}: ${error.message}`);
+      console.log(`❌ Erro ao carregar CSV para o ano ${year}.csv`);
+    }
+    text = await res.text();
+  }
+
+  const result = parseInvoiceDataCSV(text, nifsMap);
+  return result;
+}
+
+export function parseInvoiceDataCSV(text, nifsMap = {}) {
+  const lines = text.trim().split("\n").slice(1); // Skip headers
+  return lines
+    .map(line => {
+      const [NIF, VALOR, EMISSAO, SERVICO] = line.split(",");
+      if (
+        typeof NIF === "undefined" ||
+        typeof VALOR === "undefined" ||
+        typeof EMISSAO === "undefined" ||
+        typeof SERVICO === "undefined"
+      ) {
+        return null; // skip invalid lines
+      }
+      // Find entity entity name for this NIF
+      const entidade = nifsMap[NIF.trim()] || "-";
+      return {
+        NIF: NIF.trim(),
+        ENTIDADE: entidade,
+        VALOR: VALOR.trim(),
+        'DATA EMISSAO': EMISSAO.trim(),
+        'DATA SERVICO': SERVICO.trim()
+      };
+    })
+    .filter(Boolean);
+}
+
+export async function loadYearsList(config) {
+  if (!config) {
+    throw new Error('Config is required to load years list');
+  }
+
+  let files;
+
+  if (config.loadFromDropbox) {
+    const indexPath = `${config.dropboxFolder}`;
+    files = await dropboxListFolder(indexPath);
+  } else {
+    // TODO: Fix this later
+    const filePath = `${config.dataFolder}`.replace('./', '');
+    const res = await fetch(filePath);
+  }
+
+  const yearPattern = /^(\d{4})\.csv$/;
+
+  const yearList = files
+    .map(f => {
+      const match = f.match(yearPattern);
+      return match ? match[1] : null;
+    })
+    .filter(Boolean)
+    .sort((a, b) => b - a);
+
+  return yearList;
+}
+
+export async function loadNifsMap(config) {
+  if (!config) {
+    throw new Error('Config is required to load NIFs map');
+  }
+
+  const fileName = 'nifs.json';
+  let nifsArr = [];
+
+  if (config.loadFromDropbox) {
+    const nifsPath = `${config.dropboxFolder}/${fileName}`;
+    nifsArr = await dropboxDownloadJSON(nifsPath);
+  } else {
+    const filePath = `${config.dataFolder}/${fileName}`.replace('./', '');
+    const res = await fetch(filePath);
+    nifsArr = await res.json();
+  }
+
+  // Convert array to map: { [id]: entity }
+  const nifsMap = {};
+  nifsArr.forEach(item => {
+    nifsMap[item.id] = item.entity;
+  });
+
+  return nifsMap;
+}
+
+export async function loadClassValues(config) {
+  if (!config) {
+    throw new Error('Config is required to load class values');
+  }
+
+  const fileName = 'school-info.json';
+  let arr = [];
+
+  if (config.loadFromDropbox) {
+    const path = `${config.dropboxFolder}/${fileName}`;
+    arr = await dropboxDownloadJSON(path);
+  } else {
+    const filePath = `${config.dataFolder}/${fileName}`.replace('./', '');
+    const res = await fetch(filePath);
+    arr = await res.json();
+  }
+
+  return arr;
+}
+
+export async function loadHolidays(config) {
+  if (!config) {
+    throw new Error('Config is required to load holidays');
+  }
+
+  const fileName = 'holidays.json';
+  let holidays = {};
+
+  if (config.loadFromDropbox) {
+    const path = `${config.dropboxFolder}/${fileName}`;
+    holidays = await dropboxDownloadJSON(path);
+  } else {
+    const filePath = `${config.dataFolder}/${fileName}`.replace('./', '');
+    const res = await fetch(filePath);
+    holidays = await res.json();
+  }
+
+  return holidays;
+}

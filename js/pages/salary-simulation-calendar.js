@@ -1,4 +1,8 @@
-import { loadHolidays } from '../data.js';
+import { 
+  getHolidays,
+  getNifsMap,
+  getCurrentYear
+ } from '../dataStorage.js';
 
 const PT_MONTHS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -9,11 +13,11 @@ const PT_WEEKDAYS = [
   "Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"
 ];
 
-// Cache for performance
-let currentYearHolidays = [];
-let cachedYear = null;
+let currentYear = getCurrentYear();
+const holidays = getHolidays();
+let currentYearHolidays = holidays[currentYear];
 
-export async function renderSalaryCalendar(nifsMap, classValues) {
+export async function renderSalaryCalendar(classValues) {
   const year = new Date().getFullYear();
 
   const container = document.getElementById('salaryCalendar');
@@ -26,12 +30,6 @@ export async function renderSalaryCalendar(nifsMap, classValues) {
     emptyMessage.textContent = 'No data available';
     container.appendChild(emptyMessage);
     return;
-  }
-  
-  // Check if we need to reload holidays
-  if (cachedYear !== year) {
-    currentYearHolidays = await loadYearHolidays(year);
-    cachedYear = year;
   }
 
   const today = new Date();
@@ -92,7 +90,7 @@ export async function renderSalaryCalendar(nifsMap, classValues) {
         
         // Calculate values only if not holiday
         if (!holidaySet.has(yyyy_mm_dd)) {
-          const { total, details } = getExpectedValueForWeekday(classByWeekday, weekday, date, classValues, nifsMap);
+          const { total, details } = getExpectedValueForWeekday(classByWeekday, weekday, date, classValues);
 
           if (total > 0) {
             addTooltipToCell(cell, total, details);
@@ -150,7 +148,7 @@ function preCalculateClassesByWeekday(classValues) {
 }
 
 // Optimized value calculation for a specific weekday
-function getExpectedValueForWeekday(classByWeekday, weekday, date, classValues, nifsMap) {
+function getExpectedValueForWeekday(classByWeekday, weekday, date, classValues) {
   const classes = classByWeekday[weekday] || [];
   let total = 0;
   const details = [];
@@ -189,6 +187,8 @@ function getExpectedValueForWeekday(classByWeekday, weekday, date, classValues, 
       
       return date >= startOfDay && date <= endOfDay;
     });
+
+    const nifsMap = getNifsMap();
     
     // Only add to active classes if class period is valid AND not in vacation
     if (isClassPeriodValid && !isInVacation) {
@@ -265,17 +265,6 @@ function addSummaryRow(table, monthlySums) {
   
   tfoot.appendChild(sumRow);
   table.appendChild(tfoot);
-}
-
-// Cached holiday loading
-async function loadYearHolidays(year) {
-  try {
-    const holidays = await loadHolidays();
-    return holidays[year] || [];
-  } catch (err) {
-    console.error(`❌ Erro ao carregar feriados para ${year}:`, err);
-    return [];
-  }
 }
 
 // Optimized tooltip adjustment

@@ -1,8 +1,11 @@
 import { addEmptyStateRow } from '../utils.js';
+import { getCurrentYear } from '../dataStorage.js';
 
 let classSortKey = 'entidade';
 let classSortAsc = true;
 let selectedClassesYear = null;
+
+let currentYear = getCurrentYear();
 
 // Add this function to extract years from class value periods
 function extractYearsFromClassValues(classValues) {
@@ -88,7 +91,6 @@ function filterClassesByYear(classValues, year) {
 function setupClassesYearSelector(classValues) {
   const yearSelect = document.getElementById('classesYearSelect');
   const years = extractYearsFromClassValues(classValues);
-  const currentYear = new Date().getFullYear();
   
   // Filter out the current year from the options
   const filteredYears = years.filter(year => year !== currentYear);
@@ -150,7 +152,6 @@ export async function renderClassesInfoTable(nifsMap, classValues) {
   }
 
   // Filter classes to show only CURRENT YEAR data
-  const currentYear = new Date().getFullYear();
   const currentYearClassValues = classValues.map(entry => {
     const currentYearClasses = entry.classes.filter(cls => {
       if (!cls.valuePeriod) return false;
@@ -357,8 +358,6 @@ export async function renderClassesInfoTable(nifsMap, classValues) {
 // Add this function to calculate variation percentage
 function calculateVariation(classesForNif, selectedYear) {
   if (!selectedYear) return { percentage: 0, arrow: 'neutral', display: '-' };
-  
-  const currentYear = new Date().getFullYear();
   
   // If selected year is the current year, no variation to show
   if (selectedYear === currentYear) {

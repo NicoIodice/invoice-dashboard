@@ -1,27 +1,116 @@
-import { config } from '../config.js';
-import { showLoading, hideLoading, formatCurrency, addEmptyStateRow } from '../utils.js';
-import { loadInvoiceDataFromCSV, getYearList, clearRefreshableCache } from '../data.js';
-import { showErrorToaster, showSuccessToaster } from '../toaster.js';
+import { 
+  getConfig,
+  getYearsList,
+  getNifsMap,
+  getInvoiceData,
+  refreshAll
+ } from '../dataStorage.js';
+import { 
+  formatCurrency, 
+  addEmptyStateRow } from '../utils.js';
+import { 
+  showErrorToaster, 
+  showSuccessToaster } from '../toaster.js';
+import router from '../router.js';
 
 let currentYear = new Date().getFullYear();
-let globalNifsMap = {};
 
-const tableBody = document.querySelector("#invoiceTable tbody");
-const yearSelect = document.getElementById("yearSelect");
-const refreshBtn = document.getElementById("refreshBtn");
+let tableBody = null;
+let yearSelect = null;
 
 const quarterTotals = [0, 0, 0, 0];
 const nifCounts = {};
 
 let pieChart = null;
 
-export async function setupYearSelector(nifsMap) {
-  globalNifsMap = nifsMap;
+export async function init() {
+  try {
+    tableBody = document.querySelector("#invoiceTable tbody");
+    yearSelect = document.getElementById("yearSelect");
+
+    // Setup year selector
+    await setupYearSelector();
+    
+    // Load dashboard data
+    await loadAndUpdateDashboard();
+    
+    // Setup event listeners
+    setupRefreshButton();
+    setupInfoDialog();
+    
+  } catch (error) {
+    console.error('❌ Error initializing invoice dashboard:', error);
+    showErrorToaster('Erro ao inicializar dashboard de facturas');
+  }
+}
+
+export async function cleanup() {
+  // Cleanup any timers, event listeners, etc.
+  console.log('🧹 Cleaning up invoice dashboard');
+}
+
+function setupInfoDialog() {
+  const infoIcon = document.getElementById('infoIcon');
+  const infoDialog = document.getElementById('infoDialog');
+  const closeInfoDialog = document.getElementById('closeInfoDialog');
+
+  if (infoIcon) {
+    infoIcon.addEventListener('click', () => {
+      infoDialog.style.display = 'flex';
+    });
+  }
+
+  if (closeInfoDialog) {
+    closeInfoDialog.addEventListener('click', () => {
+      infoDialog.style.display = 'none';
+    });
+  }
+
+  // Close dialog when clicking outside
+  infoDialog?.addEventListener('click', (e) => {
+    if (e.target === infoDialog) {
+      infoDialog.style.display = 'none';
+    }
+  });
+}
+
+function setupRefreshButton() {
+  const refreshBtn = document.getElementById("refreshBtn");
+
+  if (refreshBtn) {
+    refreshBtn.addEventListener("click", async () => {
+      refreshBtn.classList.add("refreshing");
+      router.showLoading();
+      try {
+        // Clear cache before refreshing
+        refreshAll();
+        
+        // Reset totalValue immediately
+        window.totalValue = 0;
+        
+        // Reload year list (in case new CSV files were added)
+        await setupYearSelector();
+        
+        // Reload current dashboard data
+        await loadAndUpdateDashboard();
+        showSuccessToaster("Dados atualizados com sucesso!");
+        } catch (error) {
+        console.error('❌ Erro durante refresh:', error);
+        showErrorToaster("Erro ao atualizar dados: " + (error.message || "Erro desconhecido"));
+      } finally {
+        setTimeout(() => refreshBtn.classList.remove("refreshing"), 700);
+        router.hideLoading();
+      }
+    });
+  }
+}
+
+async function setupYearSelector() {
   let years;
   try {
-    years = await getYearList();
+    years = getYearsList();
   } catch (err) {
-    resetDashboard(tableBody, quarterTotals, nifCounts, config);
+    resetDashboard(tableBody, quarterTotals, nifCounts);
     console.error("❌ Não foi possível carregar a lista de anos.", err);
     showErrorToaster("Erro ao carregar lista de anos: " + (err.message || "Erro desconhecido"));
     
@@ -48,7 +137,7 @@ export async function setupYearSelector(nifsMap) {
     yearSelect.appendChild(placeholderOption);
     
     // Reset dashboard since no years are available
-    resetDashboard(tableBody, quarterTotals, nifCounts, config);
+    resetDashboard(tableBody, quarterTotals, nifCounts);
     return;
   }
   
@@ -64,35 +153,33 @@ export async function setupYearSelector(nifsMap) {
   // Only add event listener if we have valid years
   yearSelect.addEventListener("change", () => {
     currentYear = yearSelect.value;
-    loadAndUpdateDashboard(globalNifsMap);
+    loadAndUpdateDashboard();
   });
 }
 
-export async function loadAndUpdateDashboard(nifsMap) {
-  showLoading();
+async function loadAndUpdateDashboard() {
+  router.showLoading();
   try {
     window.totalValue = 0;
-    const rows = await loadInvoiceDataFromCSV(currentYear, nifsMap);
-    updateUI(rows, tableBody, quarterTotals, nifCounts, config);
+    const rows = await getInvoiceData(currentYear);
+    updateUI(rows, tableBody, quarterTotals, nifCounts);
   } catch (err) {
-    // Clear globalNifsMap on error to trigger N/A display
-    globalNifsMap = {};
-    resetDashboard(tableBody, quarterTotals, nifCounts, config);
-    console.error("❌ Erro ao carregar CSV para o ano selecionado:", err);
-    showErrorToaster(`Erro ao carregar dados para ${currentYear}: ${err.message || "Erro desconhecido"}`);
+    resetDashboard(tableBody, quarterTotals, nifCounts);
+    console.error(`❌ Erro ao carregar dados de faturas para o ano selecionado: ${currentYear}`, err);
+    showErrorToaster(`Erro ao carregar dados de faturas para o ano seleccionado ${currentYear}: ${err.message || "Erro desconhecido"}`);
   }finally {
-    hideLoading();
+    router.hideLoading();
   }
 }
 
 // Resets all dashboard panels and table
-function resetDashboard(tableBody, quarterTotals, nifCounts, config) {
+function resetDashboard(tableBody, quarterTotals, nifCounts) {
   tableBody.innerHTML = "";
   quarterTotals.fill(0);
   Object.keys(nifCounts).forEach(k => delete nifCounts[k]);
   window.totalValue = 0;
   updateQuarterSummaryPanel(quarterTotals);
-  updateFiscalStatusPanel(config);
+  updateFiscalStatusPanel();
   updateInvoicesByNifPanel([], nifCounts);
   document.getElementById("totalYearValue").textContent = formatCurrency(0);
   addEmptyStateRow(tableBody, 6);
@@ -100,7 +187,7 @@ function resetDashboard(tableBody, quarterTotals, nifCounts, config) {
 }
 
 // Updates the main UI with new rows
-function updateUI(rows, tableBody, quarterTotals, nifCounts, config) {
+function updateUI(rows, tableBody, quarterTotals, nifCounts) {
   tableBody.innerHTML = "";
   quarterTotals.fill(0);
   Object.keys(nifCounts).forEach(k => delete nifCounts[k]);
@@ -108,7 +195,7 @@ function updateUI(rows, tableBody, quarterTotals, nifCounts, config) {
 
   updateInvoicesTable(rows, tableBody, quarterTotals, nifCounts);
   updateQuarterSummaryPanel(quarterTotals, rows);
-  updateFiscalStatusPanel(config);
+  updateFiscalStatusPanel();
   updateInvoicesByNifPanel(rows, nifCounts);
   updatePieChart(rows); // Add this line
 }
@@ -130,7 +217,8 @@ function updateInvoicesTable(rows, tableBody, quarterTotals, nifCounts) {
     nifCounts[row.NIF] = (nifCounts[row.NIF] || 0) + 1;
     
     // Get entity name from NIF map, fallback to NIF if no match
-    const entityName = globalNifsMap[row.NIF] || row.NIF;
+    let nifsMap = getNifsMap();
+    const entityName = nifsMap[row.NIF] || row.NIF;
 
     const tr = document.createElement("tr");
     tr.classList.add(`quarter-${quarter}`);
@@ -145,31 +233,6 @@ function updateInvoicesTable(rows, tableBody, quarterTotals, nifCounts) {
   
   tableBody.appendChild(fragment); // Single DOM operation
 }
-
-refreshBtn.addEventListener("click", async () => {
-  refreshBtn.classList.add("refreshing");
-  showLoading();
-  try {
-    // Clear cache before refreshing
-    clearRefreshableCache();
-    
-    // Reset totalValue immediately
-    window.totalValue = 0;
-    
-    // Reload year list (in case new CSV files were added)
-    await setupYearSelector(globalNifsMap);
-    
-    // Reload current dashboard data
-    await loadAndUpdateDashboard(globalNifsMap);
-    showSuccessToaster("Dados atualizados com sucesso!");
-    } catch (error) {
-    console.error('❌ Erro durante refresh:', error);
-    showErrorToaster("Erro ao atualizar dados: " + (error.message || "Erro desconhecido"));
-  } finally {
-    setTimeout(() => refreshBtn.classList.remove("refreshing"), 700);
-    hideLoading();
-  }
-});
 
 // Updates the quarter summary panel with tooltips
 function updateQuarterSummaryPanel(quarterTotals, rows = []) {
@@ -225,10 +288,11 @@ function updateQuarterSummaryPanel(quarterTotals, rows = []) {
 }
 
 // Updates the fiscal status panel
-function updateFiscalStatusPanel(config) {
+function updateFiscalStatusPanel() {
   const taxPanel = document.getElementById("taxPanel");
   taxPanel.querySelectorAll(".fiscal-item").forEach(el => el.remove());
-
+  const config = getConfig();
+  
   const thresholds = [
     { label: "Pagamento IVA", threshold: config.ivaThreshold },
     { label: "Retenção na Fonte", threshold: config.retencaoFonteThreshold },
@@ -248,9 +312,10 @@ function updateFiscalStatusPanel(config) {
     
     // Check if we have valid data and threshold
     // Also check if we have a valid nifsMap (which indicates successful data loading)
+    let nifsMap = getNifsMap();
     if (window.totalValue !== undefined && window.totalValue !== null && 
         threshold !== undefined && threshold !== null && !isNaN(threshold) &&
-        globalNifsMap && Object.keys(globalNifsMap).length > 0) {
+        nifsMap && Object.keys(nifsMap).length > 0) {
       iconSpan.textContent = Number(window.totalValue) > Number(threshold) ? "✅" : "❌";
     } else {
       iconSpan.textContent = "N/A";
@@ -273,9 +338,10 @@ function updateInvoicesByNifPanel(rows, nifCounts) {
   if (sortedNifs.length === 0) {
     nifList = '<li style="text-align: center; color: #888; font-style: italic; padding: 1em;">No data available</li>';
   } else {
+    let nifsMap = getNifsMap();
     nifList = sortedNifs
       .map(([nif, count]) => {
-        const entityName = globalNifsMap[nif] || 'Entidade não encontrada';
+        const entityName = nifsMap[nif] || 'Entidade não encontrada';
         return `
           <li class="nif-item">
             <span class="nif-label quarter-tooltip">
@@ -575,8 +641,8 @@ function updatePieChart(rows) {
   
   rows.forEach(row => {
     if (!validateRow(row)) return;
-    
-    const entity = row.ENTIDADE || globalNifsMap[row.NIF] || `NIF ${row.NIF}`;
+    let nifsMap = getNifsMap();
+    const entity = row.ENTIDADE || nifsMap[row.NIF] || `NIF ${row.NIF}`;
     const value = parseFloat(row.VALOR);
     
     if (!entityTotals[entity]) {

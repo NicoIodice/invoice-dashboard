@@ -6,12 +6,12 @@
   <title>Dashboard de Faturas</title>
   <link rel="icon" type="image/x-icon" href="./assets/favicon.png">
   <link rel="apple-touch-icon" href="./assets/favicon-app.png">
+
+  <!-- Common CSS -->
   <link rel="stylesheet" href="./css/common.css" />
   <link rel="stylesheet" href="./css/toaster.css" />
-  <link rel="stylesheet" href="./css/pages/invoice-dashboard.css" />
-  <link rel="stylesheet" href="./css/pages/classes-info.css" />
-  <link rel="stylesheet" href="./css/pages/salary-simulation-calendar.css" />
-  <link rel="stylesheet" href="./css/pages/entities.css" />
+
+  <!-- Mobile CSS -->
   <link rel="stylesheet" href="./css/mobile/mobile_480.css" />
   <link rel="stylesheet" href="./css/mobile/mobile_768.css" />
   <link rel="stylesheet" href="./css/mobile/mobile_768_landscape.css" />
@@ -19,156 +19,14 @@
 </head>
 <body>
 
-  <!-- Sidebar Menu (hidden by default) -->
-  <div id="sidebar">
-    <div>
-      <div class="sidebar-menu" id="menuInvoiceDashboard">
-        <span class="sidebar-icon">📊</span>
-        <span class="sidebar-label">Dashboard</span>
-      </div>
-      <div class="sidebar-menu" id="menuClassesInfo">
-        <span class="sidebar-icon">🏷️</span>
-        <span class="sidebar-label">Valores por Aula</span>
-      </div>
-      <div class="sidebar-menu" id="menuSalarySimulation">
-        <span class="sidebar-icon">🗓️</span>
-        <span class="sidebar-label">Simulação Vencimento</span>
-      </div>
-      <div class="sidebar-menu" id="menuEntities">
-        <span class="sidebar-icon">🏢</span>
-        <span class="sidebar-label">Lista de Entidades</span>
-      </div>
-    </div>
-    <button id="sidebarToggle" title="Expandir/Recolher Menu" style="margin: 16px 0 18px 8px; background: none; border: none; cursor: pointer; font-size: 1.3em;">
-      <span id="sidebarToggleIcon">⬅️</span>
-    </button>
-  </div>
+  <!-- Sidebar Component -->
+  <div id="sidebar"></div>
 
-  <!-- Main invoice dashboard -->
-  <header>
-    <h1 id="pageTitle">📊 Faturas-Recibo Emitidas
-      <span id="infoIcon" title="Informação" style="cursor:pointer; margin-left:0.3em; font-size:0.8em;">ℹ️</span>
-    </h1>
-    <div id="year-toggle-id" class="year-toggle">
-      <label for="yearSelect">Ano:</label>
-      <select id="yearSelect" class="year-select"></select>
-      <span id="refreshBtn" title="Atualizar Dados" tabindex="0" role="button"></span>
-    </div>
-  </header>
+  <!-- Dynamic Header -->
+  <header id="pageHeader"></header>
 
-  <main>
-    <section class="left">
-      <table id="invoiceTable">
-        <thead>
-          <tr>
-            <!--<th>NIF</th>-->
-            <th>ENTIDADE</th>
-            <th>VALOR</th>
-            <th>DATA EMISSÃO</th>
-            <th>DATA SERVIÇO</th>
-            <!--<th>Trimestre</th>-->
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
-
-    <section class="right">
-      <div class="panel" id="quarterPanel">
-        <h3>Resumo Trimestral</h3>
-        <div id="quarterSummary"></div>
-        <p><strong>Total Anual:</strong> <span id="totalYearValue" class="total-value">0.00 €</span></p>
-      </div>
-
-      <div class="panel" id="taxPanel">
-        <h3>Estado Fiscal</h3>
-        <div class="fiscal-item">
-        <span class="fiscal-label">Pagamento IVA</span>
-        <span class="fiscal-icon" style="color: #888;">N/A</span>
-        </div>
-        <div class="fiscal-item">
-        <span class="fiscal-label">Retenção na Fonte</span>
-        <span class="fiscal-icon" style="color: #888;">N/A</span>
-        </div>
-        <div class="fiscal-item">
-        <span class="fiscal-label">Pagamento IRS</span>
-        <span class="fiscal-icon" style="color: #888;">N/A</span>
-        </div>
-      </div>
-
-      <div class="panel" id="nifStatsPanel">
-        <h3>Faturas por NIF</h3>
-        <ul id="nifStats"></ul>
-        <p><strong>Total de Faturas:</strong> <span id="totalInvoices" class="total-value">0</span></p>
-      </div>
-
-      <div class="panel" id="pieChartPanel">
-        <h3>Distribuição por Entidade</h3>
-        <div id="pieChartContainer">
-          <canvas id="pieChart" width="280" height="280"></canvas>
-          <div id="pieChartTooltip" class="pie-tooltip"></div>
-        </div>
-        <div id="pieChartLegend" class="pie-legend"></div>
-      </div>
-    </section>
-  </main>
-
-  <!-- Classes Table Panel (hidden by default) -->
-  <div id="classesInfoPanel" style="display:none;">
-    <div class="year-toggle">
-      <label for="classesYearSelect">Ano:</label>
-      <select id="classesYearSelect" class="year-select"></select>
-    </div>
-    
-    <table id="classesInfoTable">
-      <thead>
-      <tr>
-        <th id="sortClassNif" style="cursor:pointer;">NIF ▲▼</th>
-        <th id="sortClassEntidade" style="cursor:pointer;">ENTIDADE ▲▼</th>
-        <th id="sortClassCount" style="cursor:pointer;">Nº Aulas/Semana ▲▼</th>
-        <th id="sortClassValue" style="cursor:pointer;">Valor/Aula ▲▼</th>
-        <th id="sortClassVariation" style="cursor:pointer;">Variação ▲▼</th>
-      </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
-  <!-- Salary Simulation Calendar Panel (hidden by default) -->
-  <div id="salarySimulationPanel" style="display:none;">
-    <div id="salaryCalendar"></div>
-  </div>
-
-  <!-- Entities Table Panel (hidden by default) -->
-  <div id="entitiesPanel" style="display:none;">
-    <table id="entitiesTable">
-      <thead>
-        <tr>
-          <th id="sortNif" style="cursor:pointer;">NIF ▲▼</th>
-          <th id="sortEntidade" style="cursor:pointer;">ENTIDADE ▲▼</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
-  <!-- Info Dialog -->
-  <div id="infoDialog" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.35); z-index:99999; align-items:center; justify-content:center;">
-    <div style="background:#fff; padding:2em; border-radius:10px; max-width:90vw; max-height:80vh; overflow:auto; box-shadow:0 4px 24px rgba(0,0,0,0.18); position:relative;">
-      <button id="closeInfoDialog" style="position:absolute; top:0.5em; right:0.5em; background:none; border:none; font-size:1.3em; cursor:pointer;">✖️</button>
-      <h2>Sobre o Dashboard</h2>
-      <p>
-        IVA (https://www.vendus.pt/blog/isencao-iva-artigo-9-53/)	<br>
-        NIF começados por 5 são empresas > Isento IVA Art.º53	<br>
-        NIFS começados por 1, 2 OU 3 são singulares > Isento IVA Art.º 9 <br>
-        IVA - Regime de Isenção <br>
-        <br><br>	
-        IRS (Retençao na fonte)	<br>
-        NIF começados por 5 são empresas > Dispensa de retenção - art. 101.º-B,n.º1,al. a) e b), do CIRS <br>	
-        NIFS começados por 1, 2 OU 3 são singulares > Sem retenção - Art.101º, n.º1 do CIRS	
-      </p>
-    </div>
-  </div>
+  <!-- Main Content Area -->
+  <main id="mainContent"></main>
 
   <!-- Loading Mask -->
   <div id="loadingOverlay" style="display:none;">
@@ -176,7 +34,7 @@
     <div class="loading-text">A carregar dados...</div>
   </div>
 
-  <script src="config/secrets.js"></script>
+  <script src="./config/secrets.js"></script>
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>

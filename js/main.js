@@ -1,18 +1,64 @@
-import { loadConfig } from './config.js';
-import { showLoading, hideLoading } from './utils.js';
-import { loadNifsMap, loadClassValues } from './data.js';
-import { showErrorToaster, showSuccessToaster, showInfoToaster } from './toaster.js';
-import { infoDialogListeners } from './modals/info-dialog.js';
-import { setupYearSelector, loadAndUpdateDashboard } from './pages/invoice-dashboard.js';
-import { renderClassesInfoTable, classesInfoListeners } from './pages/classes-info.js';
-import { renderSalaryCalendar } from './pages/salary-simulation-calendar.js';
-import { renderEntitiesTable, entitiesListListeners } from './pages/entities.js';
+import { 
+  showErrorToaster, 
+  showSuccessToaster, 
+  showInfoToaster } from './toaster.js';
 import { setupMobileTooltips } from './mobile-actions.js';
+import dataStorage  from './dataStorage.js';
+import router from './router.js';
 
-// Make toaster functions globally available
-window.showErrorToaster = showErrorToaster;
-window.showSuccessToaster = showSuccessToaster;
-window.showInfoToaster = showInfoToaster;
+// Import page modules
+import * as invoiceDashboardModule from './pages/invoice-dashboard.js';
+import * as classesInfoModule from './pages/classes-info.js';
+import * as salarySimulationCalendarModule from './pages/salary-simulation-calendar.js';
+import * as entitiesModule from './pages/entities.js';
+
+// Register routes
+router.register('invoice-dashboard', invoiceDashboardModule);
+router.register('classes-info', classesInfoModule);
+router.register('salary-simulation-calendar', salarySimulationCalendarModule);
+router.register('entities', entitiesModule);
+
+// Initialize application
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    console.log('🚀 Starting application initialization...');
+    router.showLoading();
+
+    // This will load all the configuration and application data
+    console.log('📥 Initializing data storage...');
+    await dataStorage.init();
+
+    // Load common components
+    setupMobileTooltips();
+
+    // Get initial page from URL hash
+    const initialPage = router.getCurrentPageFromHash();
+    
+    // Navigate to initial page
+    console.log(`🧭 Navigating to initial page: ${initialPage}`);
+    await router.navigateTo(initialPage, false);
+    
+    // Make toaster functions globally available
+    window.showErrorToaster = showErrorToaster;
+    window.showSuccessToaster = showSuccessToaster;
+    window.showInfoToaster = showInfoToaster;
+
+    console.log('✅ Application initialized successfully');
+    
+  } catch (error) {
+    console.error('❌ Error initializing application:', error);
+    showErrorToaster('Erro ao inicializar aplicação');
+  } finally {
+    // Hide loading indicator
+    router.hideLoading();
+    
+    // Initialize the current page module
+    /*const currentPage = router.getCurrentPageFromHash();
+    if (currentPage && router.getModule(currentPage)) {
+      await router.getModule(currentPage).init(nifsMap, classValues);
+    }*/
+  }
+});
 
 const sidebarToggle = document.getElementById('sidebarToggle');
 const sidebarToggleIcon = document.getElementById('sidebarToggleIcon');
@@ -31,26 +77,23 @@ const classesInfoPanel = document.getElementById('classesInfoPanel');
 const salarySimulationPanel = document.getElementById('salarySimulationPanel');
 const entitiesPanel = document.getElementById('entitiesPanel');
 
-let nifsMap = {};
-let classValues = [];
-
 // Toggle sidebar manually
-sidebarToggle.addEventListener('click', () => {
+/*sidebarToggle.addEventListener('click', () => {
   document.body.classList.toggle('sidebar-collapsed');
   updateSidebarIcon();
-});
+});*/
 
 // Function to update the icon based on sidebar state
-function updateSidebarIcon() {
+/*function updateSidebarIcon() {
   if (document.body.classList.contains('sidebar-collapsed')) {
     sidebarToggleIcon.textContent = '➡️';
   } else {
     sidebarToggleIcon.textContent = '⬅️';
   }
-}
+}*/
 
 // Listen for clicks outside the sidebar when it's expanded
-document.addEventListener('click', (e) => {
+/*document.addEventListener('click', (e) => {
   // Only handle this when sidebar is NOT manually collapsed
   if (!document.body.classList.contains('sidebar-collapsed')) {
     // Check if click is outside the sidebar
@@ -62,27 +105,27 @@ document.addEventListener('click', (e) => {
       }, 50);
     }
   }
-});
+});*/
 
 // Listen for mouse enter/leave on sidebar to update icon
-sidebar.addEventListener('mouseenter', () => {
+/*sidebar.addEventListener('mouseenter', () => {
   // Only update icon if sidebar is not manually collapsed
   if (!document.body.classList.contains('sidebar-collapsed')) {
     sidebarToggleIcon.textContent = '⬅️';
   }
-});
+});*/
 
-sidebar.addEventListener('mouseleave', () => {
+/*sidebar.addEventListener('mouseleave', () => {
   // Only update icon if sidebar is not manually collapsed
   if (!document.body.classList.contains('sidebar-collapsed')) {
     sidebarToggleIcon.textContent = '➡️';
   }
-});
+});*/
 
 // Initialize icon state
-updateSidebarIcon();
+/*updateSidebarIcon();*/
 
-menuInvoiceDashboard.addEventListener('click', async () => {
+/*menuInvoiceDashboard.addEventListener('click', async () => {
   showLoading();
   try {
     hideAllPanels();
@@ -98,9 +141,9 @@ menuInvoiceDashboard.addEventListener('click', async () => {
   } finally {
     hideLoading();
   }
-});
+});*/
 
-menuClassesInfo.addEventListener('click', async () => {
+/*menuClassesInfo.addEventListener('click', async () => {
   showLoading();
   try {
     hideAllPanels();
@@ -116,9 +159,9 @@ menuClassesInfo.addEventListener('click', async () => {
   } finally {
     hideLoading();
   }
-});
+});*/
 
-menuSalarySimulation.addEventListener('click', async () => {
+/*menuSalarySimulation.addEventListener('click', async () => {
   showLoading();
   try {
     hideAllPanels();
@@ -136,9 +179,9 @@ menuSalarySimulation.addEventListener('click', async () => {
   } finally {
     hideLoading();
   }
-});
+});*/
 
-menuEntities.addEventListener('click', async () => {
+/*menuEntities.addEventListener('click', async () => {
   showLoading();
   try {
     hideAllPanels();
@@ -154,49 +197,11 @@ menuEntities.addEventListener('click', async () => {
   } finally {
     hideLoading();
   }
-});
+});*/
 
-function hideAllPanels() {
+/*function hideAllPanels() {
   invoiceDashboardPanel.style.display = 'none';
   classesInfoPanel.style.display = 'none';
   salarySimulationPanel.style.display = 'none';
   entitiesPanel.style.display = 'none';
-}
-
-(async function init() {
-  showLoading();
-
-  try {
-    // Load config first
-    await loadConfig();
-    
-    // Show basic UI immediately
-    menuInvoiceDashboard.classList.add('active');
-    infoDialogListeners();
-    setupMobileTooltips();
-
-    // Load data progressively
-    const dataPromises = [
-      loadNifsMap(),
-      loadClassValues()
-    ];
-
-    // Update UI as data becomes available
-    const [nifsMapResult, classValuesResult] = await Promise.all(dataPromises);
-    nifsMap = nifsMapResult;
-    classValues = classValuesResult;
-
-    // Setup dashboard
-    await setupYearSelector(nifsMap);
-    await loadAndUpdateDashboard(nifsMap);
-
-    // Setup remaining listeners
-    classesInfoListeners(nifsMap, classValues);
-    entitiesListListeners(nifsMap);
-
-  } catch (error) {
-    console.error('❌ Erro durante inicialização:', error);
-  } finally {
-    hideLoading();
-  }
-})();
+}*/
