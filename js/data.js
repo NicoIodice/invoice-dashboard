@@ -1,6 +1,6 @@
-import { config } from '/js/config.js';
-import { dropboxListFolder, dropboxDownload, dropboxDownloadJSON } from '/js/dropbox.js';
-import { showErrorToaster } from '/js/toaster.js';
+import { config } from 'js/config.js';
+import { dropboxListFolder, dropboxDownload, dropboxDownloadJSON } from 'js/dropbox.js';
+import { showErrorToaster } from 'js/toaster.js';
 
 // Simple in-memory cache
 const cache = new Map();

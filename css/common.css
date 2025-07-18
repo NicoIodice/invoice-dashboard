@@ -1,7 +1,7 @@
 @font-face {
     font-family: "Nunito";
-    src: url('css/fonts/Nunito-Regular.woff2') format('woff2'),
-         url('css/fonts/Nunito-Regular.woff') format('woff');
+    src: url('fonts/Nunito-Regular.woff2') format('woff2'),
+         url('fonts/Nunito-Regular.woff') format('woff');
     font-weight: 400;
     font-style: normal;
     font-display: swap; /* Improves loading performance */
@@ -9,7 +9,7 @@
 
 @font-face {
     font-family: "Nunito";
-    src: url("css/fonts/Nunito-ExtraBold.woff") format('woff');
+    src: url("fonts/Nunito-ExtraBold.woff") format('woff');
     font-weight: 800;
     font-style: normal;
     font-display: swap; /* Improves loading performance */
@@ -17,7 +17,7 @@
 
 @font-face {
     font-family: "RobertENEL";
-    src: url("css/fonts/RoobertENEL-Light.woff2") format('woff2');
+    src: url("fonts/RoobertENEL-Light.woff2") format('woff2');
     font-weight: 800;
     font-style: normal;
     font-display: swap; /* Improves loading performance */
@@ -25,7 +25,7 @@
 
 @font-face {
     font-family: "RobertENEL";
-    src: url("css/fonts/RoobertENEL-Bold.woff2") format('woff2');
+    src: url("fonts/RoobertENEL-Bold.woff2") format('woff2');
     font-weight: 800;
     font-style: normal;
     font-display: swap; /* Improves loading performance */

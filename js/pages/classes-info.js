@@ -1,4 +1,4 @@
-import { addEmptyStateRow } from '/js/utils.js';
+import { addEmptyStateRow } from 'js/utils.js';
 
 let classSortKey = 'entidade';
 let classSortAsc = true;
