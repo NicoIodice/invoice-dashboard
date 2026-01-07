@@ -71,16 +71,47 @@ export async function setupYearSelector(nifsMap) {
 export async function loadAndUpdateDashboard(nifsMap) {
   showLoading();
   try {
+    console.log(`[Invoice Dashboard] Loading data for year: ${currentYear}`);
     window.totalValue = 0;
     const rows = await loadInvoiceDataFromCSV(currentYear, nifsMap);
     updateUI(rows, tableBody, quarterTotals, nifCounts, config);
   } catch (err) {
+    // Try to load previous year if available
+    let years = [];
+    try {
+      years = await getYearList();
+    } catch (e) {
+      // ignore, handled below
+    }
+    let fallbackYear = null;
+    const currentIdx = years.indexOf(String(currentYear));
+    if (currentIdx !== -1 && currentIdx < years.length - 1) {
+      fallbackYear = years[currentIdx + 1]; // previous year in time
+    } else if (years.length > 0) {
+      fallbackYear = years[0]; // most recent available year
+    }
+    if (fallbackYear && fallbackYear !== String(currentYear)) {
+      try {
+        console.warn(`[Invoice Dashboard] Fallback: failed to load year ${currentYear}, trying fallback year: ${fallbackYear}`);
+        window.totalValue = 0;
+        const rows = await loadInvoiceDataFromCSV(fallbackYear, nifsMap);
+        console.log(`[Invoice Dashboard] Loaded data for fallback year: ${fallbackYear}`);
+        updateUI(rows, tableBody, quarterTotals, nifCounts, config);
+        showErrorToaster(`Erro ao carregar dados para ${currentYear}: ${err.message || "Erro desconhecido"}. Mostrando dados de ${fallbackYear}.`);
+        currentYear = fallbackYear;
+        // Update yearSelect dropdown to reflect fallback
+        if (yearSelect) yearSelect.value = fallbackYear;
+        return;
+      } catch (err2) {
+        // Fallback also failed, show original error
+      }
+    }
     // Clear globalNifsMap on error to trigger N/A display
     globalNifsMap = {};
     resetDashboard(tableBody, quarterTotals, nifCounts, config);
     console.error("❌ Erro ao carregar CSV para o ano selecionado:", err);
     showErrorToaster(`Erro ao carregar dados para ${currentYear}: ${err.message || "Erro desconhecido"}`);
-  }finally {
+  } finally {
     hideLoading();
   }
 }
